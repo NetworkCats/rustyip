@@ -39,3 +39,163 @@ impl Config {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::Mutex;
+
+    // Environment variable tests must run serially because they mutate global state.
+    // We recover from poisoned mutexes since panics in should_panic tests are expected.
+    static ENV_LOCK: Mutex<()> = Mutex::new(());
+
+    fn lock_env() -> std::sync::MutexGuard<'static, ()> {
+        ENV_LOCK
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
+
+    const CONFIG_VARS: &[&str] = &[
+        "LISTEN_ADDR",
+        "DB_PATH",
+        "DB_UPDATE_URL",
+        "DB_UPDATE_INTERVAL_HOURS",
+        "SITE_DOMAIN",
+    ];
+
+    // SAFETY: These env var helpers are only called while holding ENV_LOCK,
+    // ensuring no concurrent mutation of the process environment.
+    unsafe fn clear_config_vars() {
+        for var in CONFIG_VARS {
+            unsafe { env::remove_var(var) };
+        }
+    }
+
+    unsafe fn set_var(key: &str, value: &str) {
+        unsafe { env::set_var(key, value) };
+    }
+
+    unsafe fn remove_var(key: &str) {
+        unsafe { env::remove_var(key) };
+    }
+
+    #[test]
+    fn defaults_when_no_env_vars() {
+        let _guard = lock_env();
+        // SAFETY: ENV_LOCK is held, serializing access to env vars.
+        unsafe { clear_config_vars() };
+
+        let config = Config::from_env();
+        assert_eq!(config.listen_addr.to_string(), "0.0.0.0:3000");
+        assert_eq!(config.db_path, "data/Merged-IP.mmdb");
+        assert!(config.db_update_url.contains("Merged-IP.mmdb"));
+        assert_eq!(config.db_update_interval_hours, 24);
+        assert_eq!(config.site_domain, "localhost");
+    }
+
+    #[test]
+    fn custom_listen_addr() {
+        let _guard = lock_env();
+        // SAFETY: ENV_LOCK is held.
+        unsafe {
+            clear_config_vars();
+            set_var("LISTEN_ADDR", "127.0.0.1:8080");
+        }
+
+        let config = Config::from_env();
+        assert_eq!(config.listen_addr.to_string(), "127.0.0.1:8080");
+
+        // SAFETY: ENV_LOCK is held.
+        unsafe { remove_var("LISTEN_ADDR") };
+    }
+
+    #[test]
+    fn custom_db_path() {
+        let _guard = lock_env();
+        // SAFETY: ENV_LOCK is held.
+        unsafe {
+            clear_config_vars();
+            set_var("DB_PATH", "/tmp/test.mmdb");
+        }
+
+        let config = Config::from_env();
+        assert_eq!(config.db_path, "/tmp/test.mmdb");
+
+        // SAFETY: ENV_LOCK is held.
+        unsafe { remove_var("DB_PATH") };
+    }
+
+    #[test]
+    fn custom_update_url() {
+        let _guard = lock_env();
+        // SAFETY: ENV_LOCK is held.
+        unsafe {
+            clear_config_vars();
+            set_var("DB_UPDATE_URL", "https://example.com/db.mmdb");
+        }
+
+        let config = Config::from_env();
+        assert_eq!(config.db_update_url, "https://example.com/db.mmdb");
+
+        // SAFETY: ENV_LOCK is held.
+        unsafe { remove_var("DB_UPDATE_URL") };
+    }
+
+    #[test]
+    fn custom_update_interval() {
+        let _guard = lock_env();
+        // SAFETY: ENV_LOCK is held.
+        unsafe {
+            clear_config_vars();
+            set_var("DB_UPDATE_INTERVAL_HOURS", "12");
+        }
+
+        let config = Config::from_env();
+        assert_eq!(config.db_update_interval_hours, 12);
+
+        // SAFETY: ENV_LOCK is held.
+        unsafe { remove_var("DB_UPDATE_INTERVAL_HOURS") };
+    }
+
+    #[test]
+    fn custom_site_domain() {
+        let _guard = lock_env();
+        // SAFETY: ENV_LOCK is held.
+        unsafe {
+            clear_config_vars();
+            set_var("SITE_DOMAIN", "ip.example.com");
+        }
+
+        let config = Config::from_env();
+        assert_eq!(config.site_domain, "ip.example.com");
+
+        // SAFETY: ENV_LOCK is held.
+        unsafe { remove_var("SITE_DOMAIN") };
+    }
+
+    #[test]
+    #[should_panic(expected = "LISTEN_ADDR must be a valid socket address")]
+    fn invalid_listen_addr_panics() {
+        let _guard = lock_env();
+        // SAFETY: ENV_LOCK is held.
+        unsafe {
+            clear_config_vars();
+            set_var("LISTEN_ADDR", "not-a-socket-addr");
+        }
+
+        let _config = Config::from_env();
+    }
+
+    #[test]
+    #[should_panic(expected = "DB_UPDATE_INTERVAL_HOURS must be a valid integer")]
+    fn invalid_update_interval_panics() {
+        let _guard = lock_env();
+        // SAFETY: ENV_LOCK is held.
+        unsafe {
+            clear_config_vars();
+            set_var("DB_UPDATE_INTERVAL_HOURS", "not-a-number");
+        }
+
+        let _config = Config::from_env();
+    }
+}

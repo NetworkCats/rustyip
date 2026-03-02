@@ -280,3 +280,152 @@ async fn ipv6_via_cf_header() {
     assert_eq!(status, StatusCode::OK);
     assert_eq!(body.trim(), "2606:4700:4700::1111");
 }
+
+// --- Edge case tests ---
+
+#[tokio::test]
+async fn empty_ip_query_falls_back_to_cf_header() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/json?ip=",
+        vec![("CF-Connecting-IP", "8.8.8.8")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    let json: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(json["ip"], "8.8.8.8");
+}
+
+#[tokio::test]
+async fn whitespace_ip_query_falls_back_to_cf_header() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/json?ip=%20",
+        vec![("CF-Connecting-IP", "8.8.8.8")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    let json: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(json["ip"], "8.8.8.8");
+}
+
+#[tokio::test]
+async fn ip_not_in_database_returns_500() {
+    let app = build_test_app();
+    // 0.0.0.0 is unlikely to be in a geo database
+    let (status, _) = get(&app, "/json?ip=0.0.0.0").await;
+    assert_eq!(status, StatusCode::INTERNAL_SERVER_ERROR);
+}
+
+#[tokio::test]
+async fn cli_with_query_param_returns_html() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/?ip=45.77.77.77",
+        vec![
+            ("User-Agent", "curl/8.7.1"),
+            ("CF-Connecting-IP", "1.2.3.4"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    // When CLI sends ?ip=, the shortcut is bypassed and HTML is returned
+    assert!(body.contains("<!DOCTYPE html>"));
+    assert!(body.contains("45.77.77.77"));
+}
+
+#[tokio::test]
+async fn accept_json_with_query_param_returns_html() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/?ip=45.77.77.77",
+        vec![
+            ("Accept", "application/json"),
+            ("CF-Connecting-IP", "8.8.8.8"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    // When Accept: application/json is sent with ?ip=, the JSON shortcut is bypassed
+    assert!(body.contains("<!DOCTYPE html>"));
+    assert!(body.contains("45.77.77.77"));
+}
+
+#[tokio::test]
+async fn ip_endpoint_via_cf_header() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/ip",
+        vec![("CF-Connecting-IP", "1.1.1.1")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "1.1.1.1");
+}
+
+#[tokio::test]
+async fn asn_endpoint_via_cf_header() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/asn",
+        vec![("CF-Connecting-IP", "1.1.1.1")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "AS13335");
+}
+
+#[tokio::test]
+async fn org_endpoint_via_cf_header() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/org",
+        vec![("CF-Connecting-IP", "1.1.1.1")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "Cloudflare, Inc.");
+}
+
+#[tokio::test]
+async fn country_endpoint_via_cf_header() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/country",
+        vec![("CF-Connecting-IP", "45.77.77.77")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "United States");
+}
+
+#[tokio::test]
+async fn invalid_ip_on_field_endpoints_returns_400() {
+    let app = build_test_app();
+
+    let endpoints = ["/ip", "/asn", "/org", "/country", "/city", "/proxy", "/vpn", "/hosting", "/tor"];
+    for endpoint in endpoints {
+        let uri = format!("{endpoint}?ip=invalid");
+        let (status, _) = get(&app, &uri).await;
+        assert_eq!(status, StatusCode::BAD_REQUEST, "expected 400 for {endpoint}?ip=invalid");
+    }
+}
+
+#[tokio::test]
+async fn field_endpoints_without_ip_or_header_return_400() {
+    let app = build_test_app();
+
+    let endpoints = ["/ip", "/asn", "/org", "/country", "/city", "/proxy", "/vpn", "/hosting", "/tor", "/json"];
+    for endpoint in endpoints {
+        let (status, _) = get(&app, endpoint).await;
+        assert_eq!(status, StatusCode::BAD_REQUEST, "expected 400 for {endpoint} without IP");
+    }
+}

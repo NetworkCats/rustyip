@@ -64,4 +64,16 @@ mod tests {
     fn rejects_empty() {
         assert!(!is_cli_user_agent(""));
     }
+
+    #[test]
+    fn matching_is_case_sensitive() {
+        // Real CLI tools send consistent casing; we intentionally do not
+        // match case-insensitively to avoid false positives.
+        assert!(!is_cli_user_agent("CURL/8.7.1"));
+        assert!(!is_cli_user_agent("Curl/8.7.1"));
+        assert!(!is_cli_user_agent("WGET/1.21.4"));
+        assert!(!is_cli_user_agent("httpie/3.2.2"));
+        assert!(!is_cli_user_agent("XH/0.22.0"));
+        assert!(!is_cli_user_agent("powershell/7.4.1"));
+    }
 }
