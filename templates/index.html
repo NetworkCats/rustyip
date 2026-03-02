@@ -12,10 +12,12 @@
 </head>
 <body>
   <main>
-    <form method="GET" action="/" class="search-form">
+    <form method="GET" action="/" class="search-form" role="search">
       <div class="search-input-wrap">
-        <i class="icon-magnifier search-icon"></i>
+        <label for="ip-search" class="sr-only">Search IP address</label>
+        <i class="icon-magnifier search-icon" aria-hidden="true"></i>
         <input
+          id="ip-search"
           type="text"
           name="ip"
           placeholder="Type to search IP data"
@@ -28,7 +30,7 @@
 
     <h1 class="ip-display">{{ ip }}</h1>
 
-    <table class="info-table">
+    <table class="info-table" aria-label="IP address information">
       <tbody>
         <tr>
           <td class="label">ASN</td>
@@ -48,19 +50,19 @@
         </tr>
         <tr>
           <td class="label">Proxy</td>
-          <td><i class="{% if is_proxy %}icon-check bool-true{% else %}icon-minus bool-false{% endif %}"></i></td>
+          <td>{% if is_proxy %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">Yes</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">No</span>{% endif %}</td>
         </tr>
         <tr>
           <td class="label">VPN</td>
-          <td><i class="{% if is_vpn %}icon-check bool-true{% else %}icon-minus bool-false{% endif %}"></i></td>
+          <td>{% if is_vpn %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">Yes</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">No</span>{% endif %}</td>
         </tr>
         <tr>
           <td class="label">Hosting</td>
-          <td><i class="{% if is_hosting %}icon-check bool-true{% else %}icon-minus bool-false{% endif %}"></i></td>
+          <td>{% if is_hosting %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">Yes</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">No</span>{% endif %}</td>
         </tr>
         <tr>
           <td class="label">Tor</td>
-          <td><i class="{% if is_tor %}icon-check bool-true{% else %}icon-minus bool-false{% endif %}"></i></td>
+          <td>{% if is_tor %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">Yes</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">No</span>{% endif %}</td>
         </tr>
       </tbody>
     </table>
