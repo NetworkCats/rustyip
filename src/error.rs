@@ -4,6 +4,7 @@ use axum::response::{IntoResponse, Response};
 pub enum AppError {
     IpNotFound,
     InvalidIp,
+    MissingClientIp,
     DbLookupFailed,
 }
 
@@ -12,6 +13,7 @@ impl IntoResponse for AppError {
         let (status, message) = match self {
             Self::IpNotFound => (StatusCode::NOT_FOUND, "IP not found in database"),
             Self::InvalidIp => (StatusCode::BAD_REQUEST, "Invalid IP address"),
+            Self::MissingClientIp => (StatusCode::BAD_REQUEST, "Missing client IP address"),
             Self::DbLookupFailed => (StatusCode::INTERNAL_SERVER_ERROR, "Database lookup failed"),
         };
         (status, message).into_response()

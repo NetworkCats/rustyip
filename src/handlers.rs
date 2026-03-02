@@ -52,7 +52,7 @@ fn extract_client_ip(headers: &HeaderMap) -> Result<IpAddr, AppError> {
         .get("CF-Connecting-IP")
         .and_then(|v| v.to_str().ok())
         .and_then(|s| s.trim().parse().ok())
-        .ok_or(AppError::IpNotFound)
+        .ok_or(AppError::MissingClientIp)
 }
 
 fn lookup_ip(db: &SharedDb, ip: IpAddr) -> Result<IpInfo, AppError> {

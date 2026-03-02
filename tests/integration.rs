@@ -231,7 +231,7 @@ async fn root_without_cf_header_returns_error() {
         )],
     )
     .await;
-    assert_eq!(status, StatusCode::NOT_FOUND);
+    assert_eq!(status, StatusCode::BAD_REQUEST);
 }
 
 #[tokio::test]
