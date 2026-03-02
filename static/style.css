@@ -54,7 +54,7 @@
     --color-gray5: #2C2C2E;
     --color-gray6: #1C1C1E;
 
-    --color-label: #FFFFFF;
+    --color-label: #EEEEEE;
     --color-label-secondary: rgba(235, 235, 245, 0.6);
     --color-label-tertiary: rgba(235, 235, 245, 0.3);
     --color-label-quaternary: rgba(235, 235, 245, 0.18);
@@ -62,7 +62,7 @@
     --color-link: #0984FF;
     --color-separator: rgba(84, 84, 88, 0.65);
 
-    --color-bg: #000000;
+    --color-bg: #111111;
     --color-bg-secondary: #1C1C1E;
     --color-bg-tertiary: #2C2C2E;
   }
@@ -134,7 +134,7 @@ main {
 .ip-display {
   text-align: center;
   font-size: clamp(28px, 6vw, 42px);
-  font-weight: 300;
+  font-weight: 200;
   margin: 28px 0 20px;
   letter-spacing: -0.5px;
   overflow-wrap: break-word;
@@ -142,17 +142,17 @@ main {
 }
 
 .info-table {
-  margin: 0 auto;
+  width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .info-table td {
-  padding: 10px 4px;
+  padding: 10px 0;
   border-top: 1px solid var(--color-separator);
   font-size: 15px;
   vertical-align: top;
   overflow-wrap: break-word;
-  white-space: nowrap;
 }
 
 .info-table tr:last-child td {
@@ -160,8 +160,9 @@ main {
 }
 
 .info-table .label {
-  width: 120px;
-  padding-right: 16px;
+  width: 42%;
+  padding-left: 24px;
+  padding-right: 32px;
   font-weight: 600;
   color: var(--color-label);
 }
@@ -186,10 +187,6 @@ main {
 
   .ip-display {
     margin: 20px 0 16px;
-  }
-
-  .info-table .label {
-    width: 100px;
   }
 
   .info-table td {
