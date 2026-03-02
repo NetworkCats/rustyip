@@ -22,7 +22,7 @@ fn build_test_app() -> axum::Router {
     let shared_db = db::new_shared(reader);
     let state = AppState {
         db: shared_db,
-        site_domain: "test.example.com".to_string(),
+        site_domain: "test.example.com".into(),
     };
     build_router(state)
 }

@@ -1,4 +1,5 @@
 use std::net::IpAddr;
+use std::sync::Arc;
 
 use askama::Template;
 use axum::extract::{Query, State};
@@ -18,7 +19,7 @@ pub struct IpQuery {
 #[derive(Clone)]
 pub struct AppState {
     pub db: SharedDb,
-    pub site_domain: String,
+    pub site_domain: Arc<str>,
 }
 
 #[derive(Template)]
@@ -26,7 +27,7 @@ pub struct AppState {
 struct IndexTemplate {
     ip: String,
     query: String,
-    site_domain: String,
+    site_domain: Arc<str>,
     asn: String,
     org: String,
     country: String,
@@ -75,21 +76,21 @@ fn format_asn(info: &IpInfo) -> String {
         .unwrap_or_default()
 }
 
-fn format_org(info: &IpInfo) -> String {
+fn format_org(info: &IpInfo) -> &str {
     info.asn
         .as_ref()
-        .and_then(|a| a.autonomous_system_organization.clone())
+        .and_then(|a| a.autonomous_system_organization.as_deref())
         .unwrap_or_default()
 }
 
-fn format_country(info: &IpInfo) -> String {
+fn format_country(info: &IpInfo) -> &str {
     info.country
         .as_ref()
         .map(|c| get_en_name(&c.names))
         .unwrap_or_default()
 }
 
-fn format_city(info: &IpInfo) -> String {
+fn format_city(info: &IpInfo) -> &str {
     info.city
         .as_ref()
         .map(|c| get_en_name(&c.names))
@@ -125,9 +126,9 @@ pub async fn root(
         query: query.ip.unwrap_or_default(),
         site_domain: state.site_domain.clone(),
         asn: format_asn(&info),
-        org: format_org(&info),
-        country: format_country(&info),
-        city: format_city(&info),
+        org: format_org(&info).to_owned(),
+        country: format_country(&info).to_owned(),
+        city: format_city(&info).to_owned(),
         is_proxy: info.proxy.is_proxy,
         is_vpn: info.proxy.is_vpn,
         is_hosting: info.proxy.is_hosting,
@@ -165,8 +166,11 @@ pub async fn asn_handler(
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
     let ip = resolve_ip(&headers, &query)?;
-    let info = lookup_ip(&state.db, ip)?;
-    Ok(format!("{}\n", format_asn(&info)))
+    let reader = state.db.load();
+    let text = db::lookup_asn_number(&reader, ip)
+        .map(|n| format!("AS{n}"))
+        .unwrap_or_default();
+    Ok(format!("{text}\n"))
 }
 
 pub async fn org_handler(
@@ -175,8 +179,9 @@ pub async fn org_handler(
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
     let ip = resolve_ip(&headers, &query)?;
-    let info = lookup_ip(&state.db, ip)?;
-    Ok(format!("{}\n", format_org(&info)))
+    let reader = state.db.load();
+    let org = db::lookup_asn_org(&reader, ip).unwrap_or_default();
+    Ok(format!("{org}\n"))
 }
 
 pub async fn country_handler(
@@ -185,8 +190,9 @@ pub async fn country_handler(
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
     let ip = resolve_ip(&headers, &query)?;
-    let info = lookup_ip(&state.db, ip)?;
-    Ok(format!("{}\n", format_country(&info)))
+    let reader = state.db.load();
+    let country = db::lookup_country_name(&reader, ip).unwrap_or_default();
+    Ok(format!("{country}\n"))
 }
 
 pub async fn city_handler(
@@ -195,8 +201,9 @@ pub async fn city_handler(
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
     let ip = resolve_ip(&headers, &query)?;
-    let info = lookup_ip(&state.db, ip)?;
-    Ok(format!("{}\n", format_city(&info)))
+    let reader = state.db.load();
+    let city = db::lookup_city_name(&reader, ip).unwrap_or_default();
+    Ok(format!("{city}\n"))
 }
 
 pub async fn proxy_handler(
@@ -205,8 +212,9 @@ pub async fn proxy_handler(
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
     let ip = resolve_ip(&headers, &query)?;
-    let info = lookup_ip(&state.db, ip)?;
-    Ok(format!("{}\n", info.proxy.is_proxy))
+    let reader = state.db.load();
+    let proxy = db::lookup_proxy(&reader, ip).ok_or(AppError::DbLookupFailed)?;
+    Ok(format!("{}\n", proxy.is_proxy))
 }
 
 pub async fn vpn_handler(
@@ -215,8 +223,9 @@ pub async fn vpn_handler(
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
     let ip = resolve_ip(&headers, &query)?;
-    let info = lookup_ip(&state.db, ip)?;
-    Ok(format!("{}\n", info.proxy.is_vpn))
+    let reader = state.db.load();
+    let proxy = db::lookup_proxy(&reader, ip).ok_or(AppError::DbLookupFailed)?;
+    Ok(format!("{}\n", proxy.is_vpn))
 }
 
 pub async fn hosting_handler(
@@ -225,8 +234,9 @@ pub async fn hosting_handler(
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
     let ip = resolve_ip(&headers, &query)?;
-    let info = lookup_ip(&state.db, ip)?;
-    Ok(format!("{}\n", info.proxy.is_hosting))
+    let reader = state.db.load();
+    let proxy = db::lookup_proxy(&reader, ip).ok_or(AppError::DbLookupFailed)?;
+    Ok(format!("{}\n", proxy.is_hosting))
 }
 
 pub async fn tor_handler(
@@ -235,6 +245,7 @@ pub async fn tor_handler(
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
     let ip = resolve_ip(&headers, &query)?;
-    let info = lookup_ip(&state.db, ip)?;
-    Ok(format!("{}\n", info.proxy.is_tor))
+    let reader = state.db.load();
+    let proxy = db::lookup_proxy(&reader, ip).ok_or(AppError::DbLookupFailed)?;
+    Ok(format!("{}\n", proxy.is_tor))
 }

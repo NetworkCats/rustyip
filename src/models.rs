@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::fmt::Write;
 use std::net::IpAddr;
 
 use serde::{Deserialize, Serialize};
@@ -155,11 +155,31 @@ pub struct IpInfo {
 }
 
 #[derive(Debug, Serialize)]
+pub struct Names {
+    #[serde(rename = "de", skip_serializing_if = "Option::is_none")]
+    pub german: Option<String>,
+    #[serde(rename = "en", skip_serializing_if = "Option::is_none")]
+    pub english: Option<String>,
+    #[serde(rename = "es", skip_serializing_if = "Option::is_none")]
+    pub spanish: Option<String>,
+    #[serde(rename = "fr", skip_serializing_if = "Option::is_none")]
+    pub french: Option<String>,
+    #[serde(rename = "ja", skip_serializing_if = "Option::is_none")]
+    pub japanese: Option<String>,
+    #[serde(rename = "pt-BR", skip_serializing_if = "Option::is_none")]
+    pub brazilian_portuguese: Option<String>,
+    #[serde(rename = "ru", skip_serializing_if = "Option::is_none")]
+    pub russian: Option<String>,
+    #[serde(rename = "zh-CN", skip_serializing_if = "Option::is_none")]
+    pub simplified_chinese: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
 pub struct CityInfo {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub geoname_id: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub names: Option<BTreeMap<String, String>>,
+    pub names: Option<Names>,
 }
 
 #[derive(Debug, Serialize)]
@@ -169,7 +189,7 @@ pub struct ContinentInfo {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub geoname_id: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub names: Option<BTreeMap<String, String>>,
+    pub names: Option<Names>,
 }
 
 #[derive(Debug, Serialize)]
@@ -179,7 +199,7 @@ pub struct CountryInfo {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub iso_code: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub names: Option<BTreeMap<String, String>>,
+    pub names: Option<Names>,
 }
 
 #[derive(Debug, Serialize)]
@@ -209,7 +229,7 @@ pub struct SubdivisionInfo {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub iso_code: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub names: Option<BTreeMap<String, String>>,
+    pub names: Option<Names>,
 }
 
 #[derive(Debug, Serialize)]
@@ -235,36 +255,20 @@ pub struct ProxyInfo {
 
 // --- Conversion from MMDB record to API output ---
 
-fn convert_names(names: &MmdbNames<'_>) -> Option<BTreeMap<String, String>> {
+fn convert_names(names: &MmdbNames<'_>) -> Option<Names> {
     if names.is_empty() {
         return None;
     }
-    let mut map = BTreeMap::new();
-    if let Some(v) = names.german {
-        map.insert("de".to_string(), v.to_string());
-    }
-    if let Some(v) = names.english {
-        map.insert("en".to_string(), v.to_string());
-    }
-    if let Some(v) = names.spanish {
-        map.insert("es".to_string(), v.to_string());
-    }
-    if let Some(v) = names.french {
-        map.insert("fr".to_string(), v.to_string());
-    }
-    if let Some(v) = names.japanese {
-        map.insert("ja".to_string(), v.to_string());
-    }
-    if let Some(v) = names.brazilian_portuguese {
-        map.insert("pt-BR".to_string(), v.to_string());
-    }
-    if let Some(v) = names.russian {
-        map.insert("ru".to_string(), v.to_string());
-    }
-    if let Some(v) = names.simplified_chinese {
-        map.insert("zh-CN".to_string(), v.to_string());
-    }
-    Some(map)
+    Some(Names {
+        german: names.german.map(str::to_owned),
+        english: names.english.map(str::to_owned),
+        spanish: names.spanish.map(str::to_owned),
+        french: names.french.map(str::to_owned),
+        japanese: names.japanese.map(str::to_owned),
+        brazilian_portuguese: names.brazilian_portuguese.map(str::to_owned),
+        russian: names.russian.map(str::to_owned),
+        simplified_chinese: names.simplified_chinese.map(str::to_owned),
+    })
 }
 
 fn has_city(c: &MmdbCity<'_>) -> bool {
@@ -396,8 +400,11 @@ pub fn from_mmdb_record(ip: IpAddr, record: &MmdbRecord<'_>) -> IpInfo {
         is_anonymous: record.proxy.is_anonymous,
     };
 
+    let mut ip_str = String::with_capacity(45);
+    write!(ip_str, "{ip}").expect("IP address formatting cannot fail");
+
     IpInfo {
-        ip: ip.to_string(),
+        ip: ip_str,
         city,
         continent,
         country,
@@ -410,10 +417,9 @@ pub fn from_mmdb_record(ip: IpAddr, record: &MmdbRecord<'_>) -> IpInfo {
     }
 }
 
-pub fn get_en_name(names: &Option<BTreeMap<String, String>>) -> String {
+pub fn get_en_name(names: &Option<Names>) -> &str {
     names
         .as_ref()
-        .and_then(|m| m.get("en"))
-        .cloned()
+        .and_then(|n| n.english.as_deref())
         .unwrap_or_default()
 }

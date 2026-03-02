@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 axum = "0.8.8"
-tokio = { version = "1.49.0", features = ["full"] }
+tokio = { version = "1.49.0", features = ["rt-multi-thread", "macros", "net", "signal", "time", "fs", "io-util"] }
 askama = "0.15.4"
 askama_web = { version = "0.15.1", features = ["axum-0.8"] }
 maxminddb = "0.27.3"

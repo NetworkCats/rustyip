@@ -40,7 +40,7 @@ async fn main() {
 
     let state = handlers::AppState {
         db: shared_db,
-        site_domain: config.site_domain,
+        site_domain: config.site_domain.into(),
     };
 
     let app = routes::build_router(state);
