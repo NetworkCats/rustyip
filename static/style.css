@@ -132,10 +132,10 @@ main {
 
 
 .ip-display {
-  text-align: center;
+  text-align: left;
   font-size: clamp(28px, 6vw, 42px);
   font-weight: 300;
-  margin: 40px 0 32px;
+  margin: 28px 0 20px;
   letter-spacing: -0.5px;
   overflow-wrap: break-word;
   word-break: break-all;
@@ -184,7 +184,7 @@ main {
   }
 
   .ip-display {
-    margin: 28px 0 24px;
+    margin: 20px 0 16px;
   }
 
   .info-table .label {
