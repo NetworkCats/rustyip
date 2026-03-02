@@ -22,5 +22,11 @@ ehthumbs.db
 ehthumbs_vista.db
 
 # Project
+*.mmdb
+.env
+haproxy/certs/
 
 
+# Added by cargo
+
+/target
