@@ -1,8 +1,10 @@
-use axum::Router;
+use axum::middleware;
 use axum::routing::get;
-use tower_http::services::ServeDir;
+use axum::Router;
 
 use crate::handlers::{self, AppState};
+use crate::middleware::security_headers;
+use crate::static_assets;
 
 pub fn build_router(state: AppState) -> Router {
     Router::new()
@@ -20,6 +22,7 @@ pub fn build_router(state: AppState) -> Router {
         .route("/vpn", get(handlers::vpn_handler))
         .route("/hosting", get(handlers::hosting_handler))
         .route("/tor", get(handlers::tor_handler))
-        .nest_service("/static", ServeDir::new("static"))
+        .route("/static/{*path}", get(static_assets::serve_static))
+        .layer(middleware::from_fn(security_headers))
         .with_state(state)
 }

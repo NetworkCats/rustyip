@@ -4,7 +4,7 @@ FROM rust:1.93.1-alpine3.23 AS builder
 RUN apk add --no-cache musl-dev
 
 WORKDIR /build
-COPY Cargo.toml Cargo.lock ./
+COPY Cargo.toml Cargo.lock build.rs ./
 COPY src ./src
 COPY templates ./templates
 COPY static ./static
@@ -19,8 +19,6 @@ RUN apk add --no-cache ca-certificates \
     && adduser -S -u 1001 -G rustyip rustyip
 
 COPY --from=builder /build/target/release/rustyip /usr/local/bin/rustyip
-COPY --from=builder /build/templates /app/templates
-COPY --from=builder /build/static /app/static
 
 WORKDIR /app
 RUN chown -R rustyip:rustyip /app

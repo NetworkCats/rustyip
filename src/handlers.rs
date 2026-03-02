@@ -10,6 +10,7 @@ use crate::cli_detect::is_cli_user_agent;
 use crate::db::{self, SharedDb};
 use crate::error::AppError;
 use crate::models::{IpInfo, get_en_name};
+use crate::static_assets;
 
 #[derive(serde::Deserialize)]
 pub struct IpQuery {
@@ -28,6 +29,7 @@ struct IndexTemplate {
     ip: String,
     query: String,
     site_domain: Arc<str>,
+    css_version: u64,
     asn: String,
     org: String,
     country: String,
@@ -125,6 +127,7 @@ pub async fn root(
         ip: info.ip.clone(),
         query: query.ip.unwrap_or_default(),
         site_domain: state.site_domain.clone(),
+        css_version: static_assets::asset_version("style.css"),
         asn: format_asn(&info),
         org: format_org(&info).to_owned(),
         country: format_country(&info).to_owned(),
