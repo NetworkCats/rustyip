@@ -91,7 +91,6 @@ main {
 
 .search-form {
   display: flex;
-  gap: 8px;
 }
 
 .search-input-wrap {
@@ -130,21 +129,7 @@ main {
   color: var(--color-label-tertiary);
 }
 
-.search-form button {
-  height: 38px;
-  padding: 0 16px;
-  border: 1px solid var(--color-separator);
-  border-radius: 6px;
-  font-size: 14px;
-  font-family: inherit;
-  color: var(--color-label);
-  background: var(--color-bg-secondary);
-  cursor: pointer;
-}
 
-.search-form button:hover {
-  background: var(--color-bg-tertiary);
-}
 
 .ip-display {
   text-align: center;
@@ -194,8 +179,7 @@ main {
     padding: 0 16px;
   }
 
-  .search-form input,
-  .search-form button {
+  .search-form input {
     height: 44px;
   }
 
@@ -215,9 +199,5 @@ main {
 @media (max-width: 360px) {
   .search-form {
     flex-direction: column;
-  }
-
-  .search-form button {
-    width: 100%;
   }
 }
