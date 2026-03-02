@@ -132,7 +132,7 @@ main {
 
 
 .ip-display {
-  text-align: left;
+  text-align: center;
   font-size: clamp(28px, 6vw, 42px);
   font-weight: 300;
   margin: 28px 0 20px;
@@ -142,9 +142,8 @@ main {
 }
 
 .info-table {
-  width: 100%;
+  margin: 0 auto;
   border-collapse: collapse;
-  table-layout: fixed;
 }
 
 .info-table td {
@@ -153,6 +152,7 @@ main {
   font-size: 15px;
   vertical-align: top;
   overflow-wrap: break-word;
+  white-space: nowrap;
 }
 
 .info-table tr:last-child td {
@@ -161,6 +161,7 @@ main {
 
 .info-table .label {
   width: 120px;
+  padding-right: 16px;
   font-weight: 600;
   color: var(--color-label);
 }
