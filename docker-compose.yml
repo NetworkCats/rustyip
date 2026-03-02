@@ -1,6 +1,6 @@
 services:
   haproxy:
-    image: haproxy:3.3.4
+    image: haproxy:3.3.4-alpine3.23
     ports:
       - "443:443"
     volumes:
@@ -24,7 +24,7 @@ services:
     volumes:
       - db_data:/data
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:3000/health || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3

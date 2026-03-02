@@ -1,4 +1,7 @@
-FROM rust:1.92-slim AS builder
+# Build Stage
+FROM rust:1.93.1-alpine3.23 AS builder
+
+RUN apk add --no-cache musl-dev
 
 WORKDIR /build
 COPY Cargo.toml Cargo.lock ./
@@ -8,17 +11,19 @@ COPY static ./static
 
 RUN cargo build --release
 
-FROM debian:bookworm-slim
+# Runtime Stage
+FROM alpine:3.23.3
 
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
-    && rm -rf /var/lib/apt/lists/* \
-    && groupadd -r rustyip && useradd -r -g rustyip rustyip
+RUN apk add --no-cache ca-certificates \
+    && addgroup -S -g 1001 rustyip \
+    && adduser -S -u 1001 -G rustyip rustyip
 
 COPY --from=builder /build/target/release/rustyip /usr/local/bin/rustyip
 COPY --from=builder /build/templates /app/templates
 COPY --from=builder /build/static /app/static
 
 WORKDIR /app
+RUN chown -R rustyip:rustyip /app
 
 USER rustyip
 
