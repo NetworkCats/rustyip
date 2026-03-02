@@ -4,6 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>What is my IP address? - {{ site_domain }}</title>
+  <meta name="description" content="Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address.">
+  <link rel="canonical" href="https://{{ site_domain }}/">
+  <meta name="theme-color" content="#007AFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0A84FF" media="(prefers-color-scheme: dark)">
+  <meta property="og:title" content="What is my IP address? - {{ site_domain }}">
+  <meta property="og:description" content="Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://{{ site_domain }}/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="What is my IP address? - {{ site_domain }}">
+  <meta name="twitter:description" content="Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&display=swap">
@@ -23,6 +34,7 @@
           placeholder="Type to search IP data"
           value="{{ query }}"
           autocomplete="off"
+          autocapitalize="none"
           spellcheck="false"
         >
       </div>
@@ -33,35 +45,35 @@
     <table class="info-table" aria-label="IP address information">
       <tbody>
         <tr>
-          <td class="label">ASN</td>
+          <th scope="row">ASN</th>
           <td>{{ asn }}</td>
         </tr>
         <tr>
-          <td class="label">Org</td>
+          <th scope="row">Org</th>
           <td>{{ org }}</td>
         </tr>
         <tr>
-          <td class="label">Country</td>
+          <th scope="row">Country</th>
           <td>{{ country }}</td>
         </tr>
         <tr>
-          <td class="label">City</td>
+          <th scope="row">City</th>
           <td>{{ city }}</td>
         </tr>
         <tr>
-          <td class="label">Proxy</td>
+          <th scope="row">Proxy</th>
           <td>{% if is_proxy %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">Yes</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">No</span>{% endif %}</td>
         </tr>
         <tr>
-          <td class="label">VPN</td>
+          <th scope="row">VPN</th>
           <td>{% if is_vpn %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">Yes</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">No</span>{% endif %}</td>
         </tr>
         <tr>
-          <td class="label">Hosting</td>
+          <th scope="row">Hosting</th>
           <td>{% if is_hosting %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">Yes</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">No</span>{% endif %}</td>
         </tr>
         <tr>
-          <td class="label">Tor</td>
+          <th scope="row">Tor</th>
           <td>{% if is_tor %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">Yes</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">No</span>{% endif %}</td>
         </tr>
       </tbody>

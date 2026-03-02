@@ -412,3 +412,65 @@ async fn field_endpoints_without_ip_or_header_return_400() {
         );
     }
 }
+
+// --- SEO and accessibility tests ---
+
+#[tokio::test]
+async fn robots_txt_returns_valid_response() {
+    let app = build_test_app();
+    let (status, body) = get(&app, "/robots.txt").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(body.contains("User-agent: *"));
+    assert!(body.contains("Disallow: /json"));
+    assert!(body.contains("Disallow: /health"));
+    assert!(body.contains("Sitemap: https://test.example.com/sitemap.xml"));
+}
+
+#[tokio::test]
+async fn sitemap_xml_returns_valid_response() {
+    let app = build_test_app();
+    let (status, body) = get(&app, "/sitemap.xml").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(body.contains("<?xml version=\"1.0\""));
+    assert!(body.contains("<loc>https://test.example.com/</loc>"));
+}
+
+#[tokio::test]
+async fn html_contains_seo_meta_tags() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/?ip=45.77.77.77",
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(body.contains("<meta name=\"description\""));
+    assert!(body.contains("<link rel=\"canonical\""));
+    assert!(body.contains("<meta property=\"og:title\""));
+    assert!(body.contains("<meta property=\"og:description\""));
+    assert!(body.contains("<meta property=\"og:type\" content=\"website\""));
+    assert!(body.contains("<meta name=\"twitter:card\" content=\"summary\""));
+    assert!(body.contains("<meta name=\"theme-color\""));
+}
+
+#[tokio::test]
+async fn html_uses_th_for_row_headers() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/?ip=45.77.77.77",
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(body.contains("<th scope=\"row\">ASN</th>"));
+    assert!(body.contains("<th scope=\"row\">Country</th>"));
+    assert!(body.contains("autocapitalize=\"none\""));
+}

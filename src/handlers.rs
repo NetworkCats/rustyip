@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use askama::Template;
 use axum::extract::{Query, State};
-use axum::http::{HeaderMap, StatusCode};
+use axum::http::{HeaderMap, StatusCode, header};
 use axum::response::{Html, IntoResponse, Response};
 
 use crate::cli_detect::is_cli_user_agent;
@@ -248,4 +248,43 @@ pub async fn tor_handler(
     let reader = state.db.load();
     let proxy = db::lookup_proxy(&reader, ip).ok_or(AppError::DbLookupFailed)?;
     Ok(format!("{}\n", proxy.is_tor))
+}
+
+pub async fn robots_txt(State(state): State<AppState>) -> Response {
+    let body = format!(
+        "User-agent: *\n\
+         Allow: /\n\
+         Disallow: /json\n\
+         Disallow: /ip\n\
+         Disallow: /asn\n\
+         Disallow: /org\n\
+         Disallow: /country\n\
+         Disallow: /city\n\
+         Disallow: /proxy\n\
+         Disallow: /vpn\n\
+         Disallow: /hosting\n\
+         Disallow: /tor\n\
+         Disallow: /health\n\
+         \n\
+         Sitemap: https://{}/sitemap.xml\n",
+        state.site_domain
+    );
+    ([(header::CONTENT_TYPE, "text/plain; charset=utf-8")], body).into_response()
+}
+
+pub async fn sitemap_xml(State(state): State<AppState>) -> Response {
+    let body = format!(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+         <urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n\
+         \x20 <url>\n\
+         \x20   <loc>https://{}/</loc>\n\
+         \x20 </url>\n\
+         </urlset>\n",
+        state.site_domain
+    );
+    (
+        [(header::CONTENT_TYPE, "application/xml; charset=utf-8")],
+        body,
+    )
+        .into_response()
 }

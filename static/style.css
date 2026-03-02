@@ -136,6 +136,7 @@ main {
   border-collapse: collapse;
   table-layout: fixed;
 
+  th,
   td {
     padding-block: 10px;
     border-block-start: 1px solid var(--color-separator);
@@ -144,15 +145,17 @@ main {
     overflow-wrap: break-word;
   }
 
+  tr:last-child th,
   tr:last-child td {
     border-block-end: 1px solid var(--color-separator);
   }
 
-  .label {
+  th {
     inline-size: 42%;
     padding-inline: 24px 32px;
     font-weight: 600;
     color: var(--color-label);
+    text-align: start;
   }
 
   .bool-true {
@@ -178,13 +181,14 @@ main {
     margin-block: 20px 16px;
   }
 
+  .info-table th,
   .info-table td {
     font-size: 14px;
   }
 }
 
 @media (max-width: 360px) {
-  .info-table .label {
+  .info-table th {
     inline-size: 36%;
     padding-inline: 12px 16px;
   }
