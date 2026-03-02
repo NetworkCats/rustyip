@@ -1,5 +1,7 @@
+mod cli_detect;
 mod config;
 mod db;
+mod error;
 mod models;
 mod updater;
 
