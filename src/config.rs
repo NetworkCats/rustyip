@@ -16,7 +16,7 @@ impl Config {
             .parse()
             .expect("LISTEN_ADDR must be a valid socket address");
 
-        let db_path = env::var("DB_PATH").unwrap_or_else(|_| "/data/Merged-IP.mmdb".to_string());
+        let db_path = env::var("DB_PATH").unwrap_or_else(|_| "data/Merged-IP.mmdb".to_string());
 
         let db_update_url = env::var("DB_UPDATE_URL").unwrap_or_else(|_| {
             "https://github.com/NetworkCats/Merged-IP-Data/releases/latest/download/Merged-IP.mmdb"
