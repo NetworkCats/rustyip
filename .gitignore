@@ -23,6 +23,7 @@ ehthumbs_vista.db
 
 # Project
 *.mmdb
+data/
 .env
 haproxy/certs/
 

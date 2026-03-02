@@ -8,16 +8,17 @@ use rustyip::db;
 use rustyip::handlers::AppState;
 use rustyip::routes::build_router;
 
-fn test_db_path() -> &'static str {
-    let path = "/tmp/Merged-IP.mmdb";
-    if !Path::new(path).exists() {
+fn test_db_path() -> String {
+    let manifest_dir = env!("CARGO_MANIFEST_DIR");
+    let path = format!("{manifest_dir}/data/Merged-IP.mmdb");
+    if !Path::new(&path).exists() {
         panic!("Test MMDB not found at {path}. Download it first.");
     }
     path
 }
 
 fn build_test_app() -> axum::Router {
-    let reader = db::load_db(Path::new(test_db_path())).expect("failed to load test DB");
+    let reader = db::load_db(Path::new(&test_db_path())).expect("failed to load test DB");
     let shared_db = db::new_shared(reader);
     let state = AppState {
         db: shared_db,
