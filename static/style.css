@@ -63,15 +63,18 @@ main {
 
 .ip-display {
   text-align: center;
-  font-size: 42px;
+  font-size: clamp(28px, 6vw, 42px);
   font-weight: 600;
   margin: 40px 0 32px;
   letter-spacing: -0.5px;
+  overflow-wrap: break-word;
+  word-break: break-all;
 }
 
 .info-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .info-table td {
@@ -79,6 +82,7 @@ main {
   border-top: 1px solid #eee;
   font-size: 15px;
   vertical-align: top;
+  overflow-wrap: break-word;
 }
 
 .info-table tr:last-child td {
@@ -93,4 +97,38 @@ main {
 
 .info-table .bool-true {
   color: #16a34a;
+}
+
+@media (max-width: 480px) {
+  main {
+    margin-top: 40px;
+    padding: 0 16px;
+  }
+
+  .search-form input,
+  .search-form button {
+    height: 44px;
+  }
+
+  .ip-display {
+    margin: 28px 0 24px;
+  }
+
+  .info-table .label {
+    width: 100px;
+  }
+
+  .info-table td {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .search-form {
+    flex-direction: column;
+  }
+
+  .search-form button {
+    width: 100%;
+  }
 }
