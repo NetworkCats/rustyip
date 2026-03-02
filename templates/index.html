@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ ip }} - {{ site_domain }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main>
+    <form method="GET" action="/" class="search-form">
+      <input
+        type="text"
+        name="ip"
+        placeholder="Type to search IP data"
+        value="{{ query }}"
+        autocomplete="off"
+        spellcheck="false"
+      >
+      <button type="submit">Lookup</button>
+    </form>
+
+    <h1 class="ip-display">{{ ip }}</h1>
+
+    <table class="info-table">
+      <tbody>
+        <tr>
+          <td class="label">ASN</td>
+          <td>{{ asn }}</td>
+        </tr>
+        <tr>
+          <td class="label">Org</td>
+          <td>{{ org }}</td>
+        </tr>
+        <tr>
+          <td class="label">Country</td>
+          <td>{{ country }}</td>
+        </tr>
+        <tr>
+          <td class="label">City</td>
+          <td>{{ city }}</td>
+        </tr>
+        <tr>
+          <td class="label">Proxy</td>
+          <td{% if is_proxy %} class="bool-true"{% endif %}>{{ is_proxy }}</td>
+        </tr>
+        <tr>
+          <td class="label">VPN</td>
+          <td{% if is_vpn %} class="bool-true"{% endif %}>{{ is_vpn }}</td>
+        </tr>
+        <tr>
+          <td class="label">Hosting</td>
+          <td{% if is_hosting %} class="bool-true"{% endif %}>{{ is_hosting }}</td>
+        </tr>
+        <tr>
+          <td class="label">Tor</td>
+          <td{% if is_tor %} class="bool-true"{% endif %}>{{ is_tor }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>
