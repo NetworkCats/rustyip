@@ -1,16 +1,9 @@
-mod cli_detect;
-mod config;
-mod db;
-mod error;
-mod handlers;
-mod models;
-mod routes;
-mod updater;
-
 use std::path::PathBuf;
 
 use tracing::error;
 use tracing_subscriber::EnvFilter;
+
+use rustyip::{config, db, handlers, routes, updater};
 
 #[tokio::main]
 async fn main() {
