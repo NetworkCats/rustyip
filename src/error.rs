@@ -25,7 +25,11 @@ mod tests {
     use super::*;
     use http_body_util::BodyExt;
 
-    async fn check_error_response(error: AppError, expected_status: StatusCode, expected_body: &str) {
+    async fn check_error_response(
+        error: AppError,
+        expected_status: StatusCode,
+        expected_body: &str,
+    ) {
         let response = error.into_response();
         assert_eq!(response.status(), expected_status);
         let body = response.into_body().collect().await.unwrap().to_bytes();
