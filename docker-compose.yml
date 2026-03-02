@@ -1,0 +1,41 @@
+services:
+  haproxy:
+    image: haproxy:3.3.4
+    ports:
+      - "443:443"
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - ${CERT_PATH:-./haproxy/certs}:/etc/haproxy/certs:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - internal
+
+  app:
+    build: .
+    environment:
+      - LISTEN_ADDR=0.0.0.0:3000
+      - DB_PATH=/data/Merged-IP.mmdb
+      - DB_UPDATE_URL=${DB_UPDATE_URL:-https://github.com/NetworkCats/Merged-IP-Data/releases/latest/download/Merged-IP.mmdb}
+      - DB_UPDATE_INTERVAL_HOURS=${DB_UPDATE_INTERVAL_HOURS:-24}
+      - SITE_DOMAIN=${SITE_DOMAIN:-localhost}
+    volumes:
+      - db_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - internal
+
+volumes:
+  db_data:
+
+networks:
+  internal:
+    driver: bridge

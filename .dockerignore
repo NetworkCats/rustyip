@@ -1,0 +1,7 @@
+target
+.git
+.gitignore
+.env
+*.mmdb
+haproxy/certs
+AGENTS.md
