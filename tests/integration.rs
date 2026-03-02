@@ -214,6 +214,8 @@ async fn browser_returns_html() {
     assert!(body.contains("45.77.77.77"));
     assert!(body.contains("Piscataway"));
     assert!(body.contains("AS20473"));
+    assert!(body.contains(">True<"));
+    assert!(body.contains(">False<"));
 }
 
 #[tokio::test]

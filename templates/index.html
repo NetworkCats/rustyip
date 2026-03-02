@@ -42,19 +42,19 @@
         </tr>
         <tr>
           <td class="label">Proxy</td>
-          <td{% if is_proxy %} class="bool-true"{% endif %}>{{ is_proxy }}</td>
+          <td{% if is_proxy %} class="bool-true"{% endif %}>{% if is_proxy %}True{% else %}False{% endif %}</td>
         </tr>
         <tr>
           <td class="label">VPN</td>
-          <td{% if is_vpn %} class="bool-true"{% endif %}>{{ is_vpn }}</td>
+          <td{% if is_vpn %} class="bool-true"{% endif %}>{% if is_vpn %}True{% else %}False{% endif %}</td>
         </tr>
         <tr>
           <td class="label">Hosting</td>
-          <td{% if is_hosting %} class="bool-true"{% endif %}>{{ is_hosting }}</td>
+          <td{% if is_hosting %} class="bool-true"{% endif %}>{% if is_hosting %}True{% else %}False{% endif %}</td>
         </tr>
         <tr>
           <td class="label">Tor</td>
-          <td{% if is_tor %} class="bool-true"{% endif %}>{{ is_tor }}</td>
+          <td{% if is_tor %} class="bool-true"{% endif %}>{% if is_tor %}True{% else %}False{% endif %}</td>
         </tr>
       </tbody>
     </table>
