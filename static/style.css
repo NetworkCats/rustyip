@@ -1,3 +1,73 @@
+:root {
+  --color-red: #FF3B30;
+  --color-orange: #FF9500;
+  --color-yellow: #FFCC00;
+  --color-green: #34C759;
+  --color-mint: #00C7BE;
+  --color-teal: #30B0C7;
+  --color-cyan: #32ADE6;
+  --color-blue: #007AFF;
+  --color-indigo: #5856D6;
+  --color-purple: #AF52DE;
+  --color-pink: #FF2D55;
+  --color-brown: #A2845E;
+
+  --color-gray: #8E8E93;
+  --color-gray2: #AEAEB2;
+  --color-gray3: #C7C7CC;
+  --color-gray4: #D1D1D6;
+  --color-gray5: #E5E5EA;
+  --color-gray6: #F2F2F7;
+
+  --color-label: #000000;
+  --color-label-secondary: rgba(60, 60, 67, 0.6);
+  --color-label-tertiary: rgba(60, 60, 67, 0.3);
+  --color-label-quaternary: rgba(60, 60, 67, 0.18);
+
+  --color-link: #007AFF;
+  --color-separator: rgba(60, 60, 67, 0.29);
+
+  --color-bg: #FFFFFF;
+  --color-bg-secondary: #F2F2F7;
+  --color-bg-tertiary: #FFFFFF;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-red: #FF453A;
+    --color-orange: #FF9F0A;
+    --color-yellow: #FFD60A;
+    --color-green: #30D158;
+    --color-mint: #63E6E2;
+    --color-teal: #40C8E0;
+    --color-cyan: #64D2FF;
+    --color-blue: #0A84FF;
+    --color-indigo: #5E5CE6;
+    --color-purple: #BF5AF2;
+    --color-pink: #FF375F;
+    --color-brown: #AC8E68;
+
+    --color-gray: #8E8E93;
+    --color-gray2: #636366;
+    --color-gray3: #48484A;
+    --color-gray4: #3A3A3C;
+    --color-gray5: #2C2C2E;
+    --color-gray6: #1C1C1E;
+
+    --color-label: #FFFFFF;
+    --color-label-secondary: rgba(235, 235, 245, 0.6);
+    --color-label-tertiary: rgba(235, 235, 245, 0.3);
+    --color-label-quaternary: rgba(235, 235, 245, 0.18);
+
+    --color-link: #0984FF;
+    --color-separator: rgba(84, 84, 88, 0.65);
+
+    --color-bg: #000000;
+    --color-bg-secondary: #1C1C1E;
+    --color-bg-tertiary: #2C2C2E;
+  }
+}
+
 *,
 *::before,
 *::after {
@@ -8,8 +78,8 @@
 
 body {
   font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-  color: #1a1a1a;
-  background: #fff;
+  color: var(--color-label);
+  background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -24,47 +94,62 @@ main {
   gap: 8px;
 }
 
-.search-form input {
+.search-input-wrap {
   flex: 1;
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-label-tertiary);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.search-form input {
+  width: 100%;
   height: 38px;
-  padding: 0 12px;
-  border: 1px solid #d0d0d0;
+  padding: 0 12px 0 34px;
+  border: 1px solid var(--color-separator);
   border-radius: 6px;
   font-size: 14px;
   font-family: inherit;
-  color: #1a1a1a;
-  background: #fff;
+  color: var(--color-label);
+  background: var(--color-bg);
   outline: none;
 }
 
 .search-form input:focus {
-  border-color: #999;
+  border-color: var(--color-gray);
 }
 
 .search-form input::placeholder {
-  color: #999;
+  color: var(--color-label-tertiary);
 }
 
 .search-form button {
   height: 38px;
   padding: 0 16px;
-  border: 1px solid #d0d0d0;
+  border: 1px solid var(--color-separator);
   border-radius: 6px;
   font-size: 14px;
   font-family: inherit;
-  color: #1a1a1a;
-  background: #fafafa;
+  color: var(--color-label);
+  background: var(--color-bg-secondary);
   cursor: pointer;
 }
 
 .search-form button:hover {
-  background: #f0f0f0;
+  background: var(--color-bg-tertiary);
 }
 
 .ip-display {
   text-align: center;
   font-size: clamp(28px, 6vw, 42px);
-  font-weight: 600;
+  font-weight: 300;
   margin: 40px 0 32px;
   letter-spacing: -0.5px;
   overflow-wrap: break-word;
@@ -79,24 +164,28 @@ main {
 
 .info-table td {
   padding: 10px 4px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-separator);
   font-size: 15px;
   vertical-align: top;
   overflow-wrap: break-word;
 }
 
 .info-table tr:last-child td {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-separator);
 }
 
 .info-table .label {
   width: 120px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-label);
 }
 
 .info-table .bool-true {
-  color: #16a34a;
+  color: var(--color-green);
+}
+
+.info-table .bool-false {
+  color: var(--color-label-secondary);
 }
 
 @media (max-width: 480px) {

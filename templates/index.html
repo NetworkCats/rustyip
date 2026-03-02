@@ -4,19 +4,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>What is my IP address? - {{ site_domain }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.min.css">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
   <main>
     <form method="GET" action="/" class="search-form">
-      <input
-        type="text"
-        name="ip"
-        placeholder="Type to search IP data"
-        value="{{ query }}"
-        autocomplete="off"
-        spellcheck="false"
-      >
+      <div class="search-input-wrap">
+        <i class="icon-magnifier search-icon"></i>
+        <input
+          type="text"
+          name="ip"
+          placeholder="Type to search IP data"
+          value="{{ query }}"
+          autocomplete="off"
+          spellcheck="false"
+        >
+      </div>
       <button type="submit">Lookup</button>
     </form>
 
@@ -42,19 +49,19 @@
         </tr>
         <tr>
           <td class="label">Proxy</td>
-          <td{% if is_proxy %} class="bool-true"{% endif %}>{% if is_proxy %}True{% else %}False{% endif %}</td>
+          <td><i class="{% if is_proxy %}icon-check bool-true{% else %}icon-minus bool-false{% endif %}"></i></td>
         </tr>
         <tr>
           <td class="label">VPN</td>
-          <td{% if is_vpn %} class="bool-true"{% endif %}>{% if is_vpn %}True{% else %}False{% endif %}</td>
+          <td><i class="{% if is_vpn %}icon-check bool-true{% else %}icon-minus bool-false{% endif %}"></i></td>
         </tr>
         <tr>
           <td class="label">Hosting</td>
-          <td{% if is_hosting %} class="bool-true"{% endif %}>{% if is_hosting %}True{% else %}False{% endif %}</td>
+          <td><i class="{% if is_hosting %}icon-check bool-true{% else %}icon-minus bool-false{% endif %}"></i></td>
         </tr>
         <tr>
           <td class="label">Tor</td>
-          <td{% if is_tor %} class="bool-true"{% endif %}>{% if is_tor %}True{% else %}False{% endif %}</td>
+          <td><i class="{% if is_tor %}icon-check bool-true{% else %}icon-minus bool-false{% endif %}"></i></td>
         </tr>
       </tbody>
     </table>

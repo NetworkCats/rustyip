@@ -215,8 +215,8 @@ async fn browser_returns_html() {
     assert!(body.contains("45.77.77.77"));
     assert!(body.contains("Piscataway"));
     assert!(body.contains("AS20473"));
-    assert!(body.contains(">True<"));
-    assert!(body.contains(">False<"));
+    assert!(body.contains("icon-check bool-true"));
+    assert!(body.contains("icon-minus bool-false"));
 }
 
 #[tokio::test]
