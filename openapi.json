@@ -5,7 +5,8 @@
     "description": "IP geolocation lookup API. Returns detailed geographic, network, and proxy information for IP addresses using MaxMind-format MMDB databases.",
     "version": "0.1.0",
     "license": {
-      "name": "MIT"
+      "name": "AGPL-3.0-only",
+      "url": "https://www.gnu.org/licenses/agpl-3.0.html"
     }
   },
   "servers": [],
