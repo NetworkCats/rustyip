@@ -1,0 +1,619 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "RustyIP",
+    "description": "IP geolocation lookup API. Returns detailed geographic, network, and proxy information for IP addresses using MaxMind-format MMDB databases.",
+    "version": "0.1.0",
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://{domain}",
+      "variables": {
+        "domain": {
+          "default": "localhost:3000"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/json": {
+      "get": {
+        "operationId": "getIpInfoJson",
+        "summary": "Full IP geolocation lookup",
+        "description": "Returns complete geolocation, ASN, and proxy information for the given IP address as JSON. If no IP is specified, the client's own IP is used.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IpQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful lookup",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IpInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/ip": {
+      "get": {
+        "operationId": "getIp",
+        "summary": "IP address",
+        "description": "Returns the resolved IP address as plain text.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IpQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "IP address",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "examples": ["1.1.1.1\n"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/asn": {
+      "get": {
+        "operationId": "getAsn",
+        "summary": "Autonomous System Number",
+        "description": "Returns the ASN for the IP address as plain text (e.g. \"AS13335\"). Returns an empty line if not available.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IpQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ASN value",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "examples": ["AS13335\n"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/org": {
+      "get": {
+        "operationId": "getOrg",
+        "summary": "Organization name",
+        "description": "Returns the autonomous system organization name as plain text. Returns an empty line if not available.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IpQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Organization name",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "examples": ["Cloudflare, Inc.\n"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/country": {
+      "get": {
+        "operationId": "getCountry",
+        "summary": "Country name",
+        "description": "Returns the English country name as plain text. Returns an empty line if not available.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IpQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Country name",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "examples": ["United States\n"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/city": {
+      "get": {
+        "operationId": "getCity",
+        "summary": "City name",
+        "description": "Returns the English city name as plain text. Returns an empty line if not available.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IpQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "City name",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "examples": ["San Francisco\n"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/proxy": {
+      "get": {
+        "operationId": "getProxy",
+        "summary": "Proxy detection",
+        "description": "Returns \"true\" or \"false\" indicating whether the IP is a known proxy.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IpQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Proxy status",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "enum": ["true\n", "false\n"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/vpn": {
+      "get": {
+        "operationId": "getVpn",
+        "summary": "VPN detection",
+        "description": "Returns \"true\" or \"false\" indicating whether the IP is a known VPN.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IpQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "VPN status",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "enum": ["true\n", "false\n"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/hosting": {
+      "get": {
+        "operationId": "getHosting",
+        "summary": "Hosting/datacenter detection",
+        "description": "Returns \"true\" or \"false\" indicating whether the IP belongs to a hosting provider or datacenter.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IpQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Hosting status",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "enum": ["true\n", "false\n"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/tor": {
+      "get": {
+        "operationId": "getTor",
+        "summary": "Tor exit node detection",
+        "description": "Returns \"true\" or \"false\" indicating whether the IP is a known Tor exit node.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IpQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tor status",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "enum": ["true\n", "false\n"]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "healthCheck",
+        "summary": "Health check",
+        "description": "Returns 200 OK if the service is running.",
+        "responses": {
+          "200": {
+            "description": "Service is healthy"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "IpQuery": {
+        "name": "ip",
+        "in": "query",
+        "required": false,
+        "description": "IPv4 or IPv6 address to look up. If omitted, the client's IP is used (determined from the CF-Connecting-IP header).",
+        "schema": {
+          "type": "string",
+          "examples": ["1.1.1.1", "2606:4700:4700::1111"]
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid IP address or missing client IP",
+        "content": {
+          "text/plain": {
+            "schema": {
+              "type": "string",
+              "examples": ["Invalid IP address", "Missing client IP address"]
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "Internal server error (database lookup failed)",
+        "content": {
+          "text/plain": {
+            "schema": {
+              "type": "string",
+              "examples": ["Database lookup failed"]
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "IpInfo": {
+        "type": "object",
+        "required": ["ip", "proxy"],
+        "properties": {
+          "ip": {
+            "type": "string",
+            "description": "The queried IP address",
+            "examples": ["1.1.1.1", "2606:4700:4700::1111"]
+          },
+          "city": {
+            "$ref": "#/components/schemas/CityInfo"
+          },
+          "continent": {
+            "$ref": "#/components/schemas/ContinentInfo"
+          },
+          "country": {
+            "$ref": "#/components/schemas/CountryInfo"
+          },
+          "location": {
+            "$ref": "#/components/schemas/LocationInfo"
+          },
+          "postal": {
+            "$ref": "#/components/schemas/PostalInfo"
+          },
+          "registered_country": {
+            "$ref": "#/components/schemas/CountryInfo"
+          },
+          "subdivisions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubdivisionInfo"
+            }
+          },
+          "asn": {
+            "$ref": "#/components/schemas/AsnInfo"
+          },
+          "proxy": {
+            "$ref": "#/components/schemas/ProxyInfo"
+          }
+        }
+      },
+      "Names": {
+        "type": "object",
+        "description": "Localized names in multiple languages",
+        "properties": {
+          "de": {
+            "type": "string",
+            "description": "German name"
+          },
+          "en": {
+            "type": "string",
+            "description": "English name"
+          },
+          "es": {
+            "type": "string",
+            "description": "Spanish name"
+          },
+          "fr": {
+            "type": "string",
+            "description": "French name"
+          },
+          "ja": {
+            "type": "string",
+            "description": "Japanese name"
+          },
+          "pt-BR": {
+            "type": "string",
+            "description": "Brazilian Portuguese name"
+          },
+          "ru": {
+            "type": "string",
+            "description": "Russian name"
+          },
+          "zh-CN": {
+            "type": "string",
+            "description": "Simplified Chinese name"
+          }
+        }
+      },
+      "CityInfo": {
+        "type": "object",
+        "properties": {
+          "geoname_id": {
+            "type": "integer",
+            "format": "uint32",
+            "description": "GeoNames ID for the city"
+          },
+          "names": {
+            "$ref": "#/components/schemas/Names"
+          }
+        }
+      },
+      "ContinentInfo": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Two-letter continent code",
+            "examples": ["NA", "EU", "AS"]
+          },
+          "geoname_id": {
+            "type": "integer",
+            "format": "uint32",
+            "description": "GeoNames ID for the continent"
+          },
+          "names": {
+            "$ref": "#/components/schemas/Names"
+          }
+        }
+      },
+      "CountryInfo": {
+        "type": "object",
+        "properties": {
+          "geoname_id": {
+            "type": "integer",
+            "format": "uint32",
+            "description": "GeoNames ID for the country"
+          },
+          "iso_code": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code",
+            "examples": ["US", "DE", "JP"]
+          },
+          "names": {
+            "$ref": "#/components/schemas/Names"
+          }
+        }
+      },
+      "LocationInfo": {
+        "type": "object",
+        "properties": {
+          "accuracy_radius": {
+            "type": "integer",
+            "format": "uint16",
+            "description": "Accuracy radius in kilometers"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double",
+            "description": "Latitude coordinate"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double",
+            "description": "Longitude coordinate"
+          },
+          "metro_code": {
+            "type": "integer",
+            "format": "uint16",
+            "description": "Metro code (US only)"
+          },
+          "time_zone": {
+            "type": "string",
+            "description": "IANA time zone identifier",
+            "examples": ["America/New_York", "Europe/Berlin"]
+          }
+        }
+      },
+      "PostalInfo": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Postal or ZIP code",
+            "examples": ["10001", "08854"]
+          }
+        }
+      },
+      "SubdivisionInfo": {
+        "type": "object",
+        "description": "Administrative subdivision (state, province, region, etc.)",
+        "properties": {
+          "geoname_id": {
+            "type": "integer",
+            "format": "uint32",
+            "description": "GeoNames ID for the subdivision"
+          },
+          "iso_code": {
+            "type": "string",
+            "description": "ISO 3166-2 subdivision code",
+            "examples": ["NY", "CA", "NJ"]
+          },
+          "names": {
+            "$ref": "#/components/schemas/Names"
+          }
+        }
+      },
+      "AsnInfo": {
+        "type": "object",
+        "properties": {
+          "autonomous_system_number": {
+            "type": "integer",
+            "format": "uint32",
+            "description": "Autonomous System Number",
+            "examples": [13335, 20473]
+          },
+          "autonomous_system_organization": {
+            "type": "string",
+            "description": "Name of the organization that owns the ASN",
+            "examples": ["Cloudflare, Inc."]
+          },
+          "as_domain": {
+            "type": "string",
+            "description": "Primary domain of the AS",
+            "examples": ["cloudflare.com"]
+          }
+        }
+      },
+      "ProxyInfo": {
+        "type": "object",
+        "required": [
+          "is_proxy",
+          "is_vpn",
+          "is_tor",
+          "is_hosting",
+          "is_cdn",
+          "is_school",
+          "is_anonymous"
+        ],
+        "properties": {
+          "is_proxy": {
+            "type": "boolean",
+            "description": "Whether the IP is a known proxy"
+          },
+          "is_vpn": {
+            "type": "boolean",
+            "description": "Whether the IP is a known VPN endpoint"
+          },
+          "is_tor": {
+            "type": "boolean",
+            "description": "Whether the IP is a known Tor exit node"
+          },
+          "is_hosting": {
+            "type": "boolean",
+            "description": "Whether the IP belongs to a hosting provider or datacenter"
+          },
+          "is_cdn": {
+            "type": "boolean",
+            "description": "Whether the IP belongs to a CDN"
+          },
+          "is_school": {
+            "type": "boolean",
+            "description": "Whether the IP belongs to a school or educational institution"
+          },
+          "is_anonymous": {
+            "type": "boolean",
+            "description": "Whether the IP is associated with anonymous access"
+          }
+        }
+      }
+    }
+  }
+}
