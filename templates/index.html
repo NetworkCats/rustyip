@@ -79,6 +79,130 @@
         </tr>
       </tbody>
     </table>
+
+    <section class="faq" aria-label="Frequently Asked Questions">
+      <h2 class="faq-title">FAQ</h2>
+
+      <details open>
+        <summary>How to use this service from the command line</summary>
+        <div class="faq-content">
+          <p>You can use various command-line tools such as curl, httpie, and wget to use this service. Taking the most popular one, curl, as an example:</p>
+          <p>Query current IP:</p>
+          <pre><code>curl {{ site_domain }}</code></pre>
+          <p>Query information for your own IP:</p>
+          <pre><code>curl {{ site_domain }}/asn
+
+curl {{ site_domain }}/org
+
+curl {{ site_domain }}/country
+
+curl {{ site_domain }}/city
+
+curl {{ site_domain }}/proxy
+
+curl {{ site_domain }}/vpn
+
+curl {{ site_domain }}/hosting
+
+curl {{ site_domain }}/tor</code></pre>
+          <p>Or display all information in JSON format:</p>
+          <pre><code>curl {{ site_domain }}/json
+{
+  "ip": "1.1.1.1",
+  "continent": { ... },
+  "country": { ... },
+  "city": { ... },
+  "location": { ... },
+  "asn": { ... },
+  "proxy": { ... }
+}</code></pre>
+          <p>Query information for a specific IP:</p>
+          <pre><code>curl {{ site_domain }}/json?ip=1.1.1.1
+{
+  "ip": "1.1.1.1",
+  "continent": { ... },
+  "country": { ... },
+  "city": { ... },
+  "location": { ... },
+  "asn": { ... },
+  "proxy": { ... }
+}</code></pre>
+        </div>
+      </details>
+
+      <details open>
+        <summary>How to force the display of my IPv4 or IPv6 address?</summary>
+        <div class="faq-content">
+          <p>You can use <code>curl -4</code> or <code>curl -6</code> to view only your IPv4 or IPv6 address respectively.</p>
+        </div>
+      </details>
+
+      <details open>
+        <summary>How to get a JSON format response?</summary>
+        <div class="faq-content">
+          <p>You can send a request to the <code>/json</code> endpoint, or send a request with an <code>application/json</code> header.</p>
+        </div>
+      </details>
+
+      <details open>
+        <summary>Can I automate calls to your service via programs?</summary>
+        <div class="faq-content">
+          <p>Certainly, but you must adhere to our rate limits. Under normal conditions, the rate limit is 30 RPM (Requests Per Minute); under high load, we will increase the restriction to 10-5 RPM.</p>
+          <p>Our API is only suitable for manual calls or small-scale projects. If your website uses our API to query visitor IPs, please ensure you use a message queue to send requests to avoid blocking. If your project has high traffic or is latency-sensitive, please use our open-source offline database: <a href="https://github.com/NetworkCats/Merged-IP-Data">Merged IP Database</a>, which is the same database used by this project.</p>
+        </div>
+      </details>
+
+      <details open>
+        <summary>Where does the IP data come from?</summary>
+        <div class="faq-content">
+          <p>IP geographic data primarily comes from the free databases of MaxMind and DB-IP; AS data comes from IPinfo's free database; and IP proxy data comes from my own <a href="https://github.com/NetworkCats/OpenProxyDB">OpenProxyDB</a> database.</p>
+          <p>Data Attributions:</p>
+          <ul>
+            <li>MaxMind GeoLite2: <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a></li>
+            <li>IPinfo Lite: <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a></li>
+            <li>DB-IP: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></li>
+            <li>RouteViews ASN: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0</a></li>
+            <li>OpenProxyDB: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0</a></li>
+          </ul>
+        </div>
+      </details>
+
+      <details open>
+        <summary>Can I run my own service?</summary>
+        <div class="faq-content">
+          <p>Yes, the source code and database for this project are both open-source and hosted on GitHub:</p>
+          <ul>
+            <li><a href="https://github.com/NetworkCats/rustyip">https://github.com/NetworkCats/rustyip</a></li>
+            <li><a href="https://github.com/NetworkCats/Merged-IP-Data">https://github.com/NetworkCats/Merged-IP-Data</a></li>
+          </ul>
+        </div>
+      </details>
+
+      <details open>
+        <summary>How is this website different from other IP lookup sites?</summary>
+        <div class="faq-content">
+          <p>The biggest difference is that our database includes proxy-related information, and the proxy intelligence we provide is highly accurate. We have privately compared it with commercial proxy detection databases like IPinfo; our database's precision is fully comparable to commercial ones, and it is even more accurate in detecting residential proxies.</p>
+          <p>Secondly, our geographic coverage for IPv6 is more comprehensive because we merge multiple databases to provide more complete data.</p>
+          <p>Our UX is also better than any IP lookup site on the market. The site runs without any JavaScript, and we only load a minimal amount of external resources (fonts, icons), making the initial load speed extremely fast.</p>
+        </div>
+      </details>
+
+      <details open>
+        <summary>Is this service stable?</summary>
+        <div class="faq-content">
+          <p>The business logic of this service is written entirely in Rust, offering excellent performance that ensures the site remains operational even under L7 DDoS attacks. The site runs on a VPS with 2 cores and 2 GB of RAM, which is already overkill for this setup -- unless we encounter a massive L7 DDoS attack, though we have Cloudflare in front of us.</p>
+          <p>Running this website only costs me $18.00 per month. Because the cost is so low, I will not stop operations due to hardware costs in the foreseeable future, nor will I add any advertisements.</p>
+          <p>Rest assured, this service will definitely not "Rug Pull."</p>
+        </div>
+      </details>
+
+      <details open>
+        <summary>How can I sponsor this service?</summary>
+        <div class="faq-content">
+          <p>I accept cryptocurrency donations. If you would like to sponsor, please contact: <a href="mailto:networkcatlol@gmail.com">networkcatlol@gmail.com</a></p>
+        </div>
+      </details>
+    </section>
   </main>
 </body>
 </html>
