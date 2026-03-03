@@ -32,22 +32,30 @@
 
     <table class="info-table" aria-label="IP address information">
       <tbody>
+        {% if !asn.is_empty() %}
         <tr>
           <th scope="row">ASN</th>
           <td>{{ asn }}</td>
         </tr>
+        {% endif %}
+        {% if !org.is_empty() %}
         <tr>
           <th scope="row">Org</th>
           <td>{{ org }}</td>
         </tr>
+        {% endif %}
+        {% if !country.is_empty() %}
         <tr>
           <th scope="row">Country</th>
           <td>{{ country }}</td>
         </tr>
+        {% endif %}
+        {% if !city.is_empty() %}
         <tr>
           <th scope="row">City</th>
           <td>{{ city }}</td>
         </tr>
+        {% endif %}
         <tr>
           <th scope="row">Proxy</th>
           <td>{% if is_proxy %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">Yes</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">No</span>{% endif %}</td>
