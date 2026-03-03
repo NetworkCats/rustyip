@@ -5,7 +5,7 @@ use http_body_util::BodyExt;
 use tower::ServiceExt;
 
 use rustyip::db;
-use rustyip::handlers::AppState;
+use rustyip::handlers::{AppState, build_openapi_json};
 use rustyip::routes::build_router;
 
 fn test_db_path() -> String {
@@ -24,10 +24,13 @@ fn build_test_app() -> axum::Router {
 fn build_test_app_with_dev_mode(dev_mode: bool) -> axum::Router {
     let reader = db::load_db(Path::new(&test_db_path())).expect("failed to load test DB");
     let shared_db = db::new_shared(reader);
+    let site_domain: std::sync::Arc<str> = "test.example.com".into();
+    let openapi_json = build_openapi_json(&site_domain);
     let state = AppState {
         db: shared_db,
-        site_domain: "test.example.com".into(),
+        site_domain,
         dev_mode,
+        openapi_json,
     };
     build_router(state)
 }

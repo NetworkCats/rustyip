@@ -24,6 +24,7 @@ pub struct AppState {
     pub db: SharedDb,
     pub site_domain: Arc<str>,
     pub dev_mode: bool,
+    pub openapi_json: Arc<str>,
 }
 
 #[derive(Template)]
@@ -329,12 +330,23 @@ pub async fn tor_handler(
     Ok(format!("{}\n", proxy.is_tor))
 }
 
-pub async fn openapi_json() -> Response {
+pub async fn openapi_json(State(state): State<AppState>) -> Response {
     (
         [(header::CONTENT_TYPE, "application/json; charset=utf-8")],
-        include_str!("../openapi.json"),
+        String::from(state.openapi_json.as_ref()),
     )
         .into_response()
+}
+
+pub fn build_openapi_json(site_domain: &str) -> Arc<str> {
+    let mut spec: serde_json::Value =
+        serde_json::from_str(include_str!("../openapi.json")).expect("openapi.json must be valid");
+
+    let server_url = format!("https://{site_domain}");
+    spec["servers"] = serde_json::json!([{ "url": server_url }]);
+
+    let json = serde_json::to_string_pretty(&spec).expect("serialization cannot fail");
+    Arc::from(json)
 }
 
 pub async fn robots_txt(State(state): State<AppState>) -> Response {

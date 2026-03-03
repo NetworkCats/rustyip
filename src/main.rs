@@ -43,10 +43,14 @@ async fn main() {
         cancel.clone(),
     );
 
+    let site_domain: std::sync::Arc<str> = config.site_domain.into();
+    let openapi_json = handlers::build_openapi_json(&site_domain);
+
     let state = handlers::AppState {
         db: shared_db,
-        site_domain: config.site_domain.into(),
+        site_domain,
         dev_mode: config.dev_mode,
+        openapi_json,
     };
 
     let app = routes::build_router(state);

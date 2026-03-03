@@ -8,16 +8,7 @@
       "name": "MIT"
     }
   },
-  "servers": [
-    {
-      "url": "https://{domain}",
-      "variables": {
-        "domain": {
-          "default": "localhost:3000"
-        }
-      }
-    }
-  ],
+  "servers": [],
   "paths": {
     "/json": {
       "get": {
