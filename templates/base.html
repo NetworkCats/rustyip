@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ site_domain }}{% endblock %}</title>
+  {% block head_meta %}{% endblock %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  {% block head_preconnect %}{% endblock %}
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&display=swap">
+  {% block head_stylesheets %}{% endblock %}
+  <link rel="stylesheet" href="/static/style.css?v={{ css_version }}">
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  {% block footer %}{% endblock %}
+</body>
+</html>

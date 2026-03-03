@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>What is my IP address? - {{ site_domain }}</title>
+{% extends "base.html" %}
+
+{% block title %}What is my IP address? - {{ site_domain }}{% endblock %}
+
+{% block head_meta %}
   <meta name="description" content="Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address.">
   <link rel="canonical" href="https://{{ site_domain }}/">
   <meta name="theme-color" content="#007AFF" media="(prefers-color-scheme: light)">
@@ -15,31 +14,19 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="What is my IP address? - {{ site_domain }}">
   <meta name="twitter:description" content="Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+{% endblock %}
+
+{% block head_preconnect %}
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&display=swap">
+{% endblock %}
+
+{% block head_stylesheets %}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.min.css">
-  <link rel="stylesheet" href="/static/style.css?v={{ css_version }}">
-</head>
-<body>
-  <main>
-    <form method="GET" action="/" class="search-form" role="search">
-      <div class="search-input-wrap">
-        <label for="ip-search" class="sr-only">Search IP address</label>
-        <i class="icon-magnifier search-icon" aria-hidden="true"></i>
-        <input
-          id="ip-search"
-          type="text"
-          name="ip"
-          placeholder="Type to search IP data"
-          value="{{ query }}"
-          autocomplete="off"
-          autocapitalize="none"
-          spellcheck="false"
-        >
-      </div>
-    </form>
+{% endblock %}
+
+{% block content %}
+    {% let autofocus = false %}
+    {% include "_search_form.html" %}
 
     <h1 class="ip-display">{{ ip }}</h1>
 
@@ -203,16 +190,12 @@ curl {{ site_domain }}/tor</code></pre>
         </div>
       </details>
     </section>
-  </main>
+{% endblock %}
 
+{% block footer %}
   <footer class="site-footer">
     <div class="footer-inner">
-      <p class="footer-license">Website source code licensed under <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0</a></p>
-      <nav class="footer-links" aria-label="Project links">
-        <a href="https://github.com/NetworkCats/rustyip"><i class="icon-social-github" aria-hidden="true"></i> Website Source</a>
-        <span class="footer-sep" aria-hidden="true">|</span>
-        <a href="https://github.com/NetworkCats/Merged-IP-Data"><i class="icon-social-github" aria-hidden="true"></i> IP Database</a>
-      </nav>
+      {% include "_footer.html" %}
       <div class="footer-attribution">
         <p>IP data provided by:</p>
         <ul>
@@ -225,5 +208,4 @@ curl {{ site_domain }}/tor</code></pre>
       </div>
     </div>
   </footer>
-</body>
-</html>
+{% endblock %}

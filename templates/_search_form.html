@@ -1,0 +1,17 @@
+<form method="GET" action="/" class="search-form" role="search">
+  <div class="search-input-wrap">
+    <label for="ip-search" class="sr-only">Search IP address</label>
+    <i class="icon-magnifier search-icon" aria-hidden="true"></i>
+    <input
+      id="ip-search"
+      type="text"
+      name="ip"
+      placeholder="Type to search IP data"
+      value="{{ query }}"
+      autocomplete="off"
+      autocapitalize="none"
+      spellcheck="false"
+      {% if autofocus %}autofocus{% endif %}
+    >
+  </div>
+</form>
