@@ -272,6 +272,59 @@ main {
   }
 }
 
+.site-footer {
+  max-inline-size: 540px;
+  margin-block-start: 64px;
+  margin-inline: auto;
+  padding-inline: 20px;
+  padding-block-end: 48px;
+  border-block-start: 1px solid var(--color-separator);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-label-secondary);
+  text-align: center;
+
+  .footer-inner {
+    padding-block-start: 24px;
+  }
+
+  a {
+    color: var(--color-link);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .footer-license {
+    margin-block-end: 8px;
+  }
+
+  .footer-links {
+    margin-block-end: 16px;
+  }
+
+  .footer-sep {
+    margin-inline: 8px;
+    color: var(--color-label-tertiary);
+  }
+
+  .footer-attribution {
+    p {
+      margin-block-end: 6px;
+    }
+
+    ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4px 16px;
+    }
+  }
+}
+
 @media (max-width: 480px) {
   main {
     margin-block-start: 40px;
@@ -301,6 +354,13 @@ main {
     .faq-content {
       font-size: 13px;
     }
+  }
+
+  .site-footer {
+    margin-block-start: 40px;
+    padding-inline: 16px;
+    padding-block-end: 32px;
+    font-size: 12px;
   }
 }
 
