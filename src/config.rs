@@ -7,6 +7,7 @@ pub struct Config {
     pub db_update_url: String,
     pub db_update_interval_hours: u64,
     pub site_domain: String,
+    pub dev_mode: bool,
 }
 
 impl Config {
@@ -30,12 +31,17 @@ impl Config {
 
         let site_domain = env::var("SITE_DOMAIN").unwrap_or_else(|_| "localhost".to_string());
 
+        let dev_mode = env::var("DEV_MODE")
+            .unwrap_or_default()
+            .eq_ignore_ascii_case("true");
+
         Self {
             listen_addr,
             db_path,
             db_update_url,
             db_update_interval_hours,
             site_domain,
+            dev_mode,
         }
     }
 }
@@ -61,6 +67,7 @@ mod tests {
         "DB_UPDATE_URL",
         "DB_UPDATE_INTERVAL_HOURS",
         "SITE_DOMAIN",
+        "DEV_MODE",
     ];
 
     // SAFETY: These env var helpers are only called while holding ENV_LOCK,
@@ -91,6 +98,7 @@ mod tests {
         assert!(config.db_update_url.contains("Merged-IP.mmdb"));
         assert_eq!(config.db_update_interval_hours, 24);
         assert_eq!(config.site_domain, "localhost");
+        assert!(!config.dev_mode);
     }
 
     #[test]
@@ -171,6 +179,48 @@ mod tests {
 
         // SAFETY: ENV_LOCK is held.
         unsafe { remove_var("SITE_DOMAIN") };
+    }
+
+    #[test]
+    fn dev_mode_enabled() {
+        let _guard = lock_env();
+        // SAFETY: ENV_LOCK is held.
+        unsafe {
+            clear_config_vars();
+            set_var("DEV_MODE", "true");
+        }
+
+        let config = Config::from_env();
+        assert!(config.dev_mode);
+
+        // SAFETY: ENV_LOCK is held.
+        unsafe { remove_var("DEV_MODE") };
+    }
+
+    #[test]
+    fn dev_mode_case_insensitive() {
+        let _guard = lock_env();
+        // SAFETY: ENV_LOCK is held.
+        unsafe {
+            clear_config_vars();
+            set_var("DEV_MODE", "True");
+        }
+
+        let config = Config::from_env();
+        assert!(config.dev_mode);
+
+        // SAFETY: ENV_LOCK is held.
+        unsafe { remove_var("DEV_MODE") };
+    }
+
+    #[test]
+    fn dev_mode_disabled_by_default() {
+        let _guard = lock_env();
+        // SAFETY: ENV_LOCK is held.
+        unsafe { clear_config_vars() };
+
+        let config = Config::from_env();
+        assert!(!config.dev_mode);
     }
 
     #[test]

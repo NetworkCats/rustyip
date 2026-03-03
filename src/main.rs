@@ -41,6 +41,7 @@ async fn main() {
     let state = handlers::AppState {
         db: shared_db,
         site_domain: config.site_domain.into(),
+        dev_mode: config.dev_mode,
     };
 
     let app = routes::build_router(state);

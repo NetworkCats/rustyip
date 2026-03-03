@@ -18,11 +18,16 @@ fn test_db_path() -> String {
 }
 
 fn build_test_app() -> axum::Router {
+    build_test_app_with_dev_mode(false)
+}
+
+fn build_test_app_with_dev_mode(dev_mode: bool) -> axum::Router {
     let reader = db::load_db(Path::new(&test_db_path())).expect("failed to load test DB");
     let shared_db = db::new_shared(reader);
     let state = AppState {
         db: shared_db,
         site_domain: "test.example.com".into(),
+        dev_mode,
     };
     build_router(state)
 }
@@ -473,4 +478,82 @@ async fn html_uses_th_for_row_headers() {
     assert!(body.contains("<th scope=\"row\">ASN</th>"));
     assert!(body.contains("<th scope=\"row\">Country</th>"));
     assert!(body.contains("autocapitalize=\"none\""));
+}
+
+// --- Dev mode tests ---
+
+#[tokio::test]
+async fn dev_mode_root_returns_html_without_cf_header() {
+    let app = build_test_app_with_dev_mode(true);
+    let (status, body) = get_with_headers(
+        &app,
+        "/",
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(body.contains("<!DOCTYPE html>"));
+    assert!(body.contains("1.1.1.1"));
+}
+
+#[tokio::test]
+async fn dev_mode_cli_returns_fallback_ip() {
+    let app = build_test_app_with_dev_mode(true);
+    let (status, body) = get_with_headers(&app, "/", vec![("User-Agent", "curl/8.7.1")]).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "1.1.1.1");
+}
+
+#[tokio::test]
+async fn dev_mode_json_returns_fallback_ip() {
+    let app = build_test_app_with_dev_mode(true);
+    let (status, body) = get(&app, "/json").await;
+    assert_eq!(status, StatusCode::OK);
+    let json: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(json["ip"], "1.1.1.1");
+}
+
+#[tokio::test]
+async fn dev_mode_cf_header_takes_precedence() {
+    let app = build_test_app_with_dev_mode(true);
+    let (status, body) = get_with_headers(
+        &app,
+        "/",
+        vec![
+            ("User-Agent", "curl/8.7.1"),
+            ("CF-Connecting-IP", "8.8.8.8"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "8.8.8.8");
+}
+
+#[tokio::test]
+async fn dev_mode_query_param_overrides_fallback() {
+    let app = build_test_app_with_dev_mode(true);
+    let (status, body) = get(&app, "/json?ip=45.77.77.77").await;
+    assert_eq!(status, StatusCode::OK);
+    let json: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(json["ip"], "45.77.77.77");
+}
+
+#[tokio::test]
+async fn dev_mode_field_endpoints_return_fallback_data() {
+    let app = build_test_app_with_dev_mode(true);
+
+    let (status, body) = get(&app, "/ip").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "1.1.1.1");
+
+    let (status, body) = get(&app, "/asn").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "AS13335");
+
+    let (status, body) = get(&app, "/org").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "Cloudflare, Inc.");
 }

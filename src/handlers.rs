@@ -17,10 +17,13 @@ pub struct IpQuery {
     pub ip: Option<String>,
 }
 
+const DEV_FALLBACK_IP: IpAddr = IpAddr::V4(std::net::Ipv4Addr::new(1, 1, 1, 1));
+
 #[derive(Clone)]
 pub struct AppState {
     pub db: SharedDb,
     pub site_domain: Arc<str>,
+    pub dev_mode: bool,
 }
 
 #[derive(Template)]
@@ -40,22 +43,30 @@ struct IndexTemplate {
     is_tor: bool,
 }
 
-fn resolve_ip(headers: &HeaderMap, query: &IpQuery) -> Result<IpAddr, AppError> {
+fn resolve_ip(headers: &HeaderMap, query: &IpQuery, dev_mode: bool) -> Result<IpAddr, AppError> {
     if let Some(ref ip_str) = query.ip {
         let trimmed = ip_str.trim();
         if !trimmed.is_empty() {
             return trimmed.parse().map_err(|_| AppError::InvalidIp);
         }
     }
-    extract_client_ip(headers)
+    extract_client_ip(headers, dev_mode)
 }
 
-fn extract_client_ip(headers: &HeaderMap) -> Result<IpAddr, AppError> {
-    headers
+fn extract_client_ip(headers: &HeaderMap, dev_mode: bool) -> Result<IpAddr, AppError> {
+    if let Some(ip) = headers
         .get("CF-Connecting-IP")
         .and_then(|v| v.to_str().ok())
         .and_then(|s| s.trim().parse().ok())
-        .ok_or(AppError::MissingClientIp)
+    {
+        return Ok(ip);
+    }
+
+    if dev_mode {
+        return Ok(DEV_FALLBACK_IP);
+    }
+
+    Err(AppError::MissingClientIp)
 }
 
 fn lookup_ip(db: &SharedDb, ip: IpAddr) -> Result<IpInfo, AppError> {
@@ -110,17 +121,17 @@ pub async fn root(
         .unwrap_or("");
 
     if is_cli_user_agent(ua) && query.ip.is_none() {
-        let ip = extract_client_ip(&headers)?;
+        let ip = extract_client_ip(&headers, state.dev_mode)?;
         return Ok(format!("{ip}\n").into_response());
     }
 
     if wants_json(&headers) && query.ip.is_none() {
-        let ip = extract_client_ip(&headers)?;
+        let ip = extract_client_ip(&headers, state.dev_mode)?;
         let info = lookup_ip(&state.db, ip)?;
         return Ok(axum::Json(info).into_response());
     }
 
-    let ip = resolve_ip(&headers, &query)?;
+    let ip = resolve_ip(&headers, &query, state.dev_mode)?;
     let info = lookup_ip(&state.db, ip)?;
 
     let template = IndexTemplate {
@@ -150,16 +161,17 @@ pub async fn json_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<axum::Json<IpInfo>, AppError> {
-    let ip = resolve_ip(&headers, &query)?;
+    let ip = resolve_ip(&headers, &query, state.dev_mode)?;
     let info = lookup_ip(&state.db, ip)?;
     Ok(axum::Json(info))
 }
 
 pub async fn ip_handler(
+    State(state): State<AppState>,
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
-    let ip = resolve_ip(&headers, &query)?;
+    let ip = resolve_ip(&headers, &query, state.dev_mode)?;
     Ok(format!("{ip}\n"))
 }
 
@@ -168,7 +180,7 @@ pub async fn asn_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
-    let ip = resolve_ip(&headers, &query)?;
+    let ip = resolve_ip(&headers, &query, state.dev_mode)?;
     let reader = state.db.load();
     let text = db::lookup_asn_number(&reader, ip)
         .map(|n| format!("AS{n}"))
@@ -181,7 +193,7 @@ pub async fn org_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
-    let ip = resolve_ip(&headers, &query)?;
+    let ip = resolve_ip(&headers, &query, state.dev_mode)?;
     let reader = state.db.load();
     let org = db::lookup_asn_org(&reader, ip).unwrap_or_default();
     Ok(format!("{org}\n"))
@@ -192,7 +204,7 @@ pub async fn country_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
-    let ip = resolve_ip(&headers, &query)?;
+    let ip = resolve_ip(&headers, &query, state.dev_mode)?;
     let reader = state.db.load();
     let country = db::lookup_country_name(&reader, ip).unwrap_or_default();
     Ok(format!("{country}\n"))
@@ -203,7 +215,7 @@ pub async fn city_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
-    let ip = resolve_ip(&headers, &query)?;
+    let ip = resolve_ip(&headers, &query, state.dev_mode)?;
     let reader = state.db.load();
     let city = db::lookup_city_name(&reader, ip).unwrap_or_default();
     Ok(format!("{city}\n"))
@@ -214,7 +226,7 @@ pub async fn proxy_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
-    let ip = resolve_ip(&headers, &query)?;
+    let ip = resolve_ip(&headers, &query, state.dev_mode)?;
     let reader = state.db.load();
     let proxy = db::lookup_proxy(&reader, ip).ok_or(AppError::DbLookupFailed)?;
     Ok(format!("{}\n", proxy.is_proxy))
@@ -225,7 +237,7 @@ pub async fn vpn_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
-    let ip = resolve_ip(&headers, &query)?;
+    let ip = resolve_ip(&headers, &query, state.dev_mode)?;
     let reader = state.db.load();
     let proxy = db::lookup_proxy(&reader, ip).ok_or(AppError::DbLookupFailed)?;
     Ok(format!("{}\n", proxy.is_vpn))
@@ -236,7 +248,7 @@ pub async fn hosting_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
-    let ip = resolve_ip(&headers, &query)?;
+    let ip = resolve_ip(&headers, &query, state.dev_mode)?;
     let reader = state.db.load();
     let proxy = db::lookup_proxy(&reader, ip).ok_or(AppError::DbLookupFailed)?;
     Ok(format!("{}\n", proxy.is_hosting))
@@ -247,7 +259,7 @@ pub async fn tor_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
-    let ip = resolve_ip(&headers, &query)?;
+    let ip = resolve_ip(&headers, &query, state.dev_mode)?;
     let reader = state.db.load();
     let proxy = db::lookup_proxy(&reader, ip).ok_or(AppError::DbLookupFailed)?;
     Ok(format!("{}\n", proxy.is_tor))
