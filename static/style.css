@@ -176,21 +176,13 @@ main {
     margin-block-end: 16px;
   }
 
-  details {
-    border-block-start: 1px solid var(--color-separator);
-
-    &:last-child {
-      border-block-end: 1px solid var(--color-separator);
-    }
-  }
-
   summary {
     padding-block: 12px;
     font-size: 15px;
     font-weight: 600;
     color: var(--color-label);
     cursor: pointer;
-    list-style: disclosure-closed;
+    list-style: disclosure-closed inside;
 
     &::marker {
       color: var(--color-label-secondary);
@@ -198,7 +190,7 @@ main {
   }
 
   details[open] > summary {
-    list-style: disclosure-open;
+    list-style: disclosure-open inside;
   }
 
   .faq-content {
