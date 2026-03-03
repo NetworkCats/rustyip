@@ -148,10 +148,7 @@ fn render_error_page(site_domain: &Arc<str>, status: StatusCode, message: &str) 
         site_domain: site_domain.clone(),
         css_version: static_assets::asset_version("style.css"),
         status_code: status.as_u16(),
-        status_text: status
-            .canonical_reason()
-            .unwrap_or("Error")
-            .to_owned(),
+        status_text: status.canonical_reason().unwrap_or("Error").to_owned(),
         error_message: message.to_owned(),
     };
     match template.render() {

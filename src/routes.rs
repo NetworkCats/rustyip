@@ -1,6 +1,6 @@
+use axum::Router;
 use axum::middleware;
 use axum::routing::get;
-use axum::Router;
 
 use crate::handlers::{self, AppState};
 use crate::middleware::security_headers;
