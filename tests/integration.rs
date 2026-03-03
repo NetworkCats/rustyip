@@ -557,3 +557,98 @@ async fn dev_mode_field_endpoints_return_fallback_data() {
     assert_eq!(status, StatusCode::OK);
     assert_eq!(body.trim(), "Cloudflare, Inc.");
 }
+
+// --- Error page tests ---
+
+#[tokio::test]
+async fn not_found_returns_html_error_page() {
+    let app = build_test_app();
+    let (status, body) = get(&app, "/nonexistent-page").await;
+    assert_eq!(status, StatusCode::NOT_FOUND);
+    assert!(body.contains("<!DOCTYPE html>"));
+    assert!(body.contains("404"));
+    assert!(body.contains("Not Found"));
+    assert!(body.contains("Go to Home"));
+}
+
+#[tokio::test]
+async fn browser_invalid_ip_shows_alert_html() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/?ip=not-an-ip",
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
+    )
+    .await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+    assert!(body.contains("<!DOCTYPE html>"));
+    assert!(body.contains("alert("));
+    assert!(body.contains("Invalid IP address"));
+    assert!(body.contains("not-an-ip"));
+}
+
+#[tokio::test]
+async fn browser_db_lookup_failed_shows_alert_html() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/?ip=0.0.0.0",
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
+    )
+    .await;
+    assert_eq!(status, StatusCode::INTERNAL_SERVER_ERROR);
+    assert!(body.contains("<!DOCTYPE html>"));
+    assert!(body.contains("alert("));
+    assert!(body.contains("Database lookup failed"));
+}
+
+#[tokio::test]
+async fn browser_missing_client_ip_shows_alert_html() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/",
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
+    )
+    .await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+    assert!(body.contains("<!DOCTYPE html>"));
+    assert!(body.contains("alert("));
+    assert!(body.contains("Missing client IP address"));
+}
+
+#[tokio::test]
+async fn cli_invalid_ip_returns_plain_text() {
+    let app = build_test_app();
+    let (status, body) = get(&app, "/json?ip=not-an-ip").await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+    assert!(!body.contains("<!DOCTYPE html>"));
+    assert_eq!(body, "Invalid IP address");
+}
+
+#[tokio::test]
+async fn error_alert_page_has_search_form() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/?ip=bad-ip",
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
+    )
+    .await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+    assert!(body.contains("<form"));
+    assert!(body.contains("value=\"bad-ip\""));
+    assert!(body.contains("autofocus"));
+}

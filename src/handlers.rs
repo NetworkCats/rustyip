@@ -43,6 +43,25 @@ struct IndexTemplate {
     is_tor: bool,
 }
 
+#[derive(Template)]
+#[template(path = "error_alert.html")]
+struct ErrorAlertTemplate {
+    site_domain: Arc<str>,
+    css_version: u64,
+    query: String,
+    error_message: String,
+}
+
+#[derive(Template)]
+#[template(path = "error_page.html")]
+struct ErrorPageTemplate {
+    site_domain: Arc<str>,
+    css_version: u64,
+    status_code: u16,
+    status_text: String,
+    error_message: String,
+}
+
 fn resolve_ip(headers: &HeaderMap, query: &IpQuery, dev_mode: bool) -> Result<IpAddr, AppError> {
     if let Some(ref ip_str) = query.ip {
         let trimmed = ip_str.trim();
@@ -110,29 +129,74 @@ fn format_city(info: &IpInfo) -> &str {
         .unwrap_or_default()
 }
 
+fn render_error_alert(state: &AppState, query: &str, error: &AppError) -> Response {
+    let template = ErrorAlertTemplate {
+        site_domain: state.site_domain.clone(),
+        css_version: static_assets::asset_version("style.css"),
+        query: query.to_owned(),
+        error_message: error.message().to_owned(),
+    };
+    let status = error.status_code();
+    match template.render() {
+        Ok(html) => (status, Html(html)).into_response(),
+        Err(_) => (status, error.message()).into_response(),
+    }
+}
+
+fn render_error_page(site_domain: &Arc<str>, status: StatusCode, message: &str) -> Response {
+    let template = ErrorPageTemplate {
+        site_domain: site_domain.clone(),
+        css_version: static_assets::asset_version("style.css"),
+        status_code: status.as_u16(),
+        status_text: status
+            .canonical_reason()
+            .unwrap_or("Error")
+            .to_owned(),
+        error_message: message.to_owned(),
+    };
+    match template.render() {
+        Ok(html) => (status, Html(html)).into_response(),
+        Err(_) => (status, message.to_owned()).into_response(),
+    }
+}
+
 pub async fn root(
     State(state): State<AppState>,
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
-) -> Result<Response, AppError> {
+) -> Response {
     let ua = headers
         .get("User-Agent")
         .and_then(|v| v.to_str().ok())
         .unwrap_or("");
 
     if is_cli_user_agent(ua) && query.ip.is_none() {
-        let ip = extract_client_ip(&headers, state.dev_mode)?;
-        return Ok(format!("{ip}\n").into_response());
+        return match extract_client_ip(&headers, state.dev_mode) {
+            Ok(ip) => format!("{ip}\n").into_response(),
+            Err(e) => e.into_response(),
+        };
     }
 
     if wants_json(&headers) && query.ip.is_none() {
-        let ip = extract_client_ip(&headers, state.dev_mode)?;
-        let info = lookup_ip(&state.db, ip)?;
-        return Ok(axum::Json(info).into_response());
+        return match extract_client_ip(&headers, state.dev_mode)
+            .and_then(|ip| lookup_ip(&state.db, ip))
+        {
+            Ok(info) => axum::Json(info).into_response(),
+            Err(e) => e.into_response(),
+        };
     }
 
-    let ip = resolve_ip(&headers, &query, state.dev_mode)?;
-    let info = lookup_ip(&state.db, ip)?;
+    let query_str = query.ip.clone().unwrap_or_default();
+
+    let ip = match resolve_ip(&headers, &query, state.dev_mode) {
+        Ok(ip) => ip,
+        Err(e) => return render_error_alert(&state, &query_str, &e),
+    };
+
+    let info = match lookup_ip(&state.db, ip) {
+        Ok(info) => info,
+        Err(e) => return render_error_alert(&state, &query_str, &e),
+    };
 
     let template = IndexTemplate {
         ip: info.ip.clone(),
@@ -149,7 +213,10 @@ pub async fn root(
         is_tor: info.proxy.is_tor,
     };
 
-    Ok(Html(template.render().map_err(|_| AppError::DbLookupFailed)?).into_response())
+    match template.render() {
+        Ok(html) => Html(html).into_response(),
+        Err(_) => render_error_alert(&state, &query_str, &AppError::TemplateRenderFailed),
+    }
 }
 
 pub async fn health() -> StatusCode {
@@ -302,4 +369,12 @@ pub async fn sitemap_xml(State(state): State<AppState>) -> Response {
         body,
     )
         .into_response()
+}
+
+pub async fn not_found(State(state): State<AppState>) -> Response {
+    render_error_page(
+        &state.site_domain,
+        StatusCode::NOT_FOUND,
+        "The page you are looking for does not exist.",
+    )
 }

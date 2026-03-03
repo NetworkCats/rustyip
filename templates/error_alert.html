@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Error - {{ site_domain }}</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.min.css">
+  <link rel="stylesheet" href="/static/style.css?v={{ css_version }}">
+  <script>alert("{{ error_message }}");</script>
+</head>
+<body>
+  <main>
+    <form method="GET" action="/" class="search-form" role="search">
+      <div class="search-input-wrap">
+        <label for="ip-search" class="sr-only">Search IP address</label>
+        <i class="icon-magnifier search-icon" aria-hidden="true"></i>
+        <input
+          id="ip-search"
+          type="text"
+          name="ip"
+          placeholder="Type to search IP data"
+          value="{{ query }}"
+          autocomplete="off"
+          autocapitalize="none"
+          spellcheck="false"
+          autofocus
+        >
+      </div>
+    </form>
+
+    <div class="error-banner" role="alert">
+      <p>{{ error_message }}</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-license">Website source code licensed under <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0</a></p>
+      <nav class="footer-links" aria-label="Project links">
+        <a href="https://github.com/NetworkCats/rustyip"><i class="icon-social-github" aria-hidden="true"></i> Website Source</a>
+        <span class="footer-sep" aria-hidden="true">|</span>
+        <a href="https://github.com/NetworkCats/Merged-IP-Data"><i class="icon-social-github" aria-hidden="true"></i> IP Database</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

@@ -6,17 +6,34 @@ pub enum AppError {
     InvalidIp,
     MissingClientIp,
     DbLookupFailed,
+    TemplateRenderFailed,
+}
+
+impl AppError {
+    pub fn status_code(&self) -> StatusCode {
+        match self {
+            Self::IpNotFound => StatusCode::NOT_FOUND,
+            Self::InvalidIp => StatusCode::BAD_REQUEST,
+            Self::MissingClientIp => StatusCode::BAD_REQUEST,
+            Self::DbLookupFailed => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::TemplateRenderFailed => StatusCode::INTERNAL_SERVER_ERROR,
+        }
+    }
+
+    pub fn message(&self) -> &'static str {
+        match self {
+            Self::IpNotFound => "IP not found in database",
+            Self::InvalidIp => "Invalid IP address",
+            Self::MissingClientIp => "Missing client IP address",
+            Self::DbLookupFailed => "Database lookup failed",
+            Self::TemplateRenderFailed => "Template render failed",
+        }
+    }
 }
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        let (status, message) = match self {
-            Self::IpNotFound => (StatusCode::NOT_FOUND, "IP not found in database"),
-            Self::InvalidIp => (StatusCode::BAD_REQUEST, "Invalid IP address"),
-            Self::MissingClientIp => (StatusCode::BAD_REQUEST, "Missing client IP address"),
-            Self::DbLookupFailed => (StatusCode::INTERNAL_SERVER_ERROR, "Database lookup failed"),
-        };
-        (status, message).into_response()
+        (self.status_code(), self.message()).into_response()
     }
 }
 
@@ -73,6 +90,16 @@ mod tests {
             AppError::DbLookupFailed,
             StatusCode::INTERNAL_SERVER_ERROR,
             "Database lookup failed",
+        )
+        .await;
+    }
+
+    #[tokio::test]
+    async fn template_render_failed_returns_500() {
+        check_error_response(
+            AppError::TemplateRenderFailed,
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Template render failed",
         )
         .await;
     }

@@ -1,6 +1,6 @@
-use axum::Router;
 use axum::middleware;
 use axum::routing::get;
+use axum::Router;
 
 use crate::handlers::{self, AppState};
 use crate::middleware::security_headers;
@@ -23,6 +23,7 @@ pub fn build_router(state: AppState) -> Router {
         .route("/hosting", get(handlers::hosting_handler))
         .route("/tor", get(handlers::tor_handler))
         .route("/static/{*path}", get(static_assets::serve_static))
+        .fallback(handlers::not_found)
         .layer(middleware::from_fn(security_headers))
         .with_state(state)
 }
