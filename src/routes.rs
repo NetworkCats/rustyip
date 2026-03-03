@@ -1,6 +1,6 @@
-use axum::Router;
 use axum::middleware;
 use axum::routing::get;
+use axum::Router;
 
 use crate::handlers::{self, AppState};
 use crate::middleware::security_headers;
@@ -10,6 +10,7 @@ pub fn build_router(state: AppState) -> Router {
     Router::new()
         .route("/", get(handlers::root))
         .route("/health", get(handlers::health))
+        .route("/openapi.json", get(handlers::openapi_json))
         .route("/robots.txt", get(handlers::robots_txt))
         .route("/sitemap.xml", get(handlers::sitemap_xml))
         .route("/json", get(handlers::json_handler))

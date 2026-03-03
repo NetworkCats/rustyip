@@ -329,6 +329,14 @@ pub async fn tor_handler(
     Ok(format!("{}\n", proxy.is_tor))
 }
 
+pub async fn openapi_json() -> Response {
+    (
+        [(header::CONTENT_TYPE, "application/json; charset=utf-8")],
+        include_str!("../openapi.json"),
+    )
+        .into_response()
+}
+
 pub async fn robots_txt(State(state): State<AppState>) -> Response {
     let body = format!(
         "User-agent: *\n\
@@ -344,6 +352,7 @@ pub async fn robots_txt(State(state): State<AppState>) -> Response {
          Disallow: /hosting\n\
          Disallow: /tor\n\
          Disallow: /health\n\
+         Disallow: /openapi.json\n\
          \n\
          Sitemap: https://{}/sitemap.xml\n",
         state.site_domain
