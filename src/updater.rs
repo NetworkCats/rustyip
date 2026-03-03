@@ -4,7 +4,9 @@ use std::time::Duration;
 
 use tokio::fs;
 use tokio::io::AsyncWriteExt;
-use tracing::error;
+use tokio::task::JoinHandle;
+use tokio_util::sync::CancellationToken;
+use tracing::{error, info};
 
 use crate::db::{DbReader, SharedDb, load_db};
 
@@ -55,16 +57,23 @@ pub fn spawn_updater(
     db_path: PathBuf,
     update_url: String,
     interval_hours: u64,
-) {
+    cancel: CancellationToken,
+) -> JoinHandle<()> {
     tokio::spawn(async move {
         let interval = Duration::from_secs(interval_hours * 3600);
         loop {
-            tokio::time::sleep(interval).await;
+            tokio::select! {
+                () = tokio::time::sleep(interval) => {}
+                () = cancel.cancelled() => {
+                    info!("updater task cancelled, stopping");
+                    break;
+                }
+            }
             if let Err(e) = update_db(&shared_db, &db_path, &update_url).await {
                 error!("database update failed: {e}");
             }
         }
-    });
+    })
 }
 
 async fn update_db(

@@ -15,6 +15,7 @@ reqwest = { version = "0.13", default-features = false, features = ["rustls"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 dotenvy = "0.15"
+tokio-util = "0.7"
 static-files = "0.3.1"
 
 [build-dependencies]

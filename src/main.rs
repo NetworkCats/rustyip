@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
-use tracing::error;
+use tokio_util::sync::CancellationToken;
+use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
 
 use rustyip::{config, db, handlers, routes, updater};
@@ -32,12 +33,14 @@ async fn main() {
     };
 
     let shared_db = db::new_shared(reader);
+    let cancel = CancellationToken::new();
 
-    updater::spawn_updater(
+    let updater_handle = updater::spawn_updater(
         shared_db.clone(),
         db_path,
         config.db_update_url,
         config.db_update_interval_hours,
+        cancel.clone(),
     );
 
     let state = handlers::AppState {
@@ -56,10 +59,33 @@ async fn main() {
         .with_graceful_shutdown(shutdown_signal())
         .await
         .expect("server error");
+
+    info!("server stopped, cleaning up background tasks");
+    cancel.cancel();
+    let _ = updater_handle.await;
+    info!("shutdown complete");
 }
 
 async fn shutdown_signal() {
-    tokio::signal::ctrl_c()
-        .await
-        .expect("failed to listen for ctrl+c");
+    let ctrl_c = async {
+        tokio::signal::ctrl_c()
+            .await
+            .expect("failed to listen for ctrl+c");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+            .expect("failed to listen for SIGTERM")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        () = ctrl_c => info!("received SIGINT, shutting down"),
+        () = terminate => info!("received SIGTERM, shutting down"),
+    }
 }

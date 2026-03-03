@@ -25,4 +25,6 @@ RUN chown -R rustyip:rustyip /app
 
 USER rustyip
 
+STOPSIGNAL SIGTERM
+
 ENTRYPOINT ["rustyip"]
