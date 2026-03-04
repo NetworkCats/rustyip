@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: rustyip\n"
-"POT-Creation-Date: 2026-03-04\n"
+"POT-Creation-Date: 2026-03-05\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -75,51 +75,51 @@ msgid "How to use this service from the command line"
 msgstr ""
 
 #: templates/index.html - FAQ answer
-msgid "You can use various command-line tools such as curl, httpie, and wget to use this service. Taking the most popular one, curl, as an example:"
+msgid "You can use curl, httpie, wget, or whatever command line tool you prefer. Here's an example with curl:"
 msgstr ""
 
 #: templates/index.html - FAQ label
-msgid "Query current IP:"
+msgid "Check your current IP:"
 msgstr ""
 
 #: templates/index.html - FAQ label
-msgid "Query information for your own IP:"
+msgid "Look up information about your own IP:"
 msgstr ""
 
 #: templates/index.html - FAQ label
-msgid "Or display all information in JSON format:"
+msgid "Or get everything in JSON format:"
 msgstr ""
 
 #: templates/index.html - FAQ label
-msgid "Query information for a specific IP:"
+msgid "Look up information about a specific IP:"
 msgstr ""
 
 #: templates/index.html - FAQ question
-msgid "How to force the display of my IPv4 or IPv6 address?"
+msgid "How do I force IPv4 or IPv6?"
 msgstr ""
 
 #: templates/index.html - FAQ answer
-msgid "You can use <code>curl -4</code> or <code>curl -6</code> to view only your IPv4 or IPv6 address respectively."
+msgid "Use <code>curl -4</code> or <code>curl -6</code> to specifically check your IPv4 or IPv6 address."
 msgstr ""
 
 #: templates/index.html - FAQ question
-msgid "How to get a JSON format response?"
+msgid "How do I get a JSON response?"
 msgstr ""
 
 #: templates/index.html - FAQ answer
-msgid "You can send a request to the <code>/json</code> endpoint, or send a request with an <code>application/json</code> header."
+msgid "Send a request to the <code>/json</code> endpoint, or send a request with the <code>application/json</code> header."
 msgstr ""
 
 #: templates/index.html - FAQ question
-msgid "Can I automate calls to your service via programs?"
+msgid "Can I call your service programmatically?"
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 1
-msgid "Certainly, as long as the rate limit is respected. Under normal conditions, the rate limit is 30 RPM (Requests Per Minute); under high load, we will increase the restriction to 10-5 RPM."
+msgid "Sure, but please respect our rate limits. Normally it's 30 RPM, and under heavy load we may drop it to 10 or 5 RPM."
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 2
-msgid "Our API is only suitable for manual calls or small-scale projects. If your website uses our API to query visitor IPs, please ensure you use a message queue to send requests to avoid blocking. If your project has high traffic or is latency-sensitive, please use our open-source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>, which is the same database used by this project."
+msgid "The API is meant for manual use or small projects. If your site uses our API to look up visitor IPs, please use a message queue so requests don't block. If your project has high traffic or needs low latency, you're better off using our open source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. That's actually what this project uses under the hood."
 msgstr ""
 
 #: templates/index.html - FAQ question
@@ -127,19 +127,19 @@ msgid "Where does the IP data come from?"
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 1
-msgid "IP geographic data primarily comes from the free databases of MaxMind and DB-IP; AS data comes from IPinfo's free database; and IP proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> database."
+msgid "Geolocation data mainly comes from the free databases by Maxmind and DB-IP. AS data comes from IPinfo's free database. Proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a>."
 msgstr ""
 
 #: templates/index.html - FAQ answer label
-msgid "Data Attributions:"
+msgid "Data attributions:"
 msgstr ""
 
 #: templates/index.html - FAQ question
-msgid "Can I run my own service?"
+msgid "Can I run my own instance?"
 msgstr ""
 
 #: templates/index.html - FAQ answer
-msgid "Yes, the source code and database for this project are both open-source and hosted on GitHub:"
+msgid "Yes, the source code and database are both open source and on GitHub:"
 msgstr ""
 
 #: templates/index.html - FAQ question
@@ -147,39 +147,39 @@ msgid "How is this website different from other IP lookup sites?"
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 1
-msgid "The biggest difference is that our database includes proxy-related information, and the proxy intelligence we provide is highly accurate. We have privately compared it with commercial proxy detection databases like IPinfo; our database's precision is fully comparable to commercial ones, and it is even more accurate in detecting residential proxies."
+msgid "The biggest thing is proxy detection. Our database covers proxy related data and the accuracy is really good. We've tested it privately against commercial databases like IPinfo's, and we hold up just as well, and actually do better on residential proxy detection."
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 2
-msgid "Secondly, our geographic coverage for IPv6 is more comprehensive because we merge multiple databases to provide more complete data."
+msgid "We also have better IPv6 geolocation coverage since we merge multiple databases together, so the data ends up being more complete."
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 3
-msgid "Our UX is also better than any IP lookup site on the market. The site runs without any JavaScript, and we only load a minimal amount of external resources (fonts, icons), making the initial load speed extremely fast."
+msgid "The UX is also better than most IP lookup sites out there. The site runs without any JavaScript, and we only pull in a minimal amount of external resources (fonts and icons), so it loads fast on the first visit."
 msgstr ""
 
 #: templates/index.html - FAQ question
-msgid "Is this service stable?"
+msgid "Is this service reliable?"
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 1
-msgid "The business logic of this service is written entirely in Rust, offering excellent performance that ensures the site remains operational even under L7 DDoS attacks. The site runs on a VPS with 2 cores and 2 GB of RAM, which is already overkill for this setup -- unless we encounter a massive L7 DDoS attack, though we have Cloudflare in front of us."
+msgid "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 2 core 2 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 2
-msgid "Running this website only costs me $18.00 per month. Because the cost is so low, I will not stop operations due to hardware costs in the foreseeable future, nor will I add any advertisements."
+msgid "It costs me $18.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 3
-msgid "Rest assured, this service will definitely not \"Rug Pull.\""
+msgid "This service is not going to rug pull on you."
 msgstr ""
 
 #: templates/index.html - FAQ question
-msgid "How can I sponsor this service?"
+msgid "How can I support this service?"
 msgstr ""
 
 #: templates/index.html - FAQ answer
-msgid "I accept cryptocurrency donations. If you would like to sponsor, please contact:"
+msgid "I accept crypto donations. If you want to contribute, reach out at:"
 msgstr ""
 
 #: templates/_footer.html - license

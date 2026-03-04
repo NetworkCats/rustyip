@@ -57,86 +57,86 @@ msgstr "常见问题"
 msgid "How to use this service from the command line"
 msgstr "如何从命令行使用本服务"
 
-msgid "You can use various command-line tools such as curl, httpie, and wget to use this service. Taking the most popular one, curl, as an example:"
-msgstr "您可以使用 curl、httpie、wget 等各种命令行工具来使用本服务。以最常用的 curl 为例："
+msgid "You can use curl, httpie, wget, or whatever command line tool you prefer. Here's an example with curl:"
+msgstr "您可以使用 curl、httpie、wget 或您喜欢的任何命令行工具。以下是使用 curl 的示例："
 
-msgid "Query current IP:"
-msgstr "查询当前 IP："
+msgid "Check your current IP:"
+msgstr "查看当前 IP："
 
-msgid "Query information for your own IP:"
+msgid "Look up information about your own IP:"
 msgstr "查询您自己的 IP 信息："
 
-msgid "Or display all information in JSON format:"
-msgstr "或以 JSON 格式显示所有信息："
+msgid "Or get everything in JSON format:"
+msgstr "或以 JSON 格式获取所有信息："
 
-msgid "Query information for a specific IP:"
+msgid "Look up information about a specific IP:"
 msgstr "查询指定 IP 的信息："
 
-msgid "How to force the display of my IPv4 or IPv6 address?"
-msgstr "如何强制显示我的 IPv4 或 IPv6 地址？"
+msgid "How do I force IPv4 or IPv6?"
+msgstr "如何强制使用 IPv4 或 IPv6？"
 
-msgid "You can use <code>curl -4</code> or <code>curl -6</code> to view only your IPv4 or IPv6 address respectively."
-msgstr "您可以使用 <code>curl -4</code> 或 <code>curl -6</code> 来分别仅查看您的 IPv4 或 IPv6 地址。"
+msgid "Use <code>curl -4</code> or <code>curl -6</code> to specifically check your IPv4 or IPv6 address."
+msgstr "使用 <code>curl -4</code> 或 <code>curl -6</code> 来专门查看您的 IPv4 或 IPv6 地址。"
 
-msgid "How to get a JSON format response?"
-msgstr "如何获取 JSON 格式的响应？"
+msgid "How do I get a JSON response?"
+msgstr "如何获取 JSON 响应？"
 
-msgid "You can send a request to the <code>/json</code> endpoint, or send a request with an <code>application/json</code> header."
-msgstr "您可以向 <code>/json</code> 端点发送请求，或发送带有 <code>application/json</code> 头的请求。"
+msgid "Send a request to the <code>/json</code> endpoint, or send a request with the <code>application/json</code> header."
+msgstr "向 <code>/json</code> 端点发送请求，或发送带有 <code>application/json</code> 头的请求。"
 
-msgid "Can I automate calls to your service via programs?"
-msgstr "我可以通过程序自动调用你们的服务吗？"
+msgid "Can I call your service programmatically?"
+msgstr "我可以通过程序调用你们的服务吗？"
 
-msgid "Certainly, as long as the rate limit is respected. Under normal conditions, the rate limit is 30 RPM (Requests Per Minute); under high load, we will increase the restriction to 10-5 RPM."
-msgstr "当然可以，只要遵守速率限制即可。正常情况下，速率限制为 30 RPM（每分钟请求数）；在高负载情况下，我们会将限制提高到 10-5 RPM。"
+msgid "Sure, but please respect our rate limits. Normally it's 30 RPM, and under heavy load we may drop it to 10 or 5 RPM."
+msgstr "当然可以，但请遵守我们的速率限制。通常为 30 RPM，在高负载时可能会降至 10 或 5 RPM。"
 
-msgid "Our API is only suitable for manual calls or small-scale projects. If your website uses our API to query visitor IPs, please ensure you use a message queue to send requests to avoid blocking. If your project has high traffic or is latency-sensitive, please use our open-source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>, which is the same database used by this project."
-msgstr "我们的 API 仅适用于手动调用或小规模项目。如果您的网站使用我们的 API 查询访客 IP，请确保使用消息队列发送请求以避免阻塞。如果您的项目流量较大或对延迟敏感，请使用我们的开源离线数据库：<a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>，这与本项目使用的是同一个数据库。"
+msgid "The API is meant for manual use or small projects. If your site uses our API to look up visitor IPs, please use a message queue so requests don't block. If your project has high traffic or needs low latency, you're better off using our open source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. That's actually what this project uses under the hood."
+msgstr "本 API 适用于手动使用或小型项目。如果您的网站使用我们的 API 查询访客 IP，请使用消息队列以避免请求阻塞。如果您的项目流量较大或需要低延迟，建议使用我们的开源离线数据库：<a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>。实际上这就是本项目底层使用的数据库。"
 
 msgid "Where does the IP data come from?"
 msgstr "IP 数据来自哪里？"
 
-msgid "IP geographic data primarily comes from the free databases of MaxMind and DB-IP; AS data comes from IPinfo's free database; and IP proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> database."
-msgstr "IP 地理数据主要来自 MaxMind 和 DB-IP 的免费数据库；AS 数据来自 IPinfo 的免费数据库；IP 代理数据来自我自己的 <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> 数据库。"
+msgid "Geolocation data mainly comes from the free databases by Maxmind and DB-IP. AS data comes from IPinfo's free database. Proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a>."
+msgstr "地理位置数据主要来自 Maxmind 和 DB-IP 的免费数据库。AS 数据来自 IPinfo 的免费数据库。代理数据来自我自己的 <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a>。"
 
-msgid "Data Attributions:"
+msgid "Data attributions:"
 msgstr "数据来源："
 
-msgid "Can I run my own service?"
-msgstr "我可以自己搭建这个服务吗？"
+msgid "Can I run my own instance?"
+msgstr "我可以自己搭建实例吗？"
 
-msgid "Yes, the source code and database for this project are both open-source and hosted on GitHub:"
-msgstr "可以，本项目的源代码和数据库均为开源，托管在 GitHub 上："
+msgid "Yes, the source code and database are both open source and on GitHub:"
+msgstr "可以，源代码和数据库都是开源的，托管在 GitHub 上："
 
 msgid "How is this website different from other IP lookup sites?"
 msgstr "这个网站与其他 IP 查询网站有什么不同？"
 
-msgid "The biggest difference is that our database includes proxy-related information, and the proxy intelligence we provide is highly accurate. We have privately compared it with commercial proxy detection databases like IPinfo; our database's precision is fully comparable to commercial ones, and it is even more accurate in detecting residential proxies."
-msgstr "最大的区别在于我们的数据库包含代理相关信息，并且我们提供的代理情报非常准确。我们曾私下将其与 IPinfo 等商业代理检测数据库进行对比；我们数据库的精度完全可以与商业数据库媲美，在检测住宅代理方面甚至更为准确。"
+msgid "The biggest thing is proxy detection. Our database covers proxy related data and the accuracy is really good. We've tested it privately against commercial databases like IPinfo's, and we hold up just as well, and actually do better on residential proxy detection."
+msgstr "最大的亮点是代理检测。我们的数据库涵盖了代理相关数据，准确率非常高。我们曾私下与 IPinfo 等商业数据库进行对比测试，表现不相上下，在住宅代理检测方面甚至更胜一筹。"
 
-msgid "Secondly, our geographic coverage for IPv6 is more comprehensive because we merge multiple databases to provide more complete data."
-msgstr "其次，我们对 IPv6 的地理覆盖更加全面，因为我们合并了多个数据库以提供更完整的数据。"
+msgid "We also have better IPv6 geolocation coverage since we merge multiple databases together, so the data ends up being more complete."
+msgstr "我们的 IPv6 地理位置覆盖也更好，因为我们合并了多个数据库，所以数据更加完整。"
 
-msgid "Our UX is also better than any IP lookup site on the market. The site runs without any JavaScript, and we only load a minimal amount of external resources (fonts, icons), making the initial load speed extremely fast."
-msgstr "我们的用户体验也优于市面上任何 IP 查询网站。本站无需任何 JavaScript 即可运行，并且仅加载极少量的外部资源（字体、图标），使得首次加载速度极快。"
+msgid "The UX is also better than most IP lookup sites out there. The site runs without any JavaScript, and we only pull in a minimal amount of external resources (fonts and icons), so it loads fast on the first visit."
+msgstr "用户体验也优于大多数 IP 查询网站。本站无需任何 JavaScript 即可运行，仅加载极少量的外部资源（字体和图标），因此首次访问加载非常快。"
 
-msgid "Is this service stable?"
-msgstr "这个服务稳定吗？"
+msgid "Is this service reliable?"
+msgstr "这个服务可靠吗？"
 
-msgid "The business logic of this service is written entirely in Rust, offering excellent performance that ensures the site remains operational even under L7 DDoS attacks. The site runs on a VPS with 2 cores and 2 GB of RAM, which is already overkill for this setup -- unless we encounter a massive L7 DDoS attack, though we have Cloudflare in front of us."
-msgstr "本服务的业务逻辑完全使用 Rust 编写，提供出色的性能，确保即使在 L7 DDoS 攻击下网站仍能正常运行。本站运行在一台拥有 2 核 2 GB 内存的 VPS 上，对于这个配置来说已经绰绰有余——除非遭遇大规模 L7 DDoS 攻击，不过我们前面有 Cloudflare 保护。"
+msgid "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 2 core 2 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."
+msgstr "整个服务使用 Rust 编写，性能非常出色。它能够应对 L7 DDoS 流量并保持正常运行。运行在一台 2 核 2 GB 的 VPS 上，已经绰绰有余。唯一可能造成真正麻烦的是大规模 L7 DDoS 攻击，但我们前面有 Cloudflare 保护。"
 
-msgid "Running this website only costs me $18.00 per month. Because the cost is so low, I will not stop operations due to hardware costs in the foreseeable future, nor will I add any advertisements."
-msgstr "运营这个网站每月仅花费我 $18.00。由于成本如此之低，在可预见的未来我不会因硬件成本而停止运营，也不会添加任何广告。"
+msgid "It costs me $18.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."
+msgstr "运营成本每月 $18.00，非常便宜。我不会因为托管费用而关停服务，也不会投放任何广告。"
 
-msgid "Rest assured, this service will definitely not \"Rug Pull.\""
-msgstr "请放心，本服务绝对不会\"跑路\"。"
+msgid "This service is not going to rug pull on you."
+msgstr "本服务不会跑路。"
 
-msgid "How can I sponsor this service?"
-msgstr "我如何赞助这个服务？"
+msgid "How can I support this service?"
+msgstr "我如何支持这个服务？"
 
-msgid "I accept cryptocurrency donations. If you would like to sponsor, please contact:"
-msgstr "我接受加密货币捐赠。如果您愿意赞助，请联系："
+msgid "I accept crypto donations. If you want to contribute, reach out at:"
+msgstr "我接受加密货币捐赠。如果您想贡献，请通过以下方式联系："
 
 msgid "Website source code licensed under"
 msgstr "网站源代码基于以下许可证发布"

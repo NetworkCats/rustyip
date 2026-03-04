@@ -459,22 +459,20 @@ mod tests {
     }
 
     #[test]
-    fn translate_strings_with_escaped_quotes() {
-        // These strings contain \" in PO files. The parser must correctly unescape
-        // them and produce valid translations for all locales.
-        let msgid_rug_pull = "Rest assured, this service will definitely not \"Rug Pull.\"";
+    fn translate_rug_pull_string() {
+        let msgid_rug_pull = "This service is not going to rug pull on you.";
 
         for locale in Locale::ALL {
             let result = translate(*locale, msgid_rug_pull);
             assert!(
                 !result.is_empty(),
-                "locale {:?} has no translation for Rug Pull string",
+                "locale {:?} has no translation for rug pull string",
                 locale
             );
             if *locale != Locale::En {
                 assert_ne!(
                     result, msgid_rug_pull,
-                    "locale {:?} should have a non-English translation for Rug Pull string",
+                    "locale {:?} should have a non-English translation for rug pull string",
                     locale
                 );
             }
@@ -484,8 +482,8 @@ mod tests {
     #[test]
     fn translate_strings_with_html_href() {
         // Strings containing <a href=\"...\"> have escaped quotes in PO files.
-        let msgid_api = "Our API is only suitable for manual calls or small-scale projects. If your website uses our API to query visitor IPs, please ensure you use a message queue to send requests to avoid blocking. If your project has high traffic or is latency-sensitive, please use our open-source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>, which is the same database used by this project.";
-        let msgid_data = "IP geographic data primarily comes from the free databases of MaxMind and DB-IP; AS data comes from IPinfo's free database; and IP proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> database.";
+        let msgid_api = "The API is meant for manual use or small projects. If your site uses our API to look up visitor IPs, please use a message queue so requests don't block. If your project has high traffic or needs low latency, you're better off using our open source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. That's actually what this project uses under the hood.";
+        let msgid_data = "Geolocation data mainly comes from the free databases by Maxmind and DB-IP. AS data comes from IPinfo's free database. Proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a>.";
 
         for locale in Locale::ALL {
             let api_result = translate(*locale, msgid_api);
