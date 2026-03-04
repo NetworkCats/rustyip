@@ -4,7 +4,7 @@
   --color-red: light-dark(#FF3B30, #FF453A);
   --color-orange: light-dark(#FF9500, #FF9F0A);
   --color-yellow: light-dark(#FFCC00, #FFD60A);
-  --color-green: light-dark(#34C759, #30D158);
+  --color-green: light-dark(#248A3D, #30D158);
   --color-mint: light-dark(#00C7BE, #63E6E2);
   --color-teal: light-dark(#30B0C7, #40C8E0);
   --color-cyan: light-dark(#32ADE6, #64D2FF);
@@ -23,21 +23,21 @@
 
   --color-label: light-dark(#000000, #EEEEEE);
   --color-label-secondary: light-dark(
-    rgba(60, 60, 67, 0.6),
+    rgba(60, 60, 67, 0.78),
     rgba(235, 235, 245, 0.6)
   );
   --color-label-tertiary: light-dark(
-    rgba(60, 60, 67, 0.3),
+    rgba(60, 60, 67, 0.5),
     rgba(235, 235, 245, 0.3)
   );
   --color-label-quaternary: light-dark(
-    rgba(60, 60, 67, 0.18),
+    rgba(60, 60, 67, 0.35),
     rgba(235, 235, 245, 0.18)
   );
 
   --color-link: light-dark(#007AFF, #0984FF);
   --color-separator: light-dark(
-    rgba(60, 60, 67, 0.29),
+    rgba(60, 60, 67, 0.36),
     rgba(84, 84, 88, 0.65)
   );
 
@@ -124,7 +124,7 @@ main {
 .ip-display {
   text-align: center;
   font-size: clamp(28px, 6vw, 42px);
-  font-weight: 200;
+  font-weight: 300;
   margin-block: 28px 20px;
   letter-spacing: -0.5px;
   overflow-wrap: break-word;
