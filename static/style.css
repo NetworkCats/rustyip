@@ -197,15 +197,25 @@ main {
     font-weight: 600;
     color: var(--color-label);
     cursor: pointer;
-    list-style: disclosure-closed inside;
+    list-style: none;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
 
-    &::marker {
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::before {
+      content: "\25B8";
+      font-size: 11px;
       color: var(--color-label-secondary);
+      flex-shrink: 0;
     }
   }
 
-  details[open] > summary {
-    list-style: disclosure-open inside;
+  details[open] > summary::before {
+    content: "\25BE";
   }
 
   .faq-content {
