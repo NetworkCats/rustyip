@@ -152,7 +152,7 @@ main {
 
   th {
     inline-size: 42%;
-    padding-inline: 24px 32px;
+    padding-inline: 35px 32px;
     font-weight: 600;
     color: var(--color-label);
     text-align: start;
