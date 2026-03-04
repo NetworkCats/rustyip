@@ -4,7 +4,7 @@
   --color-red: light-dark(#FF3B30, #FF453A);
   --color-orange: light-dark(#FF9500, #FF9F0A);
   --color-yellow: light-dark(#FFCC00, #FFD60A);
-  --color-green: light-dark(#248A3D, #30D158);
+  --color-green: light-dark(#30D158, #30D158);
   --color-mint: light-dark(#00C7BE, #63E6E2);
   --color-teal: light-dark(#30B0C7, #40C8E0);
   --color-cyan: light-dark(#32ADE6, #64D2FF);
@@ -37,7 +37,7 @@
 
   --color-link: light-dark(#007AFF, #0984FF);
   --color-separator: light-dark(
-    rgba(60, 60, 67, 0.36),
+    rgba(60, 60, 67, 0.20),
     rgba(84, 84, 88, 0.65)
   );
 
