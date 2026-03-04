@@ -30,7 +30,12 @@
 {% block footer %}
   <footer class="site-footer">
     <div class="footer-inner">
-      {% include "_footer.html" %}
+      <div class="footer-left">
+        {% include "_footer.html" %}
+      </div>
+      <div class="footer-right">
+        {% include "_footer_lang.html" %}
+      </div>
     </div>
   </footer>
 {% endblock %}

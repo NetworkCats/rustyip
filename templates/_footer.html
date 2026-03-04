@@ -4,11 +4,3 @@
   <span class="footer-sep" aria-hidden="true">|</span>
   <a href="https://github.com/NetworkCats/Merged-IP-Data"><i class="icon-social-github" aria-hidden="true"></i> {{ t_footer_db }}</a>
 </nav>
-<div class="footer-lang">
-  <label for="lang-select" class="sr-only">{{ t_language }}</label>
-  <select id="lang-select" class="lang-select" autocomplete="off" onchange="if(this.value)window.location.href=this.value">
-    {% for l in all_locales %}
-    <option value="/{{ l.tag() }}/"{% if *l == locale %} selected{% endif %}>{{ l.name() }}</option>
-    {% endfor %}
-  </select>
-</div>

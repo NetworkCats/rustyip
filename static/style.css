@@ -320,7 +320,7 @@ main {
 }
 
 .site-footer {
-  max-inline-size: 540px;
+  max-inline-size: 700px;
   margin-block-start: 64px;
   margin-inline: auto;
   padding-inline: 20px;
@@ -329,10 +329,21 @@ main {
   font-size: 13px;
   line-height: 1.6;
   color: var(--color-label-secondary);
-  text-align: center;
 
   .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
     padding-block-start: 24px;
+  }
+
+  .footer-left {
+    text-align: start;
+  }
+
+  .footer-right {
+    flex-shrink: 0;
   }
 
   a {
@@ -366,13 +377,13 @@ main {
       list-style: none;
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 4px 16px;
     }
   }
 
   .footer-lang {
-    margin-block-start: 16px;
+    margin-block-start: 0;
   }
 
   .lang-select {
@@ -437,6 +448,15 @@ main {
     padding-inline: 16px;
     padding-block-end: 32px;
     font-size: 12px;
+
+    .footer-inner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .footer-lang {
+      margin-block-start: 16px;
+    }
   }
 
   .error-banner {

@@ -207,16 +207,21 @@ curl {{ site_domain }}/tor</code></pre>
 {% block footer %}
   <footer class="site-footer">
     <div class="footer-inner">
-      {% include "_footer.html" %}
-      <div class="footer-attribution">
-        <p>{{ t_footer_attribution }}</p>
-        <ul>
-          <li><a href="https://www.maxmind.com/">MaxMind GeoLite2</a></li>
-          <li><a href="https://ipinfo.io/">IPinfo Lite</a></li>
-          <li><a href="https://db-ip.com/">DB-IP</a></li>
-          <li><a href="https://www.routeviews.org/">RouteViews ASN</a></li>
-          <li><a href="https://github.com/NetworkCats/OpenProxyDB">OpenProxyDB</a></li>
-        </ul>
+      <div class="footer-left">
+        {% include "_footer.html" %}
+        <div class="footer-attribution">
+          <p>{{ t_footer_attribution }}</p>
+          <ul>
+            <li><a href="https://www.maxmind.com/">MaxMind GeoLite2</a></li>
+            <li><a href="https://ipinfo.io/">IPinfo Lite</a></li>
+            <li><a href="https://db-ip.com/">DB-IP</a></li>
+            <li><a href="https://www.routeviews.org/">RouteViews ASN</a></li>
+            <li><a href="https://github.com/NetworkCats/OpenProxyDB">OpenProxyDB</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-right">
+        {% include "_footer_lang.html" %}
       </div>
     </div>
   </footer>
