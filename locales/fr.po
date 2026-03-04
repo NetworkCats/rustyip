@@ -177,6 +177,9 @@ msgstr "IP introuvable dans la base de donnees"
 msgid "Invalid IP address"
 msgstr "Adresse IP invalide"
 
+msgid "Only public IP addresses can be queried"
+msgstr "Seules les adresses IP publiques peuvent etre interrogees"
+
 msgid "Missing client IP address"
 msgstr "Adresse IP du client manquante"
 

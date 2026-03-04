@@ -177,6 +177,9 @@ msgstr "데이터베이스에서 IP를 찾을 수 없습니다"
 msgid "Invalid IP address"
 msgstr "유효하지 않은 IP 주소"
 
+msgid "Only public IP addresses can be queried"
+msgstr "공용 IP 주소만 조회할 수 있습니다"
+
 msgid "Missing client IP address"
 msgstr "클라이언트 IP 주소가 없습니다"
 

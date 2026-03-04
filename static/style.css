@@ -118,6 +118,20 @@ main {
     &::placeholder {
       color: var(--color-label-tertiary);
     }
+
+    &[aria-invalid="true"] {
+      border-color: var(--color-red);
+
+      &:focus-visible {
+        outline-color: var(--color-red);
+      }
+    }
+  }
+
+  .search-error {
+    margin-block-start: 6px;
+    font-size: 13px;
+    color: var(--color-red);
   }
 }
 

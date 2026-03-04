@@ -177,6 +177,9 @@ msgstr "لم يتم العثور على عنوان IP في قاعدة البيا
 msgid "Invalid IP address"
 msgstr "عنوان IP غير صالح"
 
+msgid "Only public IP addresses can be queried"
+msgstr "يمكن الاستعلام عن عناوين IP العامة فقط"
+
 msgid "Missing client IP address"
 msgstr "عنوان IP للعميل مفقود"
 

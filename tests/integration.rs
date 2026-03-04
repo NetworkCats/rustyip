@@ -417,10 +417,11 @@ async fn whitespace_ip_query_falls_back_to_cf_header() {
 }
 
 #[tokio::test]
-async fn ip_not_in_database_returns_500() {
+async fn non_public_ip_returns_400() {
     let app = build_test_app();
-    let (status, _) = get(&app, "/json?ip=0.0.0.0").await;
-    assert_eq!(status, StatusCode::INTERNAL_SERVER_ERROR);
+    let (status, body) = get(&app, "/json?ip=0.0.0.0").await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+    assert_eq!(body, "Only public IP addresses can be queried");
 }
 
 #[tokio::test]
@@ -780,7 +781,7 @@ async fn browser_invalid_ip_shows_alert_html() {
 }
 
 #[tokio::test]
-async fn browser_db_lookup_failed_shows_alert_html() {
+async fn browser_non_public_ip_shows_alert_html() {
     let app = build_test_app();
     let (status, body) = get_with_headers(
         &app,
@@ -791,7 +792,7 @@ async fn browser_db_lookup_failed_shows_alert_html() {
         )],
     )
     .await;
-    assert_eq!(status, StatusCode::INTERNAL_SERVER_ERROR);
+    assert_eq!(status, StatusCode::BAD_REQUEST);
     assert!(body.contains("<!DOCTYPE html>"));
     assert!(body.contains("alert("));
 }
@@ -875,8 +876,7 @@ async fn trailing_slash_redirects_to_canonical() {
 #[tokio::test]
 async fn trailing_slash_preserves_query_params() {
     let app = build_test_app_with_dev_mode(true);
-    let response =
-        get_response(&app, "/de/?ip=1.2.3.4", vec![("User-Agent", "Mozilla/5.0")]).await;
+    let response = get_response(&app, "/de/?ip=1.2.3.4", vec![("User-Agent", "Mozilla/5.0")]).await;
     assert_eq!(response.status(), StatusCode::PERMANENT_REDIRECT);
     let location = response
         .headers()
@@ -950,12 +950,7 @@ async fn error_page_has_localized_go_home_link() {
 #[tokio::test]
 async fn german_page_contains_translated_escaped_quote_strings() {
     let app = build_test_app_with_dev_mode(true);
-    let (status, body) = get_with_headers(
-        &app,
-        "/de",
-        vec![("User-Agent", "Mozilla/5.0")],
-    )
-    .await;
+    let (status, body) = get_with_headers(&app, "/de", vec![("User-Agent", "Mozilla/5.0")]).await;
     assert_eq!(status, StatusCode::OK);
     // These strings were previously untranslated due to escaped quotes in PO files.
     assert!(
@@ -974,4 +969,145 @@ async fn german_page_contains_translated_escaped_quote_strings() {
         !body.contains("IP geographic data primarily comes from"),
         "German page should not contain English data source string"
     );
+}
+
+// --- Non-public IP rejection tests ---
+
+#[tokio::test]
+async fn private_ipv4_rejected_on_all_endpoints() {
+    let app = build_test_app();
+    let private_ips = [
+        "10.0.0.1",
+        "172.16.0.1",
+        "192.168.1.1",
+        "127.0.0.1",
+        "0.0.0.0",
+        "255.255.255.255",
+        "169.254.1.1",
+        "100.64.0.1",
+    ];
+    let endpoints = [
+        "/json", "/ip", "/asn", "/org", "/country", "/city", "/proxy", "/vpn", "/hosting", "/tor",
+    ];
+
+    for ip in private_ips {
+        for endpoint in &endpoints {
+            let uri = format!("{endpoint}?ip={ip}");
+            let (status, body) = get(&app, &uri).await;
+            assert_eq!(
+                status,
+                StatusCode::BAD_REQUEST,
+                "expected 400 for {endpoint}?ip={ip}, got {status}"
+            );
+            assert_eq!(
+                body, "Only public IP addresses can be queried",
+                "wrong error message for {endpoint}?ip={ip}"
+            );
+        }
+    }
+}
+
+#[tokio::test]
+async fn private_ipv6_rejected() {
+    let app = build_test_app();
+    let private_ips = [
+        "::1",
+        "::",
+        "fe80::1",
+        "fc00::1",
+        "fd00::1",
+        "ff02::1",
+        "2001:db8::1",
+        "::ffff:127.0.0.1",
+        "::ffff:192.168.1.1",
+    ];
+    for ip in private_ips {
+        let uri = format!("/json?ip={ip}");
+        let (status, body) = get(&app, &uri).await;
+        assert_eq!(
+            status,
+            StatusCode::BAD_REQUEST,
+            "expected 400 for /json?ip={ip}, got {status}"
+        );
+        assert_eq!(
+            body, "Only public IP addresses can be queried",
+            "wrong error message for /json?ip={ip}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn public_ips_still_accepted() {
+    let app = build_test_app();
+    let (status, _) = get(&app, "/json?ip=1.1.1.1").await;
+    assert_eq!(status, StatusCode::OK);
+
+    let (status, _) = get(&app, "/json?ip=2606:4700:4700::1111").await;
+    assert_eq!(status, StatusCode::OK);
+}
+
+#[tokio::test]
+async fn private_ip_via_cf_header_still_works() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/",
+        vec![
+            ("User-Agent", "curl/8.7.1"),
+            ("CF-Connecting-IP", "10.0.0.1"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "10.0.0.1");
+}
+
+#[tokio::test]
+async fn browser_private_ipv4_shows_error() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/en?ip=192.168.1.1",
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
+    )
+    .await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+    assert!(body.contains("<!DOCTYPE html>"));
+    assert!(body.contains("alert("));
+    assert!(body.contains("192.168.1.1"));
+}
+
+#[tokio::test]
+async fn browser_loopback_shows_error() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/en?ip=127.0.0.1",
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
+    )
+    .await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+    assert!(body.contains("alert("));
+}
+
+#[tokio::test]
+async fn browser_broadcast_shows_error() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/en?ip=255.255.255.255",
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
+    )
+    .await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+    assert!(body.contains("alert("));
 }

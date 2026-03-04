@@ -177,6 +177,9 @@ msgstr "在数据库中未找到该 IP"
 msgid "Invalid IP address"
 msgstr "无效的 IP 地址"
 
+msgid "Only public IP addresses can be queried"
+msgstr "仅可查询公网 IP 地址"
+
 msgid "Missing client IP address"
 msgstr "缺少客户端 IP 地址"
 

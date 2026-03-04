@@ -177,6 +177,9 @@ msgstr "IP niet gevonden in database"
 msgid "Invalid IP address"
 msgstr "Ongeldig IP-adres"
 
+msgid "Only public IP addresses can be queried"
+msgstr "Alleen openbare IP-adressen kunnen worden opgezocht"
+
 msgid "Missing client IP address"
 msgstr "Ontbrekend client-IP-adres"
 

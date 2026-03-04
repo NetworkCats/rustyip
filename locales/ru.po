@@ -177,6 +177,9 @@ msgstr "IP не найден в базе данных"
 msgid "Invalid IP address"
 msgstr "Недействительный IP-адрес"
 
+msgid "Only public IP addresses can be queried"
+msgstr "Можно запрашивать только публичные IP-адреса"
+
 msgid "Missing client IP address"
 msgstr "Отсутствует IP-адрес клиента"
 

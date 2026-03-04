@@ -177,6 +177,9 @@ msgstr "IPがデータベースに見つかりません"
 msgid "Invalid IP address"
 msgstr "無効なIPアドレス"
 
+msgid "Only public IP addresses can be queried"
+msgstr "パブリックIPアドレスのみ照会できます"
+
 msgid "Missing client IP address"
 msgstr "クライアントIPアドレスがありません"
 

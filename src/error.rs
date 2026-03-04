@@ -4,6 +4,7 @@ use axum::response::{IntoResponse, Response};
 pub enum AppError {
     IpNotFound,
     InvalidIp,
+    NonPublicIp,
     MissingClientIp,
     DbLookupFailed,
     TemplateRenderFailed,
@@ -13,7 +14,7 @@ impl AppError {
     pub fn status_code(&self) -> StatusCode {
         match self {
             Self::IpNotFound => StatusCode::NOT_FOUND,
-            Self::InvalidIp => StatusCode::BAD_REQUEST,
+            Self::InvalidIp | Self::NonPublicIp => StatusCode::BAD_REQUEST,
             Self::MissingClientIp => StatusCode::BAD_REQUEST,
             Self::DbLookupFailed => StatusCode::INTERNAL_SERVER_ERROR,
             Self::TemplateRenderFailed => StatusCode::INTERNAL_SERVER_ERROR,
@@ -24,6 +25,7 @@ impl AppError {
         match self {
             Self::IpNotFound => "IP not found in database",
             Self::InvalidIp => "Invalid IP address",
+            Self::NonPublicIp => "Only public IP addresses can be queried",
             Self::MissingClientIp => "Missing client IP address",
             Self::DbLookupFailed => "Database lookup failed",
             Self::TemplateRenderFailed => "Template render failed",
@@ -70,6 +72,16 @@ mod tests {
             AppError::InvalidIp,
             StatusCode::BAD_REQUEST,
             "Invalid IP address",
+        )
+        .await;
+    }
+
+    #[tokio::test]
+    async fn non_public_ip_returns_400() {
+        check_error_response(
+            AppError::NonPublicIp,
+            StatusCode::BAD_REQUEST,
+            "Only public IP addresses can be queried",
         )
         .await;
     }

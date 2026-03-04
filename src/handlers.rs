@@ -10,6 +10,7 @@ use crate::cli_detect::is_cli_user_agent;
 use crate::db::{self, SharedDb};
 use crate::error::AppError;
 use crate::i18n::{self, Locale};
+use crate::ip_validate;
 use crate::models::{IpInfo, get_localized_name};
 use crate::static_assets;
 
@@ -50,6 +51,8 @@ struct IndexTemplate {
     t_description: &'static str,
     t_search_label: &'static str,
     t_search_placeholder: &'static str,
+    t_invalid_ip: &'static str,
+    t_non_public_ip: &'static str,
     t_asn: &'static str,
     t_org: &'static str,
     t_country: &'static str,
@@ -113,6 +116,8 @@ struct ErrorAlertTemplate {
     t_error: &'static str,
     t_search_label: &'static str,
     t_search_placeholder: &'static str,
+    t_invalid_ip: &'static str,
+    t_non_public_ip: &'static str,
     t_footer_license: &'static str,
     t_footer_source: &'static str,
     t_footer_db: &'static str,
@@ -139,7 +144,11 @@ fn resolve_ip(headers: &HeaderMap, query: &IpQuery, dev_mode: bool) -> Result<Ip
     if let Some(ref ip_str) = query.ip {
         let trimmed = ip_str.trim();
         if !trimmed.is_empty() {
-            return trimmed.parse().map_err(|_| AppError::InvalidIp);
+            let ip: IpAddr = trimmed.parse().map_err(|_| AppError::InvalidIp)?;
+            if !ip_validate::is_global_ip(ip) {
+                return Err(AppError::NonPublicIp);
+            }
+            return Ok(ip);
         }
     }
     extract_client_ip(headers, dev_mode)
@@ -211,6 +220,8 @@ fn build_translations(locale: Locale) -> Translations {
         ),
         t_search_label: i18n::translate(locale, "Search IP address"),
         t_search_placeholder: i18n::translate(locale, "Type to search IP data"),
+        t_invalid_ip: i18n::translate(locale, "Invalid IP address"),
+        t_non_public_ip: i18n::translate(locale, "Only public IP addresses can be queried"),
         t_asn: i18n::translate(locale, "ASN"),
         t_org: i18n::translate(locale, "Org"),
         t_country: i18n::translate(locale, "Country"),
@@ -319,6 +330,8 @@ struct Translations {
     t_description: &'static str,
     t_search_label: &'static str,
     t_search_placeholder: &'static str,
+    t_invalid_ip: &'static str,
+    t_non_public_ip: &'static str,
     t_asn: &'static str,
     t_org: &'static str,
     t_country: &'static str,
@@ -384,6 +397,8 @@ fn render_error_alert(state: &AppState, locale: Locale, query: &str, error: &App
         t_error: t.t_error,
         t_search_label: t.t_search_label,
         t_search_placeholder: t.t_search_placeholder,
+        t_invalid_ip: t.t_invalid_ip,
+        t_non_public_ip: t.t_non_public_ip,
         t_footer_license: t.t_footer_license,
         t_footer_source: t.t_footer_source,
         t_footer_db: t.t_footer_db,
@@ -556,6 +571,8 @@ pub async fn root(
         t_description: t.t_description,
         t_search_label: t.t_search_label,
         t_search_placeholder: t.t_search_placeholder,
+        t_invalid_ip: t.t_invalid_ip,
+        t_non_public_ip: t.t_non_public_ip,
         t_asn: t.t_asn,
         t_org: t.t_org,
         t_country: t.t_country,
@@ -780,9 +797,7 @@ pub async fn sitemap_xml(State(state): State<AppState>) -> Response {
 
     for locale in Locale::ALL {
         let tag = locale.tag();
-        urls.push_str(&format!(
-            "  <url>\n    <loc>https://{domain}/{tag}</loc>\n"
-        ));
+        urls.push_str(&format!("  <url>\n    <loc>https://{domain}/{tag}</loc>\n"));
         for alt in Locale::ALL {
             let alt_tag = alt.tag();
             urls.push_str(&format!(

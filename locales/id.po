@@ -177,6 +177,9 @@ msgstr "IP tidak ditemukan dalam basis data"
 msgid "Invalid IP address"
 msgstr "Alamat IP tidak valid"
 
+msgid "Only public IP addresses can be queried"
+msgstr "Hanya alamat IP publik yang dapat dicari"
+
 msgid "Missing client IP address"
 msgstr "Alamat IP klien tidak ditemukan"
 
