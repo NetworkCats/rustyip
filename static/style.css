@@ -92,8 +92,9 @@ main {
   .search-icon {
     position: absolute;
     inset-inline-start: 12px;
-    inset-block-start: 50%;
-    translate: 0 -50%;
+    inset-block-start: 0;
+    block-size: 38px;
+    line-height: 38px;
     color: var(--color-label-tertiary);
     font-size: 14px;
     pointer-events: none;
@@ -434,6 +435,11 @@ main {
 
   .search-form input {
     block-size: 44px;
+  }
+
+  .search-form .search-icon {
+    block-size: 44px;
+    line-height: 44px;
   }
 
   .ip-display {
