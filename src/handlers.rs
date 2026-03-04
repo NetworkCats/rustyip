@@ -454,8 +454,10 @@ pub async fn root_redirect(
     let mut redirect_path = format!("/{}", locale.tag());
 
     if let Some(ref ip) = query.ip {
-        redirect_path.push_str("?ip=");
-        redirect_path.push_str(&urlencoding::encode(ip));
+        if !ip.trim().is_empty() {
+            redirect_path.push_str("?ip=");
+            redirect_path.push_str(&urlencoding::encode(ip));
+        }
     }
 
     Redirect::temporary(&redirect_path).into_response()
@@ -467,8 +469,10 @@ pub async fn root_trailing_slash(
 ) -> Response {
     let mut redirect_path = format!("/{lang}");
     if let Some(ref ip) = query.ip {
-        redirect_path.push_str("?ip=");
-        redirect_path.push_str(&urlencoding::encode(ip));
+        if !ip.trim().is_empty() {
+            redirect_path.push_str("?ip=");
+            redirect_path.push_str(&urlencoding::encode(ip));
+        }
     }
     Redirect::permanent(&redirect_path).into_response()
 }
@@ -510,6 +514,12 @@ pub async fn root(
             Ok(info) => axum::Json(info).into_response(),
             Err(e) => e.into_response(),
         };
+    }
+
+    if let Some(ref ip_str) = query.ip {
+        if ip_str.trim().is_empty() {
+            return Redirect::temporary(&format!("/{}", locale.tag())).into_response();
+        }
     }
 
     let query_str = query.ip.clone().unwrap_or_default();
