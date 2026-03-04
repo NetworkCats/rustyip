@@ -546,9 +546,9 @@ async fn sitemap_xml_returns_valid_response() {
     let (status, body) = get(&app, "/sitemap.xml").await;
     assert_eq!(status, StatusCode::OK);
     assert!(body.contains("<?xml version=\"1.0\""));
-    assert!(body.contains("<loc>https://test.example.com/en/</loc>"));
-    assert!(body.contains("<loc>https://test.example.com/es/</loc>"));
-    assert!(body.contains("<loc>https://test.example.com/ja/</loc>"));
+    assert!(body.contains("<loc>https://test.example.com/en</loc>"));
+    assert!(body.contains("<loc>https://test.example.com/es</loc>"));
+    assert!(body.contains("<loc>https://test.example.com/ja</loc>"));
     assert!(body.contains("hreflang=\"en\""));
     assert!(body.contains("hreflang=\"x-default\""));
     assert!(body.contains("hreflang=\"zh-Hant\""));
@@ -622,11 +622,11 @@ async fn html_contains_language_selector() {
     .await;
     assert_eq!(status, StatusCode::OK);
     assert!(body.contains("lang-select"));
-    assert!(body.contains("value=\"/en/\""));
-    assert!(body.contains("value=\"/es/\""));
-    assert!(body.contains("value=\"/ja/\""));
-    assert!(body.contains("value=\"/zh-Hant/\""));
-    assert!(body.contains("value=\"/ar/\""));
+    assert!(body.contains("value=\"/en\""));
+    assert!(body.contains("value=\"/es\""));
+    assert!(body.contains("value=\"/ja\""));
+    assert!(body.contains("value=\"/zh-Hant\""));
+    assert!(body.contains("value=\"/ar\""));
 }
 
 #[tokio::test]
@@ -639,7 +639,7 @@ async fn search_form_posts_to_lang_path() {
     )
     .await;
     assert_eq!(status, StatusCode::OK);
-    assert!(body.contains("action=\"/fr/\""));
+    assert!(body.contains("action=\"/fr\""));
 }
 
 #[tokio::test]
@@ -840,6 +840,53 @@ async fn error_alert_page_has_search_form() {
     assert!(body.contains("autofocus"));
 }
 
+// --- Trailing slash tests ---
+
+#[tokio::test]
+async fn trailing_slash_redirects_to_canonical() {
+    let app = build_test_app_with_dev_mode(true);
+    let tags = [
+        "en", "es", "de", "ja", "ko", "id", "fr", "ru", "pt", "it", "zh-Hant", "zh-Hans", "nl",
+        "ar",
+    ];
+    for tag in tags {
+        let uri = format!("/{tag}/");
+        let response = get_response(&app, &uri, vec![("User-Agent", "Mozilla/5.0")]).await;
+        assert_eq!(
+            response.status(),
+            StatusCode::PERMANENT_REDIRECT,
+            "/{tag}/ should redirect with 308, got {}",
+            response.status()
+        );
+        let location = response
+            .headers()
+            .get("location")
+            .unwrap()
+            .to_str()
+            .unwrap();
+        assert_eq!(
+            location,
+            format!("/{tag}"),
+            "/{tag}/ should redirect to /{tag}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn trailing_slash_preserves_query_params() {
+    let app = build_test_app_with_dev_mode(true);
+    let response =
+        get_response(&app, "/de/?ip=1.2.3.4", vec![("User-Agent", "Mozilla/5.0")]).await;
+    assert_eq!(response.status(), StatusCode::PERMANENT_REDIRECT);
+    let location = response
+        .headers()
+        .get("location")
+        .unwrap()
+        .to_str()
+        .unwrap();
+    assert_eq!(location, "/de?ip=1.2.3.4");
+}
+
 // --- i18n-specific tests ---
 
 #[tokio::test]
@@ -897,5 +944,34 @@ async fn error_page_has_localized_go_home_link() {
     .await;
     assert_eq!(status, StatusCode::NOT_FOUND);
     assert!(body.contains("Go to Home"));
-    assert!(body.contains("href=\"/en/\""));
+    assert!(body.contains("href=\"/en\""));
+}
+
+#[tokio::test]
+async fn german_page_contains_translated_escaped_quote_strings() {
+    let app = build_test_app_with_dev_mode(true);
+    let (status, body) = get_with_headers(
+        &app,
+        "/de",
+        vec![("User-Agent", "Mozilla/5.0")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    // These strings were previously untranslated due to escaped quotes in PO files.
+    assert!(
+        !body.contains("Rest assured, this service will definitely not"),
+        "German page should not contain English Rug Pull string"
+    );
+    assert!(
+        body.contains("Rug Pull"),
+        "German page should still contain Rug Pull term"
+    );
+    assert!(
+        !body.contains("Our API is only suitable for manual calls"),
+        "German page should not contain English API string"
+    );
+    assert!(
+        !body.contains("IP geographic data primarily comes from"),
+        "German page should not contain English data source string"
+    );
 }

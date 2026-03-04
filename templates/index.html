@@ -4,18 +4,18 @@
 
 {% block head_meta %}
   <meta name="description" content="{{ t_description }}">
-  <link rel="canonical" href="https://{{ site_domain }}/{{ lang_tag }}/">
+  <link rel="canonical" href="https://{{ site_domain }}/{{ lang_tag }}">
   <meta name="theme-color" content="#007AFF" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0A84FF" media="(prefers-color-scheme: dark)">
   <meta property="og:title" content="{{ t_title }} - {{ site_domain }}">
   <meta property="og:description" content="{{ t_description }}">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://{{ site_domain }}/{{ lang_tag }}/">
+  <meta property="og:url" content="https://{{ site_domain }}/{{ lang_tag }}">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{{ t_title }} - {{ site_domain }}">
   <meta name="twitter:description" content="{{ t_description }}">
   {% for l in all_locales %}
-  <link rel="alternate" hreflang="{{ l.tag() }}" href="https://{{ site_domain }}/{{ l.tag() }}/">
+  <link rel="alternate" hreflang="{{ l.tag() }}" href="https://{{ site_domain }}/{{ l.tag() }}">
   {% endfor %}
   <link rel="alternate" hreflang="x-default" href="https://{{ site_domain }}/">
 {% endblock %}

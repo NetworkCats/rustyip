@@ -461,6 +461,18 @@ pub async fn root_redirect(
     Redirect::temporary(&redirect_path).into_response()
 }
 
+pub async fn root_trailing_slash(
+    Path(lang): Path<String>,
+    Query(query): Query<IpQuery>,
+) -> Response {
+    let mut redirect_path = format!("/{lang}");
+    if let Some(ref ip) = query.ip {
+        redirect_path.push_str("?ip=");
+        redirect_path.push_str(&urlencoding::encode(ip));
+    }
+    Redirect::permanent(&redirect_path).into_response()
+}
+
 pub async fn root(
     State(state): State<AppState>,
     Path(lang): Path<String>,
@@ -759,12 +771,12 @@ pub async fn sitemap_xml(State(state): State<AppState>) -> Response {
     for locale in Locale::ALL {
         let tag = locale.tag();
         urls.push_str(&format!(
-            "  <url>\n    <loc>https://{domain}/{tag}/</loc>\n"
+            "  <url>\n    <loc>https://{domain}/{tag}</loc>\n"
         ));
         for alt in Locale::ALL {
             let alt_tag = alt.tag();
             urls.push_str(&format!(
-                "    <xhtml:link rel=\"alternate\" hreflang=\"{alt_tag}\" href=\"https://{domain}/{alt_tag}/\"/>\n"
+                "    <xhtml:link rel=\"alternate\" hreflang=\"{alt_tag}\" href=\"https://{domain}/{alt_tag}\"/>\n"
             ));
         }
         urls.push_str(

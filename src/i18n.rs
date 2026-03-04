@@ -185,13 +185,18 @@ fn insert_entry(catalog: &mut Catalog, msgid: &str, msgstr: &str, source: &'stat
     if msgstr.is_empty() {
         return;
     }
-    // Find the msgstr in the static source to get a &'static str reference.
-    // This avoids allocating owned Strings at runtime.
-    let id_static = find_in_static(source, msgid);
-    let str_static = find_in_static(source, msgstr);
-    if let (Some(id), Some(s)) = (id_static, str_static) {
-        catalog.insert(id, s);
-    }
+    // Try to find the strings in the static source to get &'static str references,
+    // avoiding heap allocation. This works for most strings, but fails for strings
+    // containing escape sequences (e.g. \") since the unescaped text differs from
+    // the raw PO source. In that case, leak a heap-allocated copy. This is acceptable
+    // because translations are loaded once at startup.
+    let id_static = find_in_static(source, msgid).unwrap_or_else(|| leak_string(msgid));
+    let str_static = find_in_static(source, msgstr).unwrap_or_else(|| leak_string(msgstr));
+    catalog.insert(id_static, str_static);
+}
+
+fn leak_string(s: &str) -> &'static str {
+    Box::leak(s.to_owned().into_boxed_str())
 }
 
 fn find_in_static(source: &'static str, needle: &str) -> Option<&'static str> {
@@ -451,5 +456,65 @@ mod tests {
         // We cannot use parse_po directly with a non-static str for the
         // static-reference optimization, but we can verify the PO files load.
         let _ = translate(Locale::Es, "FAQ");
+    }
+
+    #[test]
+    fn translate_strings_with_escaped_quotes() {
+        // These strings contain \" in PO files. The parser must correctly unescape
+        // them and produce valid translations for all locales.
+        let msgid_rug_pull = "Rest assured, this service will definitely not \"Rug Pull.\"";
+
+        for locale in Locale::ALL {
+            let result = translate(*locale, msgid_rug_pull);
+            assert!(
+                !result.is_empty(),
+                "locale {:?} has no translation for Rug Pull string",
+                locale
+            );
+            if *locale != Locale::En {
+                assert_ne!(
+                    result, msgid_rug_pull,
+                    "locale {:?} should have a non-English translation for Rug Pull string",
+                    locale
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn translate_strings_with_html_href() {
+        // Strings containing <a href=\"...\"> have escaped quotes in PO files.
+        let msgid_api = "Our API is only suitable for manual calls or small-scale projects. If your website uses our API to query visitor IPs, please ensure you use a message queue to send requests to avoid blocking. If your project has high traffic or is latency-sensitive, please use our open-source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>, which is the same database used by this project.";
+        let msgid_data = "IP geographic data primarily comes from the free databases of MaxMind and DB-IP; AS data comes from IPinfo's free database; and IP proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> database.";
+
+        for locale in Locale::ALL {
+            let api_result = translate(*locale, msgid_api);
+            assert!(
+                !api_result.is_empty(),
+                "locale {:?} has no translation for API string",
+                locale
+            );
+            if *locale != Locale::En {
+                assert_ne!(
+                    api_result, msgid_api,
+                    "locale {:?} should have a non-English translation for API string",
+                    locale
+                );
+            }
+
+            let data_result = translate(*locale, msgid_data);
+            assert!(
+                !data_result.is_empty(),
+                "locale {:?} has no translation for data source string",
+                locale
+            );
+            if *locale != Locale::En {
+                assert_ne!(
+                    data_result, msgid_data,
+                    "locale {:?} should have a non-English translation for data source string",
+                    locale
+                );
+            }
+        }
     }
 }

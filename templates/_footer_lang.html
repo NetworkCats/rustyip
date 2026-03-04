@@ -2,7 +2,7 @@
   <label for="lang-select" class="sr-only">{{ t_language }}</label>
   <select id="lang-select" class="lang-select" autocomplete="off" onchange="if(this.value)window.location.href=this.value">
     {% for l in all_locales %}
-    <option value="/{{ l.tag() }}/"{% if *l == locale %} selected{% endif %}>{{ l.name() }}</option>
+    <option value="/{{ l.tag() }}"{% if *l == locale %} selected{% endif %}>{{ l.name() }}</option>
     {% endfor %}
   </select>
 </div>
