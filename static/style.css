@@ -124,7 +124,7 @@ main {
 .ip-display {
   text-align: center;
   font-size: clamp(28px, 6vw, 42px);
-  font-weight: 300;
+  font-weight: 200;
   margin-block: 28px 20px;
   letter-spacing: -0.5px;
   overflow-wrap: break-word;
