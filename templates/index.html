@@ -142,7 +142,7 @@ curl {{ site_domain }}/tor</code></pre>
       <details open>
         <summary>Can I automate calls to your service via programs?</summary>
         <div class="faq-content">
-          <p>Certainly, but you must adhere to our rate limits. Under normal conditions, the rate limit is 30 RPM (Requests Per Minute); under high load, we will increase the restriction to 10-5 RPM.</p>
+          <p>Certainly, as long as the rate limit is respected. Under normal conditions, the rate limit is 30 RPM (Requests Per Minute); under high load, we will increase the restriction to 10-5 RPM.</p>
           <p>Our API is only suitable for manual calls or small-scale projects. If your website uses our API to query visitor IPs, please ensure you use a message queue to send requests to avoid blocking. If your project has high traffic or is latency-sensitive, please use our open-source offline database: <a href="https://github.com/NetworkCats/Merged-IP-Data">Merged IP Database</a>, which is the same database used by this project.</p>
         </div>
       </details>
