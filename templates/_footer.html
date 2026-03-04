@@ -1,6 +1,14 @@
-<p class="footer-license">Website source code licensed under <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0</a></p>
-<nav class="footer-links" aria-label="Project links">
-  <a href="https://github.com/NetworkCats/rustyip"><i class="icon-social-github" aria-hidden="true"></i> Website Source</a>
+<p class="footer-license">{{ t_footer_license }} <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0</a></p>
+<nav class="footer-links" aria-label="{{ t_nav_aria }}">
+  <a href="https://github.com/NetworkCats/rustyip"><i class="icon-social-github" aria-hidden="true"></i> {{ t_footer_source }}</a>
   <span class="footer-sep" aria-hidden="true">|</span>
-  <a href="https://github.com/NetworkCats/Merged-IP-Data"><i class="icon-social-github" aria-hidden="true"></i> IP Database</a>
+  <a href="https://github.com/NetworkCats/Merged-IP-Data"><i class="icon-social-github" aria-hidden="true"></i> {{ t_footer_db }}</a>
 </nav>
+<div class="footer-lang">
+  <label for="lang-select" class="sr-only">{{ t_language }}</label>
+  <select id="lang-select" class="lang-select" autocomplete="off" onchange="if(this.value)window.location.href=this.value">
+    {% for l in all_locales %}
+    <option value="/{{ l.tag() }}/"{% if *l == locale %} selected{% endif %}>{{ l.name() }}</option>
+    {% endfor %}
+  </select>
+</div>

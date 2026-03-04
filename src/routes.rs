@@ -1,14 +1,18 @@
+use axum::Router;
 use axum::middleware;
 use axum::routing::get;
-use axum::Router;
 
 use crate::handlers::{self, AppState};
 use crate::middleware::security_headers;
 use crate::static_assets;
 
 pub fn build_router(state: AppState) -> Router {
-    Router::new()
+    let localized = Router::new()
         .route("/", get(handlers::root))
+        .with_state(state.clone());
+
+    Router::new()
+        .route("/", get(handlers::root_redirect))
         .route("/health", get(handlers::health))
         .route("/openapi.json", get(handlers::openapi_json))
         .route("/robots.txt", get(handlers::robots_txt))
@@ -24,6 +28,7 @@ pub fn build_router(state: AppState) -> Router {
         .route("/hosting", get(handlers::hosting_handler))
         .route("/tor", get(handlers::tor_handler))
         .route("/static/{*path}", get(static_assets::serve_static))
+        .nest("/{lang}", localized)
         .fallback(handlers::not_found)
         .layer(middleware::from_fn(security_headers))
         .with_state(state)

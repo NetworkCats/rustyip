@@ -1,19 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %}What is my IP address? - {{ site_domain }}{% endblock %}
+{% block title %}{{ t_title }} - {{ site_domain }}{% endblock %}
 
 {% block head_meta %}
-  <meta name="description" content="Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address.">
-  <link rel="canonical" href="https://{{ site_domain }}/">
+  <meta name="description" content="{{ t_description }}">
+  <link rel="canonical" href="https://{{ site_domain }}/{{ lang_tag }}/">
   <meta name="theme-color" content="#007AFF" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0A84FF" media="(prefers-color-scheme: dark)">
-  <meta property="og:title" content="What is my IP address? - {{ site_domain }}">
-  <meta property="og:description" content="Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address.">
+  <meta property="og:title" content="{{ t_title }} - {{ site_domain }}">
+  <meta property="og:description" content="{{ t_description }}">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://{{ site_domain }}/">
+  <meta property="og:url" content="https://{{ site_domain }}/{{ lang_tag }}/">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="What is my IP address? - {{ site_domain }}">
-  <meta name="twitter:description" content="Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address.">
+  <meta name="twitter:title" content="{{ t_title }} - {{ site_domain }}">
+  <meta name="twitter:description" content="{{ t_description }}">
+  {% for l in all_locales %}
+  <link rel="alternate" hreflang="{{ l.tag() }}" href="https://{{ site_domain }}/{{ l.tag() }}/">
+  {% endfor %}
+  <link rel="alternate" hreflang="x-default" href="https://{{ site_domain }}/">
 {% endblock %}
 
 {% block head_preconnect %}
@@ -30,61 +34,61 @@
 
     <h1 class="ip-display">{{ ip }}</h1>
 
-    <table class="info-table" aria-label="IP address information">
+    <table class="info-table" aria-label="{{ t_table_aria }}">
       <tbody>
         {% if !asn.is_empty() %}
         <tr>
-          <th scope="row">ASN</th>
+          <th scope="row">{{ t_asn }}</th>
           <td>{{ asn }}</td>
         </tr>
         {% endif %}
         {% if !org.is_empty() %}
         <tr>
-          <th scope="row">Org</th>
+          <th scope="row">{{ t_org }}</th>
           <td>{{ org }}</td>
         </tr>
         {% endif %}
         {% if !country.is_empty() %}
         <tr>
-          <th scope="row">Country</th>
+          <th scope="row">{{ t_country }}</th>
           <td>{{ country }}</td>
         </tr>
         {% endif %}
         {% if !city.is_empty() %}
         <tr>
-          <th scope="row">City</th>
+          <th scope="row">{{ t_city }}</th>
           <td>{{ city }}</td>
         </tr>
         {% endif %}
         <tr>
-          <th scope="row">Proxy</th>
-          <td>{% if is_proxy %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">Yes</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">No</span>{% endif %}</td>
+          <th scope="row">{{ t_proxy }}</th>
+          <td>{% if is_proxy %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ t_yes }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ t_no }}</span>{% endif %}</td>
         </tr>
         <tr>
-          <th scope="row">VPN</th>
-          <td>{% if is_vpn %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">Yes</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">No</span>{% endif %}</td>
+          <th scope="row">{{ t_vpn }}</th>
+          <td>{% if is_vpn %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ t_yes }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ t_no }}</span>{% endif %}</td>
         </tr>
         <tr>
-          <th scope="row">Hosting</th>
-          <td>{% if is_hosting %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">Yes</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">No</span>{% endif %}</td>
+          <th scope="row">{{ t_hosting }}</th>
+          <td>{% if is_hosting %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ t_yes }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ t_no }}</span>{% endif %}</td>
         </tr>
         <tr>
-          <th scope="row">Tor</th>
-          <td>{% if is_tor %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">Yes</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">No</span>{% endif %}</td>
+          <th scope="row">{{ t_tor }}</th>
+          <td>{% if is_tor %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ t_yes }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ t_no }}</span>{% endif %}</td>
         </tr>
       </tbody>
     </table>
 
-    <section class="faq" aria-label="Frequently Asked Questions">
-      <h2 class="faq-title">FAQ</h2>
+    <section class="faq" aria-label="{{ t_faq_aria }}">
+      <h2 class="faq-title">{{ t_faq }}</h2>
 
       <details open>
-        <summary>How to use this service from the command line</summary>
+        <summary>{{ t_faq_cli_q }}</summary>
         <div class="faq-content">
-          <p>You can use various command-line tools such as curl, httpie, and wget to use this service. Taking the most popular one, curl, as an example:</p>
-          <p>Query current IP:</p>
+          <p>{{ t_faq_cli_a }}</p>
+          <p>{{ t_faq_cli_query_current }}</p>
           <pre><code>curl {{ site_domain }}</code></pre>
-          <p>Query information for your own IP:</p>
+          <p>{{ t_faq_cli_query_own }}</p>
           <pre><code>curl {{ site_domain }}/asn
 
 curl {{ site_domain }}/org
@@ -100,7 +104,7 @@ curl {{ site_domain }}/vpn
 curl {{ site_domain }}/hosting
 
 curl {{ site_domain }}/tor</code></pre>
-          <p>Or display all information in JSON format:</p>
+          <p>{{ t_faq_cli_json }}</p>
           <pre><code>curl {{ site_domain }}/json
 {
   "ip": "1.1.1.1",
@@ -111,7 +115,7 @@ curl {{ site_domain }}/tor</code></pre>
   "asn": { ... },
   "proxy": { ... }
 }</code></pre>
-          <p>Query information for a specific IP:</p>
+          <p>{{ t_faq_cli_specific }}</p>
           <pre><code>curl {{ site_domain }}/json?ip=1.1.1.1
 {
   "ip": "1.1.1.1",
@@ -126,32 +130,32 @@ curl {{ site_domain }}/tor</code></pre>
       </details>
 
       <details open>
-        <summary>How to force the display of my IPv4 or IPv6 address?</summary>
+        <summary>{{ t_faq_ipv46_q }}</summary>
         <div class="faq-content">
-          <p>You can use <code>curl -4</code> or <code>curl -6</code> to view only your IPv4 or IPv6 address respectively.</p>
+          <p>{{ t_faq_ipv46_a|safe }}</p>
         </div>
       </details>
 
       <details open>
-        <summary>How to get a JSON format response?</summary>
+        <summary>{{ t_faq_json_q }}</summary>
         <div class="faq-content">
-          <p>You can send a request to the <code>/json</code> endpoint, or send a request with an <code>application/json</code> header.</p>
+          <p>{{ t_faq_json_a|safe }}</p>
         </div>
       </details>
 
       <details open>
-        <summary>Can I automate calls to your service via programs?</summary>
+        <summary>{{ t_faq_automate_q }}</summary>
         <div class="faq-content">
-          <p>Certainly, as long as the rate limit is respected. Under normal conditions, the rate limit is 30 RPM (Requests Per Minute); under high load, we will increase the restriction to 10-5 RPM.</p>
-          <p>Our API is only suitable for manual calls or small-scale projects. If your website uses our API to query visitor IPs, please ensure you use a message queue to send requests to avoid blocking. If your project has high traffic or is latency-sensitive, please use our open-source offline database: <a href="https://github.com/NetworkCats/Merged-IP-Data">Merged IP Database</a>, which is the same database used by this project.</p>
+          <p>{{ t_faq_automate_a1 }}</p>
+          <p>{{ t_faq_automate_a2|safe }}</p>
         </div>
       </details>
 
       <details open>
-        <summary>Where does the IP data come from?</summary>
+        <summary>{{ t_faq_data_q }}</summary>
         <div class="faq-content">
-          <p>IP geographic data primarily comes from the free databases of MaxMind and DB-IP; AS data comes from IPinfo's free database; and IP proxy data comes from my own <a href="https://github.com/NetworkCats/OpenProxyDB">OpenProxyDB</a> database.</p>
-          <p>Data Attributions:</p>
+          <p>{{ t_faq_data_a|safe }}</p>
+          <p>{{ t_faq_data_attr }}</p>
           <ul>
             <li>MaxMind GeoLite2: <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a></li>
             <li>IPinfo Lite: <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a></li>
@@ -163,9 +167,9 @@ curl {{ site_domain }}/tor</code></pre>
       </details>
 
       <details open>
-        <summary>Can I run my own service?</summary>
+        <summary>{{ t_faq_selfhost_q }}</summary>
         <div class="faq-content">
-          <p>Yes, the source code and database for this project are both open-source and hosted on GitHub:</p>
+          <p>{{ t_faq_selfhost_a }}</p>
           <ul>
             <li><a href="https://github.com/NetworkCats/rustyip">https://github.com/NetworkCats/rustyip</a></li>
             <li><a href="https://github.com/NetworkCats/Merged-IP-Data">https://github.com/NetworkCats/Merged-IP-Data</a></li>
@@ -174,27 +178,27 @@ curl {{ site_domain }}/tor</code></pre>
       </details>
 
       <details open>
-        <summary>How is this website different from other IP lookup sites?</summary>
+        <summary>{{ t_faq_diff_q }}</summary>
         <div class="faq-content">
-          <p>The biggest difference is that our database includes proxy-related information, and the proxy intelligence we provide is highly accurate. We have privately compared it with commercial proxy detection databases like IPinfo; our database's precision is fully comparable to commercial ones, and it is even more accurate in detecting residential proxies.</p>
-          <p>Secondly, our geographic coverage for IPv6 is more comprehensive because we merge multiple databases to provide more complete data.</p>
-          <p>Our UX is also better than any IP lookup site on the market. The site runs without any JavaScript, and we only load a minimal amount of external resources (fonts, icons), making the initial load speed extremely fast.</p>
+          <p>{{ t_faq_diff_a1 }}</p>
+          <p>{{ t_faq_diff_a2 }}</p>
+          <p>{{ t_faq_diff_a3 }}</p>
         </div>
       </details>
 
       <details open>
-        <summary>Is this service stable?</summary>
+        <summary>{{ t_faq_stable_q }}</summary>
         <div class="faq-content">
-          <p>The business logic of this service is written entirely in Rust, offering excellent performance that ensures the site remains operational even under L7 DDoS attacks. The site runs on a VPS with 2 cores and 2 GB of RAM, which is already overkill for this setup -- unless we encounter a massive L7 DDoS attack, though we have Cloudflare in front of us.</p>
-          <p>Running this website only costs me $18.00 per month. Because the cost is so low, I will not stop operations due to hardware costs in the foreseeable future, nor will I add any advertisements.</p>
-          <p>Rest assured, this service will definitely not "Rug Pull."</p>
+          <p>{{ t_faq_stable_a1 }}</p>
+          <p>{{ t_faq_stable_a2 }}</p>
+          <p>{{ t_faq_stable_a3 }}</p>
         </div>
       </details>
 
       <details open>
-        <summary>How can I sponsor this service?</summary>
+        <summary>{{ t_faq_sponsor_q }}</summary>
         <div class="faq-content">
-          <p>I accept cryptocurrency donations. If you would like to sponsor, please contact: <a href="mailto:networkcatlol@gmail.com">networkcatlol@gmail.com</a></p>
+          <p>{{ t_faq_sponsor_a }} <a href="mailto:networkcatlol@gmail.com">networkcatlol@gmail.com</a></p>
         </div>
       </details>
     </section>
@@ -205,7 +209,7 @@ curl {{ site_domain }}/tor</code></pre>
     <div class="footer-inner">
       {% include "_footer.html" %}
       <div class="footer-attribution">
-        <p>IP data provided by:</p>
+        <p>{{ t_footer_attribution }}</p>
         <ul>
           <li><a href="https://www.maxmind.com/">MaxMind GeoLite2</a></li>
           <li><a href="https://ipinfo.io/">IPinfo Lite</a></li>

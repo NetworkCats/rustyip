@@ -1,0 +1,187 @@
+# Japanese translations for RustyIP
+# Copyright (C) RustyIP Contributors
+# This file is distributed under the AGPL-3.0 license.
+#
+msgid ""
+msgstr ""
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "What is my IP address?"
+msgstr "私のIPアドレスは何ですか？"
+
+msgid "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."
+msgstr "パブリックIPアドレスを即座に確認できます。任意のIPアドレスの位置情報、ASN、組織、プロキシ/VPN/Tor検出を調べることができます。"
+
+msgid "Search IP address"
+msgstr "IPアドレスを検索"
+
+msgid "Type to search IP data"
+msgstr "IPデータを検索するには入力してください"
+
+msgid "ASN"
+msgstr "ASN"
+
+msgid "Org"
+msgstr "組織"
+
+msgid "Country"
+msgstr "国"
+
+msgid "City"
+msgstr "都市"
+
+msgid "Proxy"
+msgstr "プロキシ"
+
+msgid "VPN"
+msgstr "VPN"
+
+msgid "Hosting"
+msgstr "ホスティング"
+
+msgid "Tor"
+msgstr "Tor"
+
+msgid "Yes"
+msgstr "はい"
+
+msgid "No"
+msgstr "いいえ"
+
+msgid "FAQ"
+msgstr "よくある質問"
+
+msgid "How to use this service from the command line"
+msgstr "コマンドラインからこのサービスを利用する方法"
+
+msgid "You can use various command-line tools such as curl, httpie, and wget to use this service. Taking the most popular one, curl, as an example:"
+msgstr "curl、httpie、wgetなどのさまざまなコマンドラインツールを使ってこのサービスを利用できます。最も一般的なcurlを例にとると："
+
+msgid "Query current IP:"
+msgstr "現在のIPを照会："
+
+msgid "Query information for your own IP:"
+msgstr "自分のIPの情報を照会："
+
+msgid "Or display all information in JSON format:"
+msgstr "またはすべての情報をJSON形式で表示："
+
+msgid "Query information for a specific IP:"
+msgstr "特定のIPの情報を照会："
+
+msgid "How to force the display of my IPv4 or IPv6 address?"
+msgstr "IPv4またはIPv6アドレスの表示を強制するには？"
+
+msgid "You can use <code>curl -4</code> or <code>curl -6</code> to view only your IPv4 or IPv6 address respectively."
+msgstr "<code>curl -4</code> または <code>curl -6</code> を使用することで、それぞれIPv4またはIPv6アドレスのみを表示できます。"
+
+msgid "How to get a JSON format response?"
+msgstr "JSON形式のレスポンスを取得するには？"
+
+msgid "You can send a request to the <code>/json</code> endpoint, or send a request with an <code>application/json</code> header."
+msgstr "<code>/json</code> エンドポイントにリクエストを送信するか、<code>application/json</code> ヘッダーを付けてリクエストを送信してください。"
+
+msgid "Can I automate calls to your service via programs?"
+msgstr "プログラムでこのサービスへの呼び出しを自動化できますか？"
+
+msgid "Certainly, as long as the rate limit is respected. Under normal conditions, the rate limit is 30 RPM (Requests Per Minute); under high load, we will increase the restriction to 10-5 RPM."
+msgstr "もちろんです。レート制限を守っていただければ問題ありません。通常時のレート制限は30 RPM（リクエスト/分）ですが、高負荷時には10～5 RPMに制限を強化する場合があります。"
+
+msgid "Our API is only suitable for manual calls or small-scale projects. If your website uses our API to query visitor IPs, please ensure you use a message queue to send requests to avoid blocking. If your project has high traffic or is latency-sensitive, please use our open-source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>, which is the same database used by this project."
+msgstr "当APIは手動での呼び出しや小規模プロジェクトにのみ適しています。ウェブサイトで当APIを使用して訪問者のIPを照会する場合は、ブロッキングを避けるためにメッセージキューを使用してリクエストを送信してください。高トラフィックまたはレイテンシに敏感なプロジェクトの場合は、当プロジェクトと同じデータベースを使用しているオープンソースのオフラインデータベース：<a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a> をご利用ください。"
+
+msgid "Where does the IP data come from?"
+msgstr "IPデータはどこから取得していますか？"
+
+msgid "IP geographic data primarily comes from the free databases of MaxMind and DB-IP; AS data comes from IPinfo's free database; and IP proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> database."
+msgstr "IP地理データは主にMaxMindとDB-IPの無料データベースから取得しています。ASデータはIPinfoの無料データベースから取得し、IPプロキシデータは独自の <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> データベースから取得しています。"
+
+msgid "Data Attributions:"
+msgstr "データ帰属表示："
+
+msgid "Can I run my own service?"
+msgstr "自分でサービスを運営できますか？"
+
+msgid "Yes, the source code and database for this project are both open-source and hosted on GitHub:"
+msgstr "はい、このプロジェクトのソースコードとデータベースはどちらもオープンソースでGitHubにホストされています："
+
+msgid "How is this website different from other IP lookup sites?"
+msgstr "このウェブサイトは他のIP検索サイトとどう違いますか？"
+
+msgid "The biggest difference is that our database includes proxy-related information, and the proxy intelligence we provide is highly accurate. We have privately compared it with commercial proxy detection databases like IPinfo; our database's precision is fully comparable to commercial ones, and it is even more accurate in detecting residential proxies."
+msgstr "最大の違いは、当データベースにプロキシ関連情報が含まれており、提供するプロキシインテリジェンスの精度が非常に高いことです。IPinfoなどの商用プロキシ検出データベースと内部で比較したところ、当データベースの精度は商用のものと十分に匹敵し、レジデンシャルプロキシの検出においてはさらに高い精度を誇ります。"
+
+msgid "Secondly, our geographic coverage for IPv6 is more comprehensive because we merge multiple databases to provide more complete data."
+msgstr "次に、複数のデータベースを統合してより完全なデータを提供しているため、IPv6の地理的カバレッジがより包括的です。"
+
+msgid "Our UX is also better than any IP lookup site on the market. The site runs without any JavaScript, and we only load a minimal amount of external resources (fonts, icons), making the initial load speed extremely fast."
+msgstr "UXも市場のどのIP検索サイトよりも優れています。サイトはJavaScriptなしで動作し、最小限の外部リソース（フォント、アイコン）のみを読み込むため、初回読み込み速度が非常に高速です。"
+
+msgid "Is this service stable?"
+msgstr "このサービスは安定していますか？"
+
+msgid "The business logic of this service is written entirely in Rust, offering excellent performance that ensures the site remains operational even under L7 DDoS attacks. The site runs on a VPS with 2 cores and 2 GB of RAM, which is already overkill for this setup -- unless we encounter a massive L7 DDoS attack, though we have Cloudflare in front of us."
+msgstr "このサービスのビジネスロジックはすべてRustで書かれており、優れたパフォーマンスによりL7 DDoS攻撃下でもサイトの稼働を維持できます。サイトは2コア・2GB RAMのVPSで運営されていますが、この構成には十分すぎるスペックです。大規模なL7 DDoS攻撃を受けない限り問題ありませんが、前段にCloudflareを配置しています。"
+
+msgid "Running this website only costs me $18.00 per month. Because the cost is so low, I will not stop operations due to hardware costs in the foreseeable future, nor will I add any advertisements."
+msgstr "このウェブサイトの運営コストは月額わずか18.00ドルです。コストが非常に低いため、当面の間ハードウェアコストが原因でサービスを停止することはなく、広告を掲載することもありません。"
+
+msgid "Rest assured, this service will definitely not \"Rug Pull.\""
+msgstr "ご安心ください。このサービスは決して「Rug Pull（突然の撤退）」をしません。"
+
+msgid "How can I sponsor this service?"
+msgstr "このサービスを支援するには？"
+
+msgid "I accept cryptocurrency donations. If you would like to sponsor, please contact:"
+msgstr "暗号通貨での寄付を受け付けています。スポンサーを希望される方は、こちらにご連絡ください："
+
+msgid "Website source code licensed under"
+msgstr "ウェブサイトのソースコードのライセンス"
+
+msgid "Website Source"
+msgstr "ウェブサイトソース"
+
+msgid "IP Database"
+msgstr "IPデータベース"
+
+msgid "IP data provided by:"
+msgstr "IPデータ提供元："
+
+msgid "Error"
+msgstr "エラー"
+
+msgid "Go to Home"
+msgstr "ホームに戻る"
+
+msgid "IP address information"
+msgstr "IPアドレス情報"
+
+msgid "Frequently Asked Questions"
+msgstr "よくある質問"
+
+msgid "Project links"
+msgstr "プロジェクトリンク"
+
+msgid "Language"
+msgstr "言語"
+
+msgid "The page you are looking for does not exist."
+msgstr "お探しのページは存在しません。"
+
+msgid "IP not found in database"
+msgstr "IPがデータベースに見つかりません"
+
+msgid "Invalid IP address"
+msgstr "無効なIPアドレス"
+
+msgid "Missing client IP address"
+msgstr "クライアントIPアドレスがありません"
+
+msgid "Database lookup failed"
+msgstr "データベース検索に失敗しました"
+
+msgid "Template render failed"
+msgstr "テンプレートのレンダリングに失敗しました"

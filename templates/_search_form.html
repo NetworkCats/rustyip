@@ -1,12 +1,12 @@
-<form method="GET" action="/" class="search-form" role="search">
+<form method="GET" action="/{{ lang_tag }}/" class="search-form" role="search">
   <div class="search-input-wrap">
-    <label for="ip-search" class="sr-only">Search IP address</label>
+    <label for="ip-search" class="sr-only">{{ t_search_label }}</label>
     <i class="icon-magnifier search-icon" aria-hidden="true"></i>
     <input
       id="ip-search"
       type="text"
       name="ip"
-      placeholder="Type to search IP data"
+      placeholder="{{ t_search_placeholder }}"
       value="{{ query }}"
       autocomplete="off"
       autocapitalize="none"

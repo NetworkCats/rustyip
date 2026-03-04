@@ -1,0 +1,187 @@
+# Traditional Chinese translations for RustyIP
+# Copyright (C) RustyIP Contributors
+# This file is distributed under the AGPL-3.0 license.
+#
+msgid ""
+msgstr ""
+"Language: zh-Hant\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "What is my IP address?"
+msgstr "我的 IP 位址是什麼？"
+
+msgid "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."
+msgstr "即時查詢您的公開 IP 位址。查詢任何 IP 位址的地理位置、ASN、組織，以及代理/VPN/Tor 偵測資訊。"
+
+msgid "Search IP address"
+msgstr "搜尋 IP 位址"
+
+msgid "Type to search IP data"
+msgstr "輸入以搜尋 IP 資料"
+
+msgid "ASN"
+msgstr "ASN"
+
+msgid "Org"
+msgstr "組織"
+
+msgid "Country"
+msgstr "國家"
+
+msgid "City"
+msgstr "城市"
+
+msgid "Proxy"
+msgstr "代理"
+
+msgid "VPN"
+msgstr "VPN"
+
+msgid "Hosting"
+msgstr "託管"
+
+msgid "Tor"
+msgstr "Tor"
+
+msgid "Yes"
+msgstr "是"
+
+msgid "No"
+msgstr "否"
+
+msgid "FAQ"
+msgstr "常見問題"
+
+msgid "How to use this service from the command line"
+msgstr "如何從命令列使用此服務"
+
+msgid "You can use various command-line tools such as curl, httpie, and wget to use this service. Taking the most popular one, curl, as an example:"
+msgstr "您可以使用各種命令列工具，例如 curl、httpie 和 wget 來使用此服務。以最常用的 curl 為例："
+
+msgid "Query current IP:"
+msgstr "查詢目前 IP："
+
+msgid "Query information for your own IP:"
+msgstr "查詢您自己的 IP 資訊："
+
+msgid "Or display all information in JSON format:"
+msgstr "或以 JSON 格式顯示所有資訊："
+
+msgid "Query information for a specific IP:"
+msgstr "查詢特定 IP 的資訊："
+
+msgid "How to force the display of my IPv4 or IPv6 address?"
+msgstr "如何強制顯示我的 IPv4 或 IPv6 位址？"
+
+msgid "You can use <code>curl -4</code> or <code>curl -6</code> to view only your IPv4 or IPv6 address respectively."
+msgstr "您可以使用 <code>curl -4</code> 或 <code>curl -6</code> 來分別僅查看您的 IPv4 或 IPv6 位址。"
+
+msgid "How to get a JSON format response?"
+msgstr "如何取得 JSON 格式的回應？"
+
+msgid "You can send a request to the <code>/json</code> endpoint, or send a request with an <code>application/json</code> header."
+msgstr "您可以向 <code>/json</code> 端點發送請求，或發送帶有 <code>application/json</code> 標頭的請求。"
+
+msgid "Can I automate calls to your service via programs?"
+msgstr "我可以透過程式自動呼叫你們的服務嗎？"
+
+msgid "Certainly, as long as the rate limit is respected. Under normal conditions, the rate limit is 30 RPM (Requests Per Minute); under high load, we will increase the restriction to 10-5 RPM."
+msgstr "當然可以，只要遵守速率限制即可。正常情況下，速率限制為 30 RPM（每分鐘請求數）；在高負載情況下，我們會將限制提高至 10-5 RPM。"
+
+msgid "Our API is only suitable for manual calls or small-scale projects. If your website uses our API to query visitor IPs, please ensure you use a message queue to send requests to avoid blocking. If your project has high traffic or is latency-sensitive, please use our open-source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>, which is the same database used by this project."
+msgstr "我們的 API 僅適用於手動呼叫或小型專案。如果您的網站使用我們的 API 查詢訪客 IP，請確保使用訊息佇列來發送請求以避免阻塞。如果您的專案流量較高或對延遲敏感，請使用我們的開源離線資料庫：<a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>，這與本專案使用的資料庫相同。"
+
+msgid "Where does the IP data come from?"
+msgstr "IP 資料從哪裡來？"
+
+msgid "IP geographic data primarily comes from the free databases of MaxMind and DB-IP; AS data comes from IPinfo's free database; and IP proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> database."
+msgstr "IP 地理資料主要來自 MaxMind 和 DB-IP 的免費資料庫；AS 資料來自 IPinfo 的免費資料庫；IP 代理資料則來自我自己的 <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> 資料庫。"
+
+msgid "Data Attributions:"
+msgstr "資料來源聲明："
+
+msgid "Can I run my own service?"
+msgstr "我可以自行架設此服務嗎？"
+
+msgid "Yes, the source code and database for this project are both open-source and hosted on GitHub:"
+msgstr "可以，本專案的原始碼和資料庫皆為開源並託管於 GitHub："
+
+msgid "How is this website different from other IP lookup sites?"
+msgstr "這個網站與其他 IP 查詢網站有什麼不同？"
+
+msgid "The biggest difference is that our database includes proxy-related information, and the proxy intelligence we provide is highly accurate. We have privately compared it with commercial proxy detection databases like IPinfo; our database's precision is fully comparable to commercial ones, and it is even more accurate in detecting residential proxies."
+msgstr "最大的區別在於我們的資料庫包含代理相關資訊，且我們提供的代理情報非常準確。我們曾私下與 IPinfo 等商業代理偵測資料庫進行比較；我們資料庫的精確度完全可與商業資料庫媲美，在偵測住宅代理方面甚至更為準確。"
+
+msgid "Secondly, our geographic coverage for IPv6 is more comprehensive because we merge multiple databases to provide more complete data."
+msgstr "其次，我們對 IPv6 的地理覆蓋範圍更為全面，因為我們合併了多個資料庫以提供更完整的資料。"
+
+msgid "Our UX is also better than any IP lookup site on the market. The site runs without any JavaScript, and we only load a minimal amount of external resources (fonts, icons), making the initial load speed extremely fast."
+msgstr "我們的使用者體驗也優於市面上任何 IP 查詢網站。本網站無需任何 JavaScript 即可運行，我們僅載入極少量的外部資源（字型、圖示），使得首次載入速度極快。"
+
+msgid "Is this service stable?"
+msgstr "此服務穩定嗎？"
+
+msgid "The business logic of this service is written entirely in Rust, offering excellent performance that ensures the site remains operational even under L7 DDoS attacks. The site runs on a VPS with 2 cores and 2 GB of RAM, which is already overkill for this setup -- unless we encounter a massive L7 DDoS attack, though we have Cloudflare in front of us."
+msgstr "此服務的業務邏輯完全以 Rust 編寫，提供卓越的效能，確保網站即使在 L7 DDoS 攻擊下仍能正常運作。網站運行在一台具有 2 核心和 2 GB 記憶體的 VPS 上，對於此架構來說已經綽綽有餘——除非我們遭遇大規模 L7 DDoS 攻擊，不過我們前方有 Cloudflare 保護。"
+
+msgid "Running this website only costs me $18.00 per month. Because the cost is so low, I will not stop operations due to hardware costs in the foreseeable future, nor will I add any advertisements."
+msgstr "運行此網站每月僅需 $18.00 美元。由於成本極低，在可預見的未來，我不會因硬體成本而停止營運，也不會加入任何廣告。"
+
+msgid "Rest assured, this service will definitely not \"Rug Pull.\""
+msgstr "請放心，此服務絕對不會「Rug Pull」。"
+
+msgid "How can I sponsor this service?"
+msgstr "我該如何贊助此服務？"
+
+msgid "I accept cryptocurrency donations. If you would like to sponsor, please contact:"
+msgstr "我接受加密貨幣捐贈。如果您想贊助，請聯繫："
+
+msgid "Website source code licensed under"
+msgstr "網站原始碼授權條款"
+
+msgid "Website Source"
+msgstr "網站原始碼"
+
+msgid "IP Database"
+msgstr "IP 資料庫"
+
+msgid "IP data provided by:"
+msgstr "IP 資料由以下提供："
+
+msgid "Error"
+msgstr "錯誤"
+
+msgid "Go to Home"
+msgstr "返回首頁"
+
+msgid "IP address information"
+msgstr "IP 位址資訊"
+
+msgid "Frequently Asked Questions"
+msgstr "常見問題"
+
+msgid "Project links"
+msgstr "專案連結"
+
+msgid "Language"
+msgstr "語言"
+
+msgid "The page you are looking for does not exist."
+msgstr "您所尋找的頁面不存在。"
+
+msgid "IP not found in database"
+msgstr "在資料庫中找不到此 IP"
+
+msgid "Invalid IP address"
+msgstr "無效的 IP 位址"
+
+msgid "Missing client IP address"
+msgstr "缺少用戶端 IP 位址"
+
+msgid "Database lookup failed"
+msgstr "資料庫查詢失敗"
+
+msgid "Template render failed"
+msgstr "範本渲染失敗"

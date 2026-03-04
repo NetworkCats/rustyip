@@ -1,0 +1,187 @@
+# Indonesian translations for RustyIP
+# Copyright (C) RustyIP Contributors
+# This file is distributed under the AGPL-3.0 license.
+#
+msgid ""
+msgstr ""
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "What is my IP address?"
+msgstr "Apa alamat IP saya?"
+
+msgid "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."
+msgstr "Temukan alamat IP publik Anda secara instan. Cari geolokasi, ASN, organisasi, dan deteksi proxy/VPN/Tor untuk alamat IP apa pun."
+
+msgid "Search IP address"
+msgstr "Cari alamat IP"
+
+msgid "Type to search IP data"
+msgstr "Ketik untuk mencari data IP"
+
+msgid "ASN"
+msgstr "ASN"
+
+msgid "Org"
+msgstr "Org"
+
+msgid "Country"
+msgstr "Negara"
+
+msgid "City"
+msgstr "Kota"
+
+msgid "Proxy"
+msgstr "Proxy"
+
+msgid "VPN"
+msgstr "VPN"
+
+msgid "Hosting"
+msgstr "Hosting"
+
+msgid "Tor"
+msgstr "Tor"
+
+msgid "Yes"
+msgstr "Ya"
+
+msgid "No"
+msgstr "Tidak"
+
+msgid "FAQ"
+msgstr "FAQ"
+
+msgid "How to use this service from the command line"
+msgstr "Cara menggunakan layanan ini dari baris perintah"
+
+msgid "You can use various command-line tools such as curl, httpie, and wget to use this service. Taking the most popular one, curl, as an example:"
+msgstr "Anda dapat menggunakan berbagai alat baris perintah seperti curl, httpie, dan wget untuk menggunakan layanan ini. Mengambil yang paling populer, curl, sebagai contoh:"
+
+msgid "Query current IP:"
+msgstr "Kueri IP saat ini:"
+
+msgid "Query information for your own IP:"
+msgstr "Kueri informasi untuk IP Anda sendiri:"
+
+msgid "Or display all information in JSON format:"
+msgstr "Atau tampilkan semua informasi dalam format JSON:"
+
+msgid "Query information for a specific IP:"
+msgstr "Kueri informasi untuk IP tertentu:"
+
+msgid "How to force the display of my IPv4 or IPv6 address?"
+msgstr "Bagaimana cara memaksa tampilan alamat IPv4 atau IPv6 saya?"
+
+msgid "You can use <code>curl -4</code> or <code>curl -6</code> to view only your IPv4 or IPv6 address respectively."
+msgstr "Anda dapat menggunakan <code>curl -4</code> atau <code>curl -6</code> untuk melihat hanya alamat IPv4 atau IPv6 Anda."
+
+msgid "How to get a JSON format response?"
+msgstr "Bagaimana cara mendapatkan respons dalam format JSON?"
+
+msgid "You can send a request to the <code>/json</code> endpoint, or send a request with an <code>application/json</code> header."
+msgstr "Anda dapat mengirim permintaan ke endpoint <code>/json</code>, atau mengirim permintaan dengan header <code>application/json</code>."
+
+msgid "Can I automate calls to your service via programs?"
+msgstr "Bisakah saya mengotomatiskan panggilan ke layanan Anda melalui program?"
+
+msgid "Certainly, as long as the rate limit is respected. Under normal conditions, the rate limit is 30 RPM (Requests Per Minute); under high load, we will increase the restriction to 10-5 RPM."
+msgstr "Tentu saja, selama batas laju dipatuhi. Dalam kondisi normal, batas laju adalah 30 RPM (Permintaan Per Menit); dalam beban tinggi, kami akan meningkatkan pembatasan menjadi 10-5 RPM."
+
+msgid "Our API is only suitable for manual calls or small-scale projects. If your website uses our API to query visitor IPs, please ensure you use a message queue to send requests to avoid blocking. If your project has high traffic or is latency-sensitive, please use our open-source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>, which is the same database used by this project."
+msgstr "API kami hanya cocok untuk panggilan manual atau proyek berskala kecil. Jika situs web Anda menggunakan API kami untuk mengkueri IP pengunjung, pastikan Anda menggunakan antrean pesan untuk mengirim permintaan agar tidak terblokir. Jika proyek Anda memiliki lalu lintas tinggi atau sensitif terhadap latensi, silakan gunakan basis data offline sumber terbuka kami: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>, yang merupakan basis data yang sama yang digunakan oleh proyek ini."
+
+msgid "Where does the IP data come from?"
+msgstr "Dari mana data IP berasal?"
+
+msgid "IP geographic data primarily comes from the free databases of MaxMind and DB-IP; AS data comes from IPinfo's free database; and IP proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> database."
+msgstr "Data geografis IP terutama berasal dari basis data gratis MaxMind dan DB-IP; data AS berasal dari basis data gratis IPinfo; dan data proxy IP berasal dari basis data <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> milik saya sendiri."
+
+msgid "Data Attributions:"
+msgstr "Atribusi Data:"
+
+msgid "Can I run my own service?"
+msgstr "Bisakah saya menjalankan layanan saya sendiri?"
+
+msgid "Yes, the source code and database for this project are both open-source and hosted on GitHub:"
+msgstr "Ya, kode sumber dan basis data untuk proyek ini keduanya bersumber terbuka dan dihosting di GitHub:"
+
+msgid "How is this website different from other IP lookup sites?"
+msgstr "Apa perbedaan situs web ini dari situs pencarian IP lainnya?"
+
+msgid "The biggest difference is that our database includes proxy-related information, and the proxy intelligence we provide is highly accurate. We have privately compared it with commercial proxy detection databases like IPinfo; our database's precision is fully comparable to commercial ones, and it is even more accurate in detecting residential proxies."
+msgstr "Perbedaan terbesar adalah basis data kami mencakup informasi terkait proxy, dan inteligensi proxy yang kami sediakan sangat akurat. Kami telah membandingkannya secara privat dengan basis data deteksi proxy komersial seperti IPinfo; presisi basis data kami sepenuhnya sebanding dengan yang komersial, dan bahkan lebih akurat dalam mendeteksi proxy residensial."
+
+msgid "Secondly, our geographic coverage for IPv6 is more comprehensive because we merge multiple databases to provide more complete data."
+msgstr "Kedua, cakupan geografis kami untuk IPv6 lebih komprehensif karena kami menggabungkan beberapa basis data untuk menyediakan data yang lebih lengkap."
+
+msgid "Our UX is also better than any IP lookup site on the market. The site runs without any JavaScript, and we only load a minimal amount of external resources (fonts, icons), making the initial load speed extremely fast."
+msgstr "UX kami juga lebih baik daripada situs pencarian IP mana pun di pasaran. Situs ini berjalan tanpa JavaScript apa pun, dan kami hanya memuat sumber daya eksternal dalam jumlah minimal (font, ikon), membuat kecepatan pemuatan awal sangat cepat."
+
+msgid "Is this service stable?"
+msgstr "Apakah layanan ini stabil?"
+
+msgid "The business logic of this service is written entirely in Rust, offering excellent performance that ensures the site remains operational even under L7 DDoS attacks. The site runs on a VPS with 2 cores and 2 GB of RAM, which is already overkill for this setup -- unless we encounter a massive L7 DDoS attack, though we have Cloudflare in front of us."
+msgstr "Logika bisnis layanan ini ditulis sepenuhnya dalam Rust, menawarkan performa luar biasa yang memastikan situs tetap beroperasi bahkan di bawah serangan DDoS L7. Situs ini berjalan di VPS dengan 2 core dan 2 GB RAM, yang sudah lebih dari cukup untuk konfigurasi ini -- kecuali kami menghadapi serangan DDoS L7 besar-besaran, meskipun kami memiliki Cloudflare di depan kami."
+
+msgid "Running this website only costs me $18.00 per month. Because the cost is so low, I will not stop operations due to hardware costs in the foreseeable future, nor will I add any advertisements."
+msgstr "Menjalankan situs web ini hanya menghabiskan biaya $18,00 per bulan. Karena biayanya sangat rendah, saya tidak akan menghentikan operasi karena biaya perangkat keras di masa mendatang, dan juga tidak akan menambahkan iklan apa pun."
+
+msgid "Rest assured, this service will definitely not \"Rug Pull.\""
+msgstr "Tenang saja, layanan ini pasti tidak akan melakukan \"Rug Pull.\""
+
+msgid "How can I sponsor this service?"
+msgstr "Bagaimana cara mensponsori layanan ini?"
+
+msgid "I accept cryptocurrency donations. If you would like to sponsor, please contact:"
+msgstr "Saya menerima donasi mata uang kripto. Jika Anda ingin mensponsori, silakan hubungi:"
+
+msgid "Website source code licensed under"
+msgstr "Kode sumber situs web dilisensikan di bawah"
+
+msgid "Website Source"
+msgstr "Kode Sumber Situs"
+
+msgid "IP Database"
+msgstr "Basis Data IP"
+
+msgid "IP data provided by:"
+msgstr "Data IP disediakan oleh:"
+
+msgid "Error"
+msgstr "Kesalahan"
+
+msgid "Go to Home"
+msgstr "Ke Beranda"
+
+msgid "IP address information"
+msgstr "Informasi alamat IP"
+
+msgid "Frequently Asked Questions"
+msgstr "Pertanyaan yang Sering Diajukan"
+
+msgid "Project links"
+msgstr "Tautan proyek"
+
+msgid "Language"
+msgstr "Bahasa"
+
+msgid "The page you are looking for does not exist."
+msgstr "Halaman yang Anda cari tidak ditemukan."
+
+msgid "IP not found in database"
+msgstr "IP tidak ditemukan dalam basis data"
+
+msgid "Invalid IP address"
+msgstr "Alamat IP tidak valid"
+
+msgid "Missing client IP address"
+msgstr "Alamat IP klien tidak ditemukan"
+
+msgid "Database lookup failed"
+msgstr "Pencarian basis data gagal"
+
+msgid "Template render failed"
+msgstr "Render template gagal"

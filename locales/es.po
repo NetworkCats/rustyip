@@ -1,0 +1,187 @@
+# Spanish translations for RustyIP
+# Copyright (C) RustyIP Contributors
+# This file is distributed under the AGPL-3.0 license.
+#
+msgid ""
+msgstr ""
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "What is my IP address?"
+msgstr "Cual es mi direccion IP?"
+
+msgid "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."
+msgstr "Encuentra tu direccion IP publica al instante. Consulta la geolocalizacion, ASN, organizacion y deteccion de proxy/VPN/Tor para cualquier direccion IP."
+
+msgid "Search IP address"
+msgstr "Buscar direccion IP"
+
+msgid "Type to search IP data"
+msgstr "Escribe para buscar datos de IP"
+
+msgid "ASN"
+msgstr "ASN"
+
+msgid "Org"
+msgstr "Org"
+
+msgid "Country"
+msgstr "Pais"
+
+msgid "City"
+msgstr "Ciudad"
+
+msgid "Proxy"
+msgstr "Proxy"
+
+msgid "VPN"
+msgstr "VPN"
+
+msgid "Hosting"
+msgstr "Hosting"
+
+msgid "Tor"
+msgstr "Tor"
+
+msgid "Yes"
+msgstr "Si"
+
+msgid "No"
+msgstr "No"
+
+msgid "FAQ"
+msgstr "Preguntas frecuentes"
+
+msgid "How to use this service from the command line"
+msgstr "Como usar este servicio desde la linea de comandos"
+
+msgid "You can use various command-line tools such as curl, httpie, and wget to use this service. Taking the most popular one, curl, as an example:"
+msgstr "Puedes usar diversas herramientas de linea de comandos como curl, httpie y wget para utilizar este servicio. Tomando la mas popular, curl, como ejemplo:"
+
+msgid "Query current IP:"
+msgstr "Consultar la IP actual:"
+
+msgid "Query information for your own IP:"
+msgstr "Consultar informacion de tu propia IP:"
+
+msgid "Or display all information in JSON format:"
+msgstr "O mostrar toda la informacion en formato JSON:"
+
+msgid "Query information for a specific IP:"
+msgstr "Consultar informacion de una IP especifica:"
+
+msgid "How to force the display of my IPv4 or IPv6 address?"
+msgstr "Como forzar la visualizacion de mi direccion IPv4 o IPv6?"
+
+msgid "You can use <code>curl -4</code> or <code>curl -6</code> to view only your IPv4 or IPv6 address respectively."
+msgstr "Puedes usar <code>curl -4</code> o <code>curl -6</code> para ver solo tu direccion IPv4 o IPv6 respectivamente."
+
+msgid "How to get a JSON format response?"
+msgstr "Como obtener una respuesta en formato JSON?"
+
+msgid "You can send a request to the <code>/json</code> endpoint, or send a request with an <code>application/json</code> header."
+msgstr "Puedes enviar una solicitud al endpoint <code>/json</code>, o enviar una solicitud con el encabezado <code>application/json</code>."
+
+msgid "Can I automate calls to your service via programs?"
+msgstr "Puedo automatizar las llamadas a su servicio mediante programas?"
+
+msgid "Certainly, as long as the rate limit is respected. Under normal conditions, the rate limit is 30 RPM (Requests Per Minute); under high load, we will increase the restriction to 10-5 RPM."
+msgstr "Por supuesto, siempre que se respete el limite de velocidad. En condiciones normales, el limite es de 30 RPM (solicitudes por minuto); bajo alta carga, aumentaremos la restriccion a 10-5 RPM."
+
+msgid "Our API is only suitable for manual calls or small-scale projects. If your website uses our API to query visitor IPs, please ensure you use a message queue to send requests to avoid blocking. If your project has high traffic or is latency-sensitive, please use our open-source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>, which is the same database used by this project."
+msgstr "Nuestra API solo es adecuada para llamadas manuales o proyectos de pequena escala. Si tu sitio web utiliza nuestra API para consultar las IP de los visitantes, asegurate de usar una cola de mensajes para enviar solicitudes y evitar bloqueos. Si tu proyecto tiene alto trafico o es sensible a la latencia, utiliza nuestra base de datos offline de codigo abierto: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>, que es la misma base de datos utilizada por este proyecto."
+
+msgid "Where does the IP data come from?"
+msgstr "De donde provienen los datos de IP?"
+
+msgid "IP geographic data primarily comes from the free databases of MaxMind and DB-IP; AS data comes from IPinfo's free database; and IP proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> database."
+msgstr "Los datos geograficos de IP provienen principalmente de las bases de datos gratuitas de MaxMind y DB-IP; los datos de AS provienen de la base de datos gratuita de IPinfo; y los datos de proxy de IP provienen de mi propia base de datos <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a>."
+
+msgid "Data Attributions:"
+msgstr "Atribuciones de datos:"
+
+msgid "Can I run my own service?"
+msgstr "Puedo ejecutar mi propio servicio?"
+
+msgid "Yes, the source code and database for this project are both open-source and hosted on GitHub:"
+msgstr "Si, el codigo fuente y la base de datos de este proyecto son de codigo abierto y estan alojados en GitHub:"
+
+msgid "How is this website different from other IP lookup sites?"
+msgstr "En que se diferencia este sitio web de otros sitios de consulta de IP?"
+
+msgid "The biggest difference is that our database includes proxy-related information, and the proxy intelligence we provide is highly accurate. We have privately compared it with commercial proxy detection databases like IPinfo; our database's precision is fully comparable to commercial ones, and it is even more accurate in detecting residential proxies."
+msgstr "La mayor diferencia es que nuestra base de datos incluye informacion relacionada con proxies, y la inteligencia de proxies que proporcionamos es muy precisa. La hemos comparado de forma privada con bases de datos comerciales de deteccion de proxies como IPinfo; la precision de nuestra base de datos es totalmente comparable con las comerciales, e incluso es mas precisa en la deteccion de proxies residenciales."
+
+msgid "Secondly, our geographic coverage for IPv6 is more comprehensive because we merge multiple databases to provide more complete data."
+msgstr "En segundo lugar, nuestra cobertura geografica para IPv6 es mas completa porque fusionamos multiples bases de datos para proporcionar datos mas completos."
+
+msgid "Our UX is also better than any IP lookup site on the market. The site runs without any JavaScript, and we only load a minimal amount of external resources (fonts, icons), making the initial load speed extremely fast."
+msgstr "Nuestra experiencia de usuario tambien es mejor que la de cualquier sitio de consulta de IP del mercado. El sitio funciona sin ningun JavaScript, y solo cargamos una cantidad minima de recursos externos (fuentes, iconos), lo que hace que la velocidad de carga inicial sea extremadamente rapida."
+
+msgid "Is this service stable?"
+msgstr "Es estable este servicio?"
+
+msgid "The business logic of this service is written entirely in Rust, offering excellent performance that ensures the site remains operational even under L7 DDoS attacks. The site runs on a VPS with 2 cores and 2 GB of RAM, which is already overkill for this setup -- unless we encounter a massive L7 DDoS attack, though we have Cloudflare in front of us."
+msgstr "La logica de negocio de este servicio esta escrita completamente en Rust, ofreciendo un rendimiento excelente que asegura que el sitio permanezca operativo incluso bajo ataques DDoS de capa 7. El sitio funciona en un VPS con 2 nucleos y 2 GB de RAM, lo cual ya es mas que suficiente para esta configuracion, a menos que enfrentemos un ataque DDoS de capa 7 masivo, aunque tenemos Cloudflare delante de nosotros."
+
+msgid "Running this website only costs me $18.00 per month. Because the cost is so low, I will not stop operations due to hardware costs in the foreseeable future, nor will I add any advertisements."
+msgstr "Ejecutar este sitio web solo me cuesta $18.00 al mes. Debido a que el costo es tan bajo, no dejare de operar por costos de hardware en el futuro previsible, ni agregare ningun anuncio."
+
+msgid "Rest assured, this service will definitely not \"Rug Pull.\""
+msgstr "Tengan la seguridad de que este servicio definitivamente no hara un \"Rug Pull.\""
+
+msgid "How can I sponsor this service?"
+msgstr "Como puedo patrocinar este servicio?"
+
+msgid "I accept cryptocurrency donations. If you would like to sponsor, please contact:"
+msgstr "Acepto donaciones en criptomonedas. Si deseas patrocinar, por favor contacta:"
+
+msgid "Website source code licensed under"
+msgstr "Codigo fuente del sitio web licenciado bajo"
+
+msgid "Website Source"
+msgstr "Codigo fuente del sitio web"
+
+msgid "IP Database"
+msgstr "Base de datos de IP"
+
+msgid "IP data provided by:"
+msgstr "Datos de IP proporcionados por:"
+
+msgid "Error"
+msgstr "Error"
+
+msgid "Go to Home"
+msgstr "Ir al inicio"
+
+msgid "IP address information"
+msgstr "Informacion de la direccion IP"
+
+msgid "Frequently Asked Questions"
+msgstr "Preguntas frecuentes"
+
+msgid "Project links"
+msgstr "Enlaces del proyecto"
+
+msgid "Language"
+msgstr "Idioma"
+
+msgid "The page you are looking for does not exist."
+msgstr "La pagina que buscas no existe."
+
+msgid "IP not found in database"
+msgstr "IP no encontrada en la base de datos"
+
+msgid "Invalid IP address"
+msgstr "Direccion IP no valida"
+
+msgid "Missing client IP address"
+msgstr "Falta la direccion IP del cliente"
+
+msgid "Database lookup failed"
+msgstr "La consulta a la base de datos fallo"
+
+msgid "Template render failed"
+msgstr "La renderizacion de la plantilla fallo"

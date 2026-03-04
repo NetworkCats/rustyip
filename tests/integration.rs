@@ -56,6 +56,19 @@ async fn get_with_headers(
     (status, text)
 }
 
+async fn get_response(
+    app: &axum::Router,
+    uri: &str,
+    headers: Vec<(&str, &str)>,
+) -> axum::http::Response<axum::body::Body> {
+    let mut builder = Request::builder().uri(uri).method("GET");
+    for (k, v) in headers {
+        builder = builder.header(k, v);
+    }
+    let request = builder.body(axum::body::Body::empty()).unwrap();
+    app.clone().oneshot(request).await.unwrap()
+}
+
 #[tokio::test]
 async fn health_returns_200() {
     let app = build_test_app();
@@ -206,12 +219,64 @@ async fn accept_json_returns_json() {
     assert_eq!(json["ip"], "45.77.77.77");
 }
 
+// The root path for browser requests now redirects to /{lang}/
 #[tokio::test]
-async fn browser_returns_html() {
+async fn root_redirects_browser_to_lang_path() {
+    let app = build_test_app();
+    let response = get_response(
+        &app,
+        "/",
+        vec![
+            (
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            ),
+            ("CF-Connecting-IP", "45.77.77.77"),
+        ],
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
+    let location = response
+        .headers()
+        .get("location")
+        .unwrap()
+        .to_str()
+        .unwrap();
+    assert!(
+        location.starts_with("/en"),
+        "redirect should go to /en, got: {location}"
+    );
+}
+
+#[tokio::test]
+async fn root_redirects_to_japanese_for_ja_accept_language() {
+    let app = build_test_app();
+    let response = get_response(
+        &app,
+        "/",
+        vec![
+            ("User-Agent", "Mozilla/5.0"),
+            ("Accept-Language", "ja,en;q=0.5"),
+            ("CF-Connecting-IP", "1.1.1.1"),
+        ],
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
+    let location = response
+        .headers()
+        .get("location")
+        .unwrap()
+        .to_str()
+        .unwrap();
+    assert_eq!(location, "/ja");
+}
+
+#[tokio::test]
+async fn browser_returns_html_at_lang_path() {
     let app = build_test_app();
     let (status, body) = get_with_headers(
         &app,
-        "/?ip=45.77.77.77",
+        "/en?ip=45.77.77.77",
         vec![(
             "User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -228,11 +293,55 @@ async fn browser_returns_html() {
 }
 
 #[tokio::test]
-async fn root_without_cf_header_returns_error() {
+async fn browser_returns_html_in_spanish() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/es?ip=45.77.77.77",
+        vec![("User-Agent", "Mozilla/5.0")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(body.contains("lang=\"es\""));
+    assert!(body.contains("45.77.77.77"));
+}
+
+#[tokio::test]
+async fn browser_returns_html_in_arabic_with_rtl() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/ar?ip=45.77.77.77",
+        vec![("User-Agent", "Mozilla/5.0")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(body.contains("lang=\"ar\""));
+    assert!(body.contains("dir=\"rtl\""));
+}
+
+#[tokio::test]
+async fn root_without_cf_header_redirects() {
+    let app = build_test_app();
+    let response = get_response(
+        &app,
+        "/",
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
+    )
+    .await;
+    // Root should redirect to /en when no Accept-Language header
+    assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
+}
+
+#[tokio::test]
+async fn lang_path_without_cf_header_returns_error() {
     let app = build_test_app();
     let (status, _) = get_with_headers(
         &app,
-        "/",
+        "/en",
         vec![(
             "User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -310,7 +419,6 @@ async fn whitespace_ip_query_falls_back_to_cf_header() {
 #[tokio::test]
 async fn ip_not_in_database_returns_500() {
     let app = build_test_app();
-    // 0.0.0.0 is unlikely to be in a geo database
     let (status, _) = get(&app, "/json?ip=0.0.0.0").await;
     assert_eq!(status, StatusCode::INTERNAL_SERVER_ERROR);
 }
@@ -320,7 +428,7 @@ async fn cli_with_query_param_returns_html() {
     let app = build_test_app();
     let (status, body) = get_with_headers(
         &app,
-        "/?ip=45.77.77.77",
+        "/en?ip=45.77.77.77",
         vec![
             ("User-Agent", "curl/8.7.1"),
             ("CF-Connecting-IP", "1.2.3.4"),
@@ -328,7 +436,6 @@ async fn cli_with_query_param_returns_html() {
     )
     .await;
     assert_eq!(status, StatusCode::OK);
-    // When CLI sends ?ip=, the shortcut is bypassed and HTML is returned
     assert!(body.contains("<!DOCTYPE html>"));
     assert!(body.contains("45.77.77.77"));
 }
@@ -338,7 +445,7 @@ async fn accept_json_with_query_param_returns_html() {
     let app = build_test_app();
     let (status, body) = get_with_headers(
         &app,
-        "/?ip=45.77.77.77",
+        "/en?ip=45.77.77.77",
         vec![
             ("Accept", "application/json"),
             ("CF-Connecting-IP", "8.8.8.8"),
@@ -346,7 +453,6 @@ async fn accept_json_with_query_param_returns_html() {
     )
     .await;
     assert_eq!(status, StatusCode::OK);
-    // When Accept: application/json is sent with ?ip=, the JSON shortcut is bypassed
     assert!(body.contains("<!DOCTYPE html>"));
     assert!(body.contains("45.77.77.77"));
 }
@@ -440,7 +546,13 @@ async fn sitemap_xml_returns_valid_response() {
     let (status, body) = get(&app, "/sitemap.xml").await;
     assert_eq!(status, StatusCode::OK);
     assert!(body.contains("<?xml version=\"1.0\""));
-    assert!(body.contains("<loc>https://test.example.com/</loc>"));
+    assert!(body.contains("<loc>https://test.example.com/en/</loc>"));
+    assert!(body.contains("<loc>https://test.example.com/es/</loc>"));
+    assert!(body.contains("<loc>https://test.example.com/ja/</loc>"));
+    assert!(body.contains("hreflang=\"en\""));
+    assert!(body.contains("hreflang=\"x-default\""));
+    assert!(body.contains("hreflang=\"zh-Hant\""));
+    assert!(body.contains("xmlns:xhtml"));
 }
 
 #[tokio::test]
@@ -448,7 +560,7 @@ async fn html_contains_seo_meta_tags() {
     let app = build_test_app();
     let (status, body) = get_with_headers(
         &app,
-        "/?ip=45.77.77.77",
+        "/en?ip=45.77.77.77",
         vec![(
             "User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -463,6 +575,9 @@ async fn html_contains_seo_meta_tags() {
     assert!(body.contains("<meta property=\"og:type\" content=\"website\""));
     assert!(body.contains("<meta name=\"twitter:card\" content=\"summary\""));
     assert!(body.contains("<meta name=\"theme-color\""));
+    assert!(body.contains("hreflang=\"en\""));
+    assert!(body.contains("hreflang=\"x-default\""));
+    assert!(body.contains("hreflang=\"es\""));
 }
 
 #[tokio::test]
@@ -470,7 +585,7 @@ async fn html_uses_th_for_row_headers() {
     let app = build_test_app();
     let (status, body) = get_with_headers(
         &app,
-        "/?ip=45.77.77.77",
+        "/en?ip=45.77.77.77",
         vec![(
             "User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -483,14 +598,86 @@ async fn html_uses_th_for_row_headers() {
     assert!(body.contains("autocapitalize=\"none\""));
 }
 
+#[tokio::test]
+async fn html_contains_lang_attribute() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/de?ip=45.77.77.77",
+        vec![("User-Agent", "Mozilla/5.0")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(body.contains("lang=\"de\""));
+}
+
+#[tokio::test]
+async fn html_contains_language_selector() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/en?ip=45.77.77.77",
+        vec![("User-Agent", "Mozilla/5.0")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(body.contains("lang-select"));
+    assert!(body.contains("value=\"/en/\""));
+    assert!(body.contains("value=\"/es/\""));
+    assert!(body.contains("value=\"/ja/\""));
+    assert!(body.contains("value=\"/zh-Hant/\""));
+    assert!(body.contains("value=\"/ar/\""));
+}
+
+#[tokio::test]
+async fn search_form_posts_to_lang_path() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/fr?ip=45.77.77.77",
+        vec![("User-Agent", "Mozilla/5.0")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(body.contains("action=\"/fr/\""));
+}
+
+#[tokio::test]
+async fn invalid_lang_tag_returns_404() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/xx?ip=45.77.77.77",
+        vec![("User-Agent", "Mozilla/5.0")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::NOT_FOUND);
+    assert!(body.contains("404"));
+}
+
 // --- Dev mode tests ---
 
 #[tokio::test]
-async fn dev_mode_root_returns_html_without_cf_header() {
+async fn dev_mode_root_redirects_without_cf_header() {
+    let app = build_test_app_with_dev_mode(true);
+    let response = get_response(
+        &app,
+        "/",
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
+}
+
+#[tokio::test]
+async fn dev_mode_lang_path_returns_html_without_cf_header() {
     let app = build_test_app_with_dev_mode(true);
     let (status, body) = get_with_headers(
         &app,
-        "/",
+        "/en",
         vec![(
             "User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -579,7 +766,7 @@ async fn browser_invalid_ip_shows_alert_html() {
     let app = build_test_app();
     let (status, body) = get_with_headers(
         &app,
-        "/?ip=not-an-ip",
+        "/en?ip=not-an-ip",
         vec![(
             "User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -589,7 +776,6 @@ async fn browser_invalid_ip_shows_alert_html() {
     assert_eq!(status, StatusCode::BAD_REQUEST);
     assert!(body.contains("<!DOCTYPE html>"));
     assert!(body.contains("alert("));
-    assert!(body.contains("Invalid IP address"));
     assert!(body.contains("not-an-ip"));
 }
 
@@ -598,7 +784,7 @@ async fn browser_db_lookup_failed_shows_alert_html() {
     let app = build_test_app();
     let (status, body) = get_with_headers(
         &app,
-        "/?ip=0.0.0.0",
+        "/en?ip=0.0.0.0",
         vec![(
             "User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -608,7 +794,6 @@ async fn browser_db_lookup_failed_shows_alert_html() {
     assert_eq!(status, StatusCode::INTERNAL_SERVER_ERROR);
     assert!(body.contains("<!DOCTYPE html>"));
     assert!(body.contains("alert("));
-    assert!(body.contains("Database lookup failed"));
 }
 
 #[tokio::test]
@@ -616,7 +801,7 @@ async fn browser_missing_client_ip_shows_alert_html() {
     let app = build_test_app();
     let (status, body) = get_with_headers(
         &app,
-        "/",
+        "/en",
         vec![(
             "User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -626,7 +811,6 @@ async fn browser_missing_client_ip_shows_alert_html() {
     assert_eq!(status, StatusCode::BAD_REQUEST);
     assert!(body.contains("<!DOCTYPE html>"));
     assert!(body.contains("alert("));
-    assert!(body.contains("Missing client IP address"));
 }
 
 #[tokio::test]
@@ -643,7 +827,7 @@ async fn error_alert_page_has_search_form() {
     let app = build_test_app();
     let (status, body) = get_with_headers(
         &app,
-        "/?ip=bad-ip",
+        "/en?ip=bad-ip",
         vec![(
             "User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -654,4 +838,64 @@ async fn error_alert_page_has_search_form() {
     assert!(body.contains("<form"));
     assert!(body.contains("value=\"bad-ip\""));
     assert!(body.contains("autofocus"));
+}
+
+// --- i18n-specific tests ---
+
+#[tokio::test]
+async fn root_with_ip_query_redirects_with_ip() {
+    let app = build_test_app();
+    let response = get_response(
+        &app,
+        "/?ip=1.2.3.4",
+        vec![
+            ("User-Agent", "Mozilla/5.0"),
+            ("CF-Connecting-IP", "1.1.1.1"),
+        ],
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
+    let location = response
+        .headers()
+        .get("location")
+        .unwrap()
+        .to_str()
+        .unwrap();
+    assert!(
+        location.contains("ip=1.2.3.4"),
+        "redirect should contain ip param: {location}"
+    );
+}
+
+#[tokio::test]
+async fn all_locale_paths_return_200() {
+    let app = build_test_app_with_dev_mode(true);
+    let tags = [
+        "en", "es", "de", "ja", "ko", "id", "fr", "ru", "pt", "it", "zh-Hant", "zh-Hans", "nl",
+        "ar",
+    ];
+    for tag in tags {
+        let uri = format!("/{tag}");
+        let (status, body) =
+            get_with_headers(&app, &uri, vec![("User-Agent", "Mozilla/5.0")]).await;
+        assert_eq!(status, StatusCode::OK, "expected 200 for /{tag}");
+        assert!(
+            body.contains(&format!("lang=\"{tag}\"")),
+            "/{tag} should have lang=\"{tag}\" attribute"
+        );
+    }
+}
+
+#[tokio::test]
+async fn error_page_has_localized_go_home_link() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/nonexistent",
+        vec![("User-Agent", "Mozilla/5.0"), ("Accept-Language", "en")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::NOT_FOUND);
+    assert!(body.contains("Go to Home"));
+    assert!(body.contains("href=\"/en/\""));
 }

@@ -424,6 +424,22 @@ pub fn get_en_name(names: &Option<Names>) -> &str {
         .unwrap_or_default()
 }
 
+pub fn get_localized_name<'a>(names: &'a Option<Names>, mmdb_key: &str) -> &'a str {
+    names
+        .as_ref()
+        .and_then(|n| match mmdb_key {
+            "de" => n.german.as_deref().or(n.english.as_deref()),
+            "es" => n.spanish.as_deref().or(n.english.as_deref()),
+            "fr" => n.french.as_deref().or(n.english.as_deref()),
+            "ja" => n.japanese.as_deref().or(n.english.as_deref()),
+            "pt-BR" => n.brazilian_portuguese.as_deref().or(n.english.as_deref()),
+            "ru" => n.russian.as_deref().or(n.english.as_deref()),
+            "zh-CN" => n.simplified_chinese.as_deref().or(n.english.as_deref()),
+            _ => n.english.as_deref(),
+        })
+        .unwrap_or_default()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

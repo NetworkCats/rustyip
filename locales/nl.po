@@ -1,0 +1,187 @@
+# Dutch translations for RustyIP
+# Copyright (C) RustyIP Contributors
+# This file is distributed under the AGPL-3.0 license.
+#
+msgid ""
+msgstr ""
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "What is my IP address?"
+msgstr "Wat is mijn IP-adres?"
+
+msgid "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."
+msgstr "Vind direct uw openbare IP-adres. Zoek geolocatie, ASN, organisatie en proxy/VPN/Tor-detectie op voor elk IP-adres."
+
+msgid "Search IP address"
+msgstr "IP-adres zoeken"
+
+msgid "Type to search IP data"
+msgstr "Typ om IP-gegevens te zoeken"
+
+msgid "ASN"
+msgstr "ASN"
+
+msgid "Org"
+msgstr "Org"
+
+msgid "Country"
+msgstr "Land"
+
+msgid "City"
+msgstr "Stad"
+
+msgid "Proxy"
+msgstr "Proxy"
+
+msgid "VPN"
+msgstr "VPN"
+
+msgid "Hosting"
+msgstr "Hosting"
+
+msgid "Tor"
+msgstr "Tor"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nee"
+
+msgid "FAQ"
+msgstr "FAQ"
+
+msgid "How to use this service from the command line"
+msgstr "Hoe deze dienst te gebruiken vanaf de opdrachtregel"
+
+msgid "You can use various command-line tools such as curl, httpie, and wget to use this service. Taking the most popular one, curl, as an example:"
+msgstr "U kunt verschillende opdrachtregelprogramma's zoals curl, httpie en wget gebruiken om deze dienst te gebruiken. Met de populairste, curl, als voorbeeld:"
+
+msgid "Query current IP:"
+msgstr "Huidig IP opvragen:"
+
+msgid "Query information for your own IP:"
+msgstr "Informatie opvragen voor uw eigen IP:"
+
+msgid "Or display all information in JSON format:"
+msgstr "Of toon alle informatie in JSON-formaat:"
+
+msgid "Query information for a specific IP:"
+msgstr "Informatie opvragen voor een specifiek IP:"
+
+msgid "How to force the display of my IPv4 or IPv6 address?"
+msgstr "Hoe forceer ik de weergave van mijn IPv4- of IPv6-adres?"
+
+msgid "You can use <code>curl -4</code> or <code>curl -6</code> to view only your IPv4 or IPv6 address respectively."
+msgstr "U kunt <code>curl -4</code> of <code>curl -6</code> gebruiken om respectievelijk alleen uw IPv4- of IPv6-adres te bekijken."
+
+msgid "How to get a JSON format response?"
+msgstr "Hoe krijg ik een antwoord in JSON-formaat?"
+
+msgid "You can send a request to the <code>/json</code> endpoint, or send a request with an <code>application/json</code> header."
+msgstr "U kunt een verzoek sturen naar het <code>/json</code>-eindpunt, of een verzoek sturen met een <code>application/json</code>-header."
+
+msgid "Can I automate calls to your service via programs?"
+msgstr "Kan ik aanroepen naar uw dienst automatiseren via programma's?"
+
+msgid "Certainly, as long as the rate limit is respected. Under normal conditions, the rate limit is 30 RPM (Requests Per Minute); under high load, we will increase the restriction to 10-5 RPM."
+msgstr "Zeker, zolang de snelheidslimiet wordt gerespecteerd. Onder normale omstandigheden is de snelheidslimiet 30 RPM (verzoeken per minuut); bij hoge belasting verhogen we de beperking naar 10-5 RPM."
+
+msgid "Our API is only suitable for manual calls or small-scale projects. If your website uses our API to query visitor IPs, please ensure you use a message queue to send requests to avoid blocking. If your project has high traffic or is latency-sensitive, please use our open-source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>, which is the same database used by this project."
+msgstr "Onze API is alleen geschikt voor handmatige aanroepen of kleinschalige projecten. Als uw website onze API gebruikt om bezoeker-IP's op te vragen, zorg er dan voor dat u een berichtenwachtrij gebruikt om verzoeken te verzenden en blokkering te voorkomen. Als uw project veel verkeer heeft of latentiegevoelig is, gebruik dan onze open-source offlinedatabase: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>, dezelfde database die door dit project wordt gebruikt."
+
+msgid "Where does the IP data come from?"
+msgstr "Waar komen de IP-gegevens vandaan?"
+
+msgid "IP geographic data primarily comes from the free databases of MaxMind and DB-IP; AS data comes from IPinfo's free database; and IP proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> database."
+msgstr "IP-geografische gegevens komen voornamelijk uit de gratis databases van MaxMind en DB-IP; AS-gegevens komen uit de gratis database van IPinfo; en IP-proxygegevens komen uit mijn eigen <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a>-database."
+
+msgid "Data Attributions:"
+msgstr "Databronvermeldingen:"
+
+msgid "Can I run my own service?"
+msgstr "Kan ik mijn eigen dienst draaien?"
+
+msgid "Yes, the source code and database for this project are both open-source and hosted on GitHub:"
+msgstr "Ja, de broncode en database voor dit project zijn beide open-source en gehost op GitHub:"
+
+msgid "How is this website different from other IP lookup sites?"
+msgstr "Hoe verschilt deze website van andere IP-opzoeksites?"
+
+msgid "The biggest difference is that our database includes proxy-related information, and the proxy intelligence we provide is highly accurate. We have privately compared it with commercial proxy detection databases like IPinfo; our database's precision is fully comparable to commercial ones, and it is even more accurate in detecting residential proxies."
+msgstr "Het grootste verschil is dat onze database proxyinformatie bevat en dat de proxy-intelligentie die wij bieden zeer nauwkeurig is. We hebben deze intern vergeleken met commerciele proxydetectiedatabases zoals IPinfo; de precisie van onze database is volledig vergelijkbaar met commerciele databases, en is zelfs nauwkeuriger bij het detecteren van residentieel proxies."
+
+msgid "Secondly, our geographic coverage for IPv6 is more comprehensive because we merge multiple databases to provide more complete data."
+msgstr "Ten tweede is onze geografische dekking voor IPv6 uitgebreider omdat we meerdere databases samenvoegen om completere gegevens te bieden."
+
+msgid "Our UX is also better than any IP lookup site on the market. The site runs without any JavaScript, and we only load a minimal amount of external resources (fonts, icons), making the initial load speed extremely fast."
+msgstr "Onze UX is ook beter dan elke IP-opzoeksite op de markt. De site draait zonder JavaScript en we laden slechts een minimale hoeveelheid externe bronnen (lettertypen, pictogrammen), waardoor de initiele laadsnelheid extreem snel is."
+
+msgid "Is this service stable?"
+msgstr "Is deze dienst stabiel?"
+
+msgid "The business logic of this service is written entirely in Rust, offering excellent performance that ensures the site remains operational even under L7 DDoS attacks. The site runs on a VPS with 2 cores and 2 GB of RAM, which is already overkill for this setup -- unless we encounter a massive L7 DDoS attack, though we have Cloudflare in front of us."
+msgstr "De bedrijfslogica van deze dienst is volledig geschreven in Rust en biedt uitstekende prestaties die ervoor zorgen dat de site operationeel blijft, zelfs bij L7 DDoS-aanvallen. De site draait op een VPS met 2 cores en 2 GB RAM, wat al ruim voldoende is voor deze opzet -- tenzij we een enorme L7 DDoS-aanval tegenkomen, hoewel we Cloudflare voor ons hebben."
+
+msgid "Running this website only costs me $18.00 per month. Because the cost is so low, I will not stop operations due to hardware costs in the foreseeable future, nor will I add any advertisements."
+msgstr "Het draaien van deze website kost mij slechts $18,00 per maand. Omdat de kosten zo laag zijn, zal ik de dienst in de voorzienbare toekomst niet stopzetten vanwege hardwarekosten, noch zal ik advertenties toevoegen."
+
+msgid "Rest assured, this service will definitely not \"Rug Pull.\""
+msgstr "Wees gerust, deze dienst zal absoluut geen \"Rug Pull\" doen."
+
+msgid "How can I sponsor this service?"
+msgstr "Hoe kan ik deze dienst sponsoren?"
+
+msgid "I accept cryptocurrency donations. If you would like to sponsor, please contact:"
+msgstr "Ik accepteer cryptovalutadonaties. Als u wilt sponsoren, neem dan contact op met:"
+
+msgid "Website source code licensed under"
+msgstr "Broncode van de website gelicentieerd onder"
+
+msgid "Website Source"
+msgstr "Websitebroncode"
+
+msgid "IP Database"
+msgstr "IP-database"
+
+msgid "IP data provided by:"
+msgstr "IP-gegevens geleverd door:"
+
+msgid "Error"
+msgstr "Fout"
+
+msgid "Go to Home"
+msgstr "Ga naar startpagina"
+
+msgid "IP address information"
+msgstr "IP-adresinformatie"
+
+msgid "Frequently Asked Questions"
+msgstr "Veelgestelde vragen"
+
+msgid "Project links"
+msgstr "Projectlinks"
+
+msgid "Language"
+msgstr "Taal"
+
+msgid "The page you are looking for does not exist."
+msgstr "De pagina die u zoekt bestaat niet."
+
+msgid "IP not found in database"
+msgstr "IP niet gevonden in database"
+
+msgid "Invalid IP address"
+msgstr "Ongeldig IP-adres"
+
+msgid "Missing client IP address"
+msgstr "Ontbrekend client-IP-adres"
+
+msgid "Database lookup failed"
+msgstr "Database-opzoeking mislukt"
+
+msgid "Template render failed"
+msgstr "Sjabloonweergave mislukt"

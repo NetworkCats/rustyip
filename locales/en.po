@@ -1,0 +1,187 @@
+# English translations for RustyIP
+# Copyright (C) RustyIP Contributors
+# This file is distributed under the AGPL-3.0 license.
+#
+msgid ""
+msgstr ""
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "What is my IP address?"
+msgstr "What is my IP address?"
+
+msgid "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."
+msgstr "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."
+
+msgid "Search IP address"
+msgstr "Search IP address"
+
+msgid "Type to search IP data"
+msgstr "Type to search IP data"
+
+msgid "ASN"
+msgstr "ASN"
+
+msgid "Org"
+msgstr "Org"
+
+msgid "Country"
+msgstr "Country"
+
+msgid "City"
+msgstr "City"
+
+msgid "Proxy"
+msgstr "Proxy"
+
+msgid "VPN"
+msgstr "VPN"
+
+msgid "Hosting"
+msgstr "Hosting"
+
+msgid "Tor"
+msgstr "Tor"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "FAQ"
+msgstr "FAQ"
+
+msgid "How to use this service from the command line"
+msgstr "How to use this service from the command line"
+
+msgid "You can use various command-line tools such as curl, httpie, and wget to use this service. Taking the most popular one, curl, as an example:"
+msgstr "You can use various command-line tools such as curl, httpie, and wget to use this service. Taking the most popular one, curl, as an example:"
+
+msgid "Query current IP:"
+msgstr "Query current IP:"
+
+msgid "Query information for your own IP:"
+msgstr "Query information for your own IP:"
+
+msgid "Or display all information in JSON format:"
+msgstr "Or display all information in JSON format:"
+
+msgid "Query information for a specific IP:"
+msgstr "Query information for a specific IP:"
+
+msgid "How to force the display of my IPv4 or IPv6 address?"
+msgstr "How to force the display of my IPv4 or IPv6 address?"
+
+msgid "You can use <code>curl -4</code> or <code>curl -6</code> to view only your IPv4 or IPv6 address respectively."
+msgstr "You can use <code>curl -4</code> or <code>curl -6</code> to view only your IPv4 or IPv6 address respectively."
+
+msgid "How to get a JSON format response?"
+msgstr "How to get a JSON format response?"
+
+msgid "You can send a request to the <code>/json</code> endpoint, or send a request with an <code>application/json</code> header."
+msgstr "You can send a request to the <code>/json</code> endpoint, or send a request with an <code>application/json</code> header."
+
+msgid "Can I automate calls to your service via programs?"
+msgstr "Can I automate calls to your service via programs?"
+
+msgid "Certainly, as long as the rate limit is respected. Under normal conditions, the rate limit is 30 RPM (Requests Per Minute); under high load, we will increase the restriction to 10-5 RPM."
+msgstr "Certainly, as long as the rate limit is respected. Under normal conditions, the rate limit is 30 RPM (Requests Per Minute); under high load, we will increase the restriction to 10-5 RPM."
+
+msgid "Our API is only suitable for manual calls or small-scale projects. If your website uses our API to query visitor IPs, please ensure you use a message queue to send requests to avoid blocking. If your project has high traffic or is latency-sensitive, please use our open-source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>, which is the same database used by this project."
+msgstr "Our API is only suitable for manual calls or small-scale projects. If your website uses our API to query visitor IPs, please ensure you use a message queue to send requests to avoid blocking. If your project has high traffic or is latency-sensitive, please use our open-source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>, which is the same database used by this project."
+
+msgid "Where does the IP data come from?"
+msgstr "Where does the IP data come from?"
+
+msgid "IP geographic data primarily comes from the free databases of MaxMind and DB-IP; AS data comes from IPinfo's free database; and IP proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> database."
+msgstr "IP geographic data primarily comes from the free databases of MaxMind and DB-IP; AS data comes from IPinfo's free database; and IP proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a> database."
+
+msgid "Data Attributions:"
+msgstr "Data Attributions:"
+
+msgid "Can I run my own service?"
+msgstr "Can I run my own service?"
+
+msgid "Yes, the source code and database for this project are both open-source and hosted on GitHub:"
+msgstr "Yes, the source code and database for this project are both open-source and hosted on GitHub:"
+
+msgid "How is this website different from other IP lookup sites?"
+msgstr "How is this website different from other IP lookup sites?"
+
+msgid "The biggest difference is that our database includes proxy-related information, and the proxy intelligence we provide is highly accurate. We have privately compared it with commercial proxy detection databases like IPinfo; our database's precision is fully comparable to commercial ones, and it is even more accurate in detecting residential proxies."
+msgstr "The biggest difference is that our database includes proxy-related information, and the proxy intelligence we provide is highly accurate. We have privately compared it with commercial proxy detection databases like IPinfo; our database's precision is fully comparable to commercial ones, and it is even more accurate in detecting residential proxies."
+
+msgid "Secondly, our geographic coverage for IPv6 is more comprehensive because we merge multiple databases to provide more complete data."
+msgstr "Secondly, our geographic coverage for IPv6 is more comprehensive because we merge multiple databases to provide more complete data."
+
+msgid "Our UX is also better than any IP lookup site on the market. The site runs without any JavaScript, and we only load a minimal amount of external resources (fonts, icons), making the initial load speed extremely fast."
+msgstr "Our UX is also better than any IP lookup site on the market. The site runs without any JavaScript, and we only load a minimal amount of external resources (fonts, icons), making the initial load speed extremely fast."
+
+msgid "Is this service stable?"
+msgstr "Is this service stable?"
+
+msgid "The business logic of this service is written entirely in Rust, offering excellent performance that ensures the site remains operational even under L7 DDoS attacks. The site runs on a VPS with 2 cores and 2 GB of RAM, which is already overkill for this setup -- unless we encounter a massive L7 DDoS attack, though we have Cloudflare in front of us."
+msgstr "The business logic of this service is written entirely in Rust, offering excellent performance that ensures the site remains operational even under L7 DDoS attacks. The site runs on a VPS with 2 cores and 2 GB of RAM, which is already overkill for this setup -- unless we encounter a massive L7 DDoS attack, though we have Cloudflare in front of us."
+
+msgid "Running this website only costs me $18.00 per month. Because the cost is so low, I will not stop operations due to hardware costs in the foreseeable future, nor will I add any advertisements."
+msgstr "Running this website only costs me $18.00 per month. Because the cost is so low, I will not stop operations due to hardware costs in the foreseeable future, nor will I add any advertisements."
+
+msgid "Rest assured, this service will definitely not \"Rug Pull.\""
+msgstr "Rest assured, this service will definitely not \"Rug Pull.\""
+
+msgid "How can I sponsor this service?"
+msgstr "How can I sponsor this service?"
+
+msgid "I accept cryptocurrency donations. If you would like to sponsor, please contact:"
+msgstr "I accept cryptocurrency donations. If you would like to sponsor, please contact:"
+
+msgid "Website source code licensed under"
+msgstr "Website source code licensed under"
+
+msgid "Website Source"
+msgstr "Website Source"
+
+msgid "IP Database"
+msgstr "IP Database"
+
+msgid "IP data provided by:"
+msgstr "IP data provided by:"
+
+msgid "Error"
+msgstr "Error"
+
+msgid "Go to Home"
+msgstr "Go to Home"
+
+msgid "IP address information"
+msgstr "IP address information"
+
+msgid "Frequently Asked Questions"
+msgstr "Frequently Asked Questions"
+
+msgid "Project links"
+msgstr "Project links"
+
+msgid "Language"
+msgstr "Language"
+
+msgid "The page you are looking for does not exist."
+msgstr "The page you are looking for does not exist."
+
+msgid "IP not found in database"
+msgstr "IP not found in database"
+
+msgid "Invalid IP address"
+msgstr "Invalid IP address"
+
+msgid "Missing client IP address"
+msgstr "Missing client IP address"
+
+msgid "Database lookup failed"
+msgstr "Database lookup failed"
+
+msgid "Template render failed"
+msgstr "Template render failed"
