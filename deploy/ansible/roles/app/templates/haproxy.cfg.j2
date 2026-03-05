@@ -1,15 +1,14 @@
 global
     log stderr local0 err
-    maxconn 100000
+    maxconn 10000
     # Performance tuning for high-throughput
     tune.bufsize 16384
     tune.maxrewrite 1024
     tune.http.maxhdr 128
     tune.comp.maxlevel 1
-    tune.ssl.default-dh-param 2048
-    # TLS configuration optimized for Cloudflare-to-origin connections
-    ssl-default-bind-curves X25519:prime256v1:secp384r1
-    ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384
+    # TLS configuration optimized for Cloudflare Origin CA ECC certificates
+    ssl-default-bind-curves prime256v1:X25519:secp384r1
+    ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384
     ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
     ssl-default-bind-options prefer-client-ciphers ssl-min-ver TLSv1.2 no-tls-tickets
 
@@ -19,7 +18,7 @@ defaults
     option  httplog
     option  dontlognormal
     option  http-keep-alive
-    maxconn 100000
+    maxconn 10000
     timeout connect 5s
     timeout client  30s
     timeout server  30s
@@ -46,7 +45,7 @@ frontend https_in
 
     # Rate limiting: tiered based on global request rate
     # Track per-IP request rate (per minute)
-    stick-table type string len 45 size 500k expire 1m store http_req_rate(1m)
+    stick-table type string len 45 size 100k expire 1m store http_req_rate(1m)
     http-request track-sc0 req.hdr(CF-Connecting-IP)
     # Track global request rate (per second)
     http-request track-sc1 str(global) table global_rate_tracking

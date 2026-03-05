@@ -58,8 +58,8 @@
     dest: /etc/systemd/system/docker.service.d/override.conf
     content: |
       [Service]
-      LimitNOFILE=1048576
-      LimitNPROC=infinity
+      LimitNOFILE=65536
+      LimitNPROC=8192
       LimitCORE=infinity
     owner: root
     group: root

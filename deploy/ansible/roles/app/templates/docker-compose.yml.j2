@@ -10,10 +10,10 @@ services:
     restart: unless-stopped
     ulimits:
       nofile:
-        soft: 1048576
-        hard: 1048576
+        soft: 65536
+        hard: 65536
     sysctls:
-      net.core.somaxconn: "65535"
+      net.core.somaxconn: "16384"
       net.ipv4.tcp_tw_reuse: "1"
     networks:
       - internal
@@ -33,8 +33,8 @@ services:
     restart: unless-stopped
     ulimits:
       nofile:
-        soft: 1048576
-        hard: 1048576
+        soft: 65536
+        hard: 65536
     networks:
       - internal
 
@@ -53,8 +53,8 @@ services:
     restart: unless-stopped
     ulimits:
       nofile:
-        soft: 1048576
-        hard: 1048576
+        soft: 65536
+        hard: 65536
     networks:
       - internal
 
