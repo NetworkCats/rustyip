@@ -37,6 +37,7 @@ struct IndexTemplate {
     site_domain: Arc<str>,
     css_version: u64,
     asn: String,
+    asn_number: Option<u32>,
     org: String,
     country: String,
     city: String,
@@ -182,10 +183,12 @@ fn wants_json(headers: &HeaderMap) -> bool {
         .is_some_and(|v| v.contains("application/json"))
 }
 
+fn asn_number(info: &IpInfo) -> Option<u32> {
+    info.asn.as_ref().and_then(|a| a.autonomous_system_number)
+}
+
 fn format_asn(info: &IpInfo) -> String {
-    info.asn
-        .as_ref()
-        .and_then(|a| a.autonomous_system_number)
+    asn_number(info)
         .map(|n| format!("AS{n}"))
         .unwrap_or_default()
 }
@@ -557,6 +560,7 @@ pub async fn root(
         site_domain: state.site_domain.clone(),
         css_version: static_assets::asset_version("style.css"),
         asn: format_asn(&info),
+        asn_number: asn_number(&info),
         org: format_org(&info).to_owned(),
         country: format_country(&info, locale).to_owned(),
         city: format_city(&info, locale).to_owned(),

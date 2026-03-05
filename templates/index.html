@@ -39,7 +39,7 @@
         {% if !asn.is_empty() %}
         <tr>
           <th scope="row">{{ t_asn }}</th>
-          <td>{{ asn }}</td>
+          <td>{% if let Some(n) = asn_number %}<a href="https://bgp.tools/as/{{ n }}" target="_blank" rel="noopener noreferrer">{{ asn }}</a>{% else %}{{ asn }}{% endif %}</td>
         </tr>
         {% endif %}
         {% if !org.is_empty() %}
