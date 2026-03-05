@@ -199,7 +199,7 @@ main {
     cursor: pointer;
     list-style: none;
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 6px;
 
     &::-webkit-details-marker {
@@ -208,8 +208,7 @@ main {
 
     &::before {
       content: "\25B6";
-      font-size: 23px;
-      line-height: 1;
+      font-size: 12px;
       color: var(--color-label-secondary);
       flex-shrink: 0;
     }
