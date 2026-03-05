@@ -4,4 +4,5 @@ target
 .env
 *.mmdb
 haproxy/certs
-AGENTS.md
+README.md
+INSTALL.md
