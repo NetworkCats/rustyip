@@ -23,7 +23,7 @@ services:
     container_name: rustyip-app-blue
     env_file: .env
     volumes:
-      - db_data:/data
+      - db_data_blue:/data
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health || exit 1"]
       interval: 5s
@@ -43,7 +43,7 @@ services:
     container_name: rustyip-app-green
     env_file: .env
     volumes:
-      - db_data:/data
+      - db_data_green:/data
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health || exit 1"]
       interval: 5s
@@ -59,7 +59,8 @@ services:
       - internal
 
 volumes:
-  db_data:
+  db_data_blue:
+  db_data_green:
 
 networks:
   internal:

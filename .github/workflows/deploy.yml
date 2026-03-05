@@ -150,7 +150,16 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "${{ steps.vps.outputs.ip }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+          for i in 1 2 3; do
+            if ssh-keyscan -H "${{ steps.vps.outputs.ip }}" >> ~/.ssh/known_hosts 2>/dev/null; then
+              echo "ssh-keyscan succeeded on attempt $i"
+              exit 0
+            fi
+            echo "ssh-keyscan attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
+          echo "ssh-keyscan failed after 3 attempts"
+          exit 1
 
       # ---- Detect first deployment ----
       - name: Detect first deployment

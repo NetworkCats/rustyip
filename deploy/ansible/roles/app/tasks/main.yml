@@ -78,7 +78,7 @@
     is_first_deploy: true
   when: not active_color_stat.stat.exists
 
-# --- Deploy docker-compose and HAProxy config ---
+# --- Deploy docker-compose.yml (shared across both paths) ---
 
 - name: Deploy docker-compose.yml
   ansible.builtin.template:
@@ -88,7 +88,10 @@
     group: root
     mode: "0644"
 
-- name: Deploy HAProxy configuration (target color active)
+# --- First Deployment ---
+# On first deploy, HAProxy config can be written early since nothing is live yet.
+
+- name: Deploy HAProxy configuration (first deploy)
   ansible.builtin.template:
     src: haproxy.cfg.j2
     dest: /opt/rustyip/haproxy/haproxy.cfg
@@ -97,10 +100,9 @@
     mode: "0644"
   vars:
     active_color: "{{ deploy_target }}"
+  when: is_first_deploy
 
-# --- First Deployment ---
-
-- name: Start target app container
+- name: Start target app container (first deploy)
   ansible.builtin.shell: |
     docker compose -f /opt/rustyip/docker-compose.yml up -d "app-{{ deploy_target }}"
   changed_when: true
@@ -137,55 +139,92 @@
   when: is_first_deploy
 
 # --- Blue-Green Deployment ---
+# The HAProxy config is written AFTER the standby container passes its health check,
+# so that on-disk config always reflects the actual healthy state.
 
-- name: Start standby container with new image
-  ansible.builtin.shell: |
-    docker compose -f /opt/rustyip/docker-compose.yml up -d "app-{{ deploy_target }}"
-  changed_when: true
+- name: Blue-green deployment
   when: not is_first_deploy
+  block:
+    - name: Start standby container with new image
+      ansible.builtin.shell: |
+        docker compose -f /opt/rustyip/docker-compose.yml up -d "app-{{ deploy_target }}"
+      changed_when: true
 
-- name: Wait for standby container health check
-  ansible.builtin.shell: |
-    for i in $(seq 1 30); do
-      status=$(docker inspect --format='{% raw %}{{.State.Health.Status}}{% endraw %}' "rustyip-app-{{ deploy_target }}" 2>/dev/null)
-      if [ "$status" = "healthy" ]; then
-        echo "healthy"
-        exit 0
-      fi
-      sleep 2
-    done
-    echo "timeout"
-    exit 1
-  register: health_result
-  changed_when: false
-  when: not is_first_deploy
+    - name: Wait for standby container health check
+      ansible.builtin.shell: |
+        for i in $(seq 1 30); do
+          status=$(docker inspect --format='{% raw %}{{.State.Health.Status}}{% endraw %}' "rustyip-app-{{ deploy_target }}" 2>/dev/null)
+          if [ "$status" = "healthy" ]; then
+            echo "healthy"
+            exit 0
+          fi
+          sleep 2
+        done
+        echo "timeout"
+        exit 1
+      changed_when: false
 
-- name: Reload HAProxy to switch to new backend
-  ansible.builtin.shell: |
-    docker compose -f /opt/rustyip/docker-compose.yml up -d haproxy
-  changed_when: true
-  when: not is_first_deploy
+    - name: Deploy HAProxy configuration (switch to new backend)
+      ansible.builtin.template:
+        src: haproxy.cfg.j2
+        dest: /opt/rustyip/haproxy/haproxy.cfg
+        owner: root
+        group: root
+        mode: "0644"
+      vars:
+        active_color: "{{ deploy_target }}"
 
-- name: Wait for HAProxy to settle
-  ansible.builtin.pause:
-    seconds: 5
-  when: not is_first_deploy
+    - name: Reload HAProxy in-place to switch traffic
+      ansible.builtin.shell: |
+        docker kill -s HUP rustyip-haproxy
+      changed_when: true
 
-- name: Stop old active container
-  ansible.builtin.shell: |
-    docker compose -f /opt/rustyip/docker-compose.yml stop "app-{{ current_active }}"
-    docker compose -f /opt/rustyip/docker-compose.yml rm -f "app-{{ current_active }}"
-  changed_when: true
-  when: not is_first_deploy
+    - name: Wait for HAProxy to settle
+      ansible.builtin.pause:
+        seconds: 5
 
-- name: Update active color state file
-  ansible.builtin.copy:
-    content: "{{ deploy_target }}"
-    dest: /opt/rustyip/.active_color
-    owner: root
-    group: root
-    mode: "0644"
-  when: not is_first_deploy
+    - name: Stop old active container
+      ansible.builtin.shell: |
+        docker compose -f /opt/rustyip/docker-compose.yml stop "app-{{ current_active }}"
+        docker compose -f /opt/rustyip/docker-compose.yml rm -f "app-{{ current_active }}"
+      changed_when: true
+
+    - name: Update active color state file
+      ansible.builtin.copy:
+        content: "{{ deploy_target }}"
+        dest: /opt/rustyip/.active_color
+        owner: root
+        group: root
+        mode: "0644"
+
+  rescue:
+    - name: Stop failed standby container
+      ansible.builtin.shell: |
+        docker compose -f /opt/rustyip/docker-compose.yml stop "app-{{ deploy_target }}" || true
+        docker compose -f /opt/rustyip/docker-compose.yml rm -f "app-{{ deploy_target }}" || true
+      changed_when: true
+
+    - name: Restore HAProxy configuration to current active color
+      ansible.builtin.template:
+        src: haproxy.cfg.j2
+        dest: /opt/rustyip/haproxy/haproxy.cfg
+        owner: root
+        group: root
+        mode: "0644"
+      vars:
+        active_color: "{{ current_active }}"
+
+    - name: Reload HAProxy to restore original backend
+      ansible.builtin.shell: |
+        docker kill -s HUP rustyip-haproxy
+      changed_when: true
+      failed_when: false
+
+    - name: Fail with deployment error
+      ansible.builtin.fail:
+        msg: >-
+          Blue-green deployment failed. Rolled back to app-{{ current_active }}.
+          The failed standby container (app-{{ deploy_target }}) has been removed.
 
 - name: Clean up unused Docker images
   ansible.builtin.shell: |
