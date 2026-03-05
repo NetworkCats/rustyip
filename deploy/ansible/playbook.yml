@@ -10,8 +10,8 @@
     db_update_url: "{{ lookup('env', 'DB_UPDATE_URL') }}"
     origin_cert: "{{ lookup('env', 'ORIGIN_CERT') }}"
     origin_key: "{{ lookup('env', 'ORIGIN_KEY') }}"
-    ghcr_token: "{{ lookup('env', 'GHCR_TOKEN') }}"
-    ghcr_user: "{{ lookup('env', 'GHCR_USER') }}"
+    dockerhub_token: "{{ lookup('env', 'DOCKERHUB_TOKEN') }}"
+    dockerhub_username: "{{ lookup('env', 'DOCKERHUB_USERNAME') }}"
     first_deploy: "{{ lookup('env', 'FIRST_DEPLOY') | default('false', true) }}"
 
   roles:

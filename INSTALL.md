@@ -31,13 +31,13 @@ docker compose up --build
 Pushing a version tag (e.g. `v1.0.0`) triggers the full deployment pipeline:
 
 ```
-v* tag push --> CI checks --> Docker build + push to GHCR --> Terraform + Ansible deploy
+v* tag push --> CI checks --> Docker build + push to Docker Hub --> Terraform + Ansible deploy
 ```
 
 ### Pipeline Overview
 
 1. **Check** -- Runs `cargo fmt`, `cargo clippy`, and `cargo test`.
-2. **Build** -- Builds a Docker image and pushes it to GitHub Container Registry (`ghcr.io`).
+2. **Build** -- Builds a Docker image and pushes it to Docker Hub (`docker.io/networkcat/rustyip`).
 3. **Deploy** -- Provisions infrastructure with Terraform and configures/deploys with Ansible.
 
 The deploy job uses a `production` environment with concurrency control to prevent overlapping deployments.
@@ -79,7 +79,12 @@ If you are using environments, add them under the `production` environment (**Se
 | `ORIGIN_CERT` | Cloudflare Origin certificate (PEM) for TLS termination at HAProxy |
 | `ORIGIN_KEY` | Corresponding private key (PEM) for the Origin certificate |
 
-`GITHUB_TOKEN` is provided automatically by GitHub Actions and does not need to be configured. It is used to authenticate with GHCR.
+#### Docker Hub
+
+| Secret | Description |
+|---|---|
+| `DOCKERHUB_USERNAME` | Docker Hub username used for image push and pull |
+| `DOCKERHUB_TOKEN` | Docker Hub access token for authentication |
 
 ### Deploying
 

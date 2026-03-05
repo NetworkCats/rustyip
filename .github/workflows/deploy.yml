@@ -7,12 +7,10 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: networkcat/rustyip
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   # ---- CI checks ----
@@ -62,18 +60,17 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GHCR
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.IMAGE_NAME }}
           tags: |
             type=semver,pattern={{version}}
             type=raw,value=latest
@@ -92,7 +89,7 @@ jobs:
         id: full_image
         run: |
           TAG="${GITHUB_REF_NAME#v}"
-          echo "image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}" >> "$GITHUB_OUTPUT"
+          echo "image=${{ env.IMAGE_NAME }}:${TAG}" >> "$GITHUB_OUTPUT"
 
   # ---- Deploy to VPS ----
   deploy:
@@ -199,8 +196,8 @@ jobs:
           DB_UPDATE_URL: ${{ secrets.DB_UPDATE_URL }}
           ORIGIN_CERT: ${{ secrets.ORIGIN_CERT }}
           ORIGIN_KEY: ${{ secrets.ORIGIN_KEY }}
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GHCR_USER: ${{ github.actor }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           FIRST_DEPLOY: ${{ steps.detect.outputs.first_deploy }}
         run: |
           ansible-playbook -i inventory.yml playbook.yml

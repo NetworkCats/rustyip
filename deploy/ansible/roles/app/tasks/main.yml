@@ -40,9 +40,9 @@
     group: root
     mode: "0600"
 
-- name: Log in to GHCR
+- name: Log in to Docker Hub
   ansible.builtin.shell: |
-    echo "{{ ghcr_token }}" | docker login ghcr.io -u "{{ ghcr_user }}" --password-stdin
+    echo "{{ dockerhub_token }}" | docker login -u "{{ dockerhub_username }}" --password-stdin
   no_log: true
   changed_when: true
 
