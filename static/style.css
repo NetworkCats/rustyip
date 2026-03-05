@@ -200,7 +200,7 @@ main {
     list-style: none;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
 
     &::-webkit-details-marker {
       display: none;
@@ -208,7 +208,7 @@ main {
 
     &::before {
       content: "\25B6";
-      font-size: 12px;
+      font-size: 11px;
       color: var(--color-label-secondary);
       flex-shrink: 0;
     }
