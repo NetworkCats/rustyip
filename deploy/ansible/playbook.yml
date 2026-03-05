@@ -1,0 +1,22 @@
+---
+- name: Configure RustyIP VPS
+  hosts: vps
+  become: true
+  gather_facts: true
+
+  vars:
+    app_image: "{{ lookup('env', 'APP_IMAGE') }}"
+    site_domain: "{{ lookup('env', 'SITE_DOMAIN') }}"
+    db_update_url: "{{ lookup('env', 'DB_UPDATE_URL') }}"
+    origin_cert: "{{ lookup('env', 'ORIGIN_CERT') }}"
+    origin_key: "{{ lookup('env', 'ORIGIN_KEY') }}"
+    ghcr_token: "{{ lookup('env', 'GHCR_TOKEN') }}"
+    ghcr_user: "{{ lookup('env', 'GHCR_USER') }}"
+    first_deploy: "{{ lookup('env', 'FIRST_DEPLOY') | default('false', true) }}"
+
+  roles:
+    - role: base
+      when: first_deploy | bool
+    - role: docker
+      when: first_deploy | bool
+    - role: app

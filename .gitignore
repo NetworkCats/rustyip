@@ -27,6 +27,20 @@ data/
 .env
 haproxy/certs/
 
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform.lock.hcl
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ansible
+deploy/ansible/inventory.yml
+*.retry
 
 # Added by cargo
 

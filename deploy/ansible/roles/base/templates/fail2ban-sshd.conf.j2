@@ -1,0 +1,14 @@
+[sshd]
+enabled   = true
+port      = ssh
+filter    = sshd
+maxretry  = 5
+findtime  = 600
+bantime   = 3600
+
+# Use iptables directly instead of UFW
+banaction         = iptables-multiport
+banaction_allports = iptables-allports
+
+logpath   = /var/log/auth.log
+backend   = auto

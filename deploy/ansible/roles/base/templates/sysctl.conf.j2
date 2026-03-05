@@ -1,0 +1,59 @@
+# Network performance tuning for high-throughput web service
+
+# Socket buffer sizes
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
+net.core.rmem_default = 1048576
+net.core.wmem_default = 1048576
+
+# TCP buffer auto-tuning
+net.ipv4.tcp_rmem = 4096 87380 16777216
+net.ipv4.tcp_wmem = 4096 65536 16777216
+
+# Connection backlog
+net.core.somaxconn = 65535
+net.core.netdev_max_backlog = 65535
+net.ipv4.tcp_max_syn_backlog = 65535
+
+# TCP connection reuse and timeout
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.tcp_fin_timeout = 15
+
+# TCP keepalive (detect dead connections faster)
+net.ipv4.tcp_keepalive_time = 300
+net.ipv4.tcp_keepalive_intvl = 30
+net.ipv4.tcp_keepalive_probes = 5
+
+# Ephemeral port range
+net.ipv4.ip_local_port_range = 1024 65535
+
+# TCP Fast Open (client + server)
+net.ipv4.tcp_fastopen = 3
+
+# Disable slow start after idle
+net.ipv4.tcp_slow_start_after_idle = 0
+
+# Enable TCP window scaling
+net.ipv4.tcp_window_scaling = 1
+
+# Enable TCP timestamps
+net.ipv4.tcp_timestamps = 1
+
+# Enable selective acknowledgements
+net.ipv4.tcp_sack = 1
+
+# SYN flood protection
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_max_tw_buckets = 2000000
+
+# File descriptor limits
+fs.file-max = 2097152
+fs.nr_open = 2097152
+
+# VM tuning
+vm.swappiness = 10
+vm.dirty_ratio = 15
+vm.dirty_background_ratio = 5
+
+# Connection tracking (for iptables/fail2ban)
+net.netfilter.nf_conntrack_max = 262144

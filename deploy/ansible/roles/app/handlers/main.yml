@@ -1,0 +1,5 @@
+---
+- name: Reload haproxy
+  ansible.builtin.shell: |
+    docker compose -f /opt/rustyip/docker-compose.yml kill -s HUP haproxy
+  failed_when: false

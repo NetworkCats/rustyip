@@ -1,0 +1,77 @@
+global
+    log stderr local0 err
+    maxconn 100000
+    # Performance tuning for high-throughput
+    tune.bufsize 16384
+    tune.maxrewrite 1024
+    tune.http.maxhdr 128
+    tune.comp.maxlevel 1
+    tune.ssl.default-dh-param 2048
+    # TLS configuration optimized for Cloudflare-to-origin connections
+    ssl-default-bind-curves X25519:prime256v1:secp384r1
+    ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384
+    ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+    ssl-default-bind-options prefer-client-ciphers ssl-min-ver TLSv1.2 no-tls-tickets
+
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognormal
+    option  http-keep-alive
+    maxconn 100000
+    timeout connect 5s
+    timeout client  30s
+    timeout server  30s
+    timeout http-request 10s
+    timeout http-keep-alive 60s
+    timeout queue 30s
+
+frontend https_in
+    bind *:443 ssl crt /etc/haproxy/certs/origin.pem alpn h2,http/1.1 strict-sni
+
+    # Gzip compression
+    compression algo gzip
+    compression type text/html text/plain application/json text/css
+
+    # Access to port 443 is already restricted to Cloudflare IPs at the firewall level
+    # All requests reaching HAProxy come from Cloudflare; no additional ACL validation is required.
+
+    # HAProxy's own forwardfor must be disabled, otherwise it will insert Cloudflare node IPs
+    no option forwardfor
+
+    # Overwrite standard headers directly with the real IP forcibly added by Cloudflare
+    http-request set-header X-Forwarded-For %[req.hdr(CF-Connecting-IP)]
+    http-request set-header X-Real-IP      %[req.hdr(CF-Connecting-IP)]
+
+    # Rate limiting: tiered based on global request rate
+    # Track per-IP request rate (per minute)
+    stick-table type string len 45 size 500k expire 1m store http_req_rate(1m)
+    http-request track-sc0 req.hdr(CF-Connecting-IP)
+    # Track global request rate (per second)
+    http-request track-sc1 str(global) table global_rate_tracking
+
+    # Tier 3: global >= 200 RPS -> limit each IP to 5 RPM
+    http-request deny deny_status 429 if { sc_http_req_rate(1,global_rate_tracking) ge 200 } { sc_http_req_rate(0) gt 5 }
+    # Tier 2: global >= 100 RPS -> limit each IP to 10 RPM
+    http-request deny deny_status 429 if { sc_http_req_rate(1,global_rate_tracking) ge 100 } { sc_http_req_rate(0) gt 10 }
+    # Tier 1: default -> limit each IP to 30 RPM
+    http-request deny deny_status 429 if { sc_http_req_rate(0) gt 30 }
+
+    # Block /health from external access
+    acl is_health path /health
+    http-request deny deny_status 403 if is_health
+
+    default_backend app
+
+backend global_rate_tracking
+    stick-table type string len 6 size 1 expire 10m store http_req_rate(1s)
+
+backend app
+    balance roundrobin
+    option httpchk GET /health
+    http-check expect status 200
+
+    # Blue-green backends: only the active color is enabled
+    server blue app-blue:3000 check inter 2s fall 3 rise 2 {{ 'disabled' if active_color == 'green' else '' }}
+    server green app-green:3000 check inter 2s fall 3 rise 2 {{ 'disabled' if active_color == 'blue' else '' }}

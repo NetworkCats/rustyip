@@ -1,0 +1,66 @@
+services:
+  haproxy:
+    image: haproxy:3.3.4-alpine3.23
+    container_name: rustyip-haproxy
+    ports:
+      - "443:443"
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - ./haproxy/certs:/etc/haproxy/certs:ro
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    sysctls:
+      net.core.somaxconn: "65535"
+      net.ipv4.tcp_tw_reuse: "1"
+    networks:
+      - internal
+
+  app-blue:
+    image: {{ app_image }}
+    container_name: rustyip-app-blue
+    env_file: .env
+    volumes:
+      - db_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    networks:
+      - internal
+
+  app-green:
+    image: {{ app_image }}
+    container_name: rustyip-app-green
+    env_file: .env
+    volumes:
+      - db_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    networks:
+      - internal
+
+volumes:
+  db_data:
+
+networks:
+  internal:
+    driver: bridge
