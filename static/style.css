@@ -345,7 +345,7 @@ main {
 }
 
 .site-footer {
-  max-inline-size: 700px;
+  max-inline-size: 450px;
   margin-block-start: 64px;
   margin-inline: auto;
   padding-inline: 20px;
