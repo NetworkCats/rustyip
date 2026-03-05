@@ -199,7 +199,7 @@ main {
     cursor: pointer;
     list-style: none;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 6px;
 
     &::-webkit-details-marker {
