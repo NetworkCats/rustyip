@@ -400,6 +400,11 @@ main {
       color: var(--color-gray2);
     }
 
+    a {
+      color: var(--color-gray2);
+      font-size: 11px;
+    }
+
     ul {
       list-style: none;
       display: flex;
