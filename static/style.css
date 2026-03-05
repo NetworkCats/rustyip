@@ -199,7 +199,7 @@ main {
     cursor: pointer;
     list-style: none;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 6px;
 
     &::-webkit-details-marker {
@@ -207,15 +207,16 @@ main {
     }
 
     &::before {
-      content: "\25B8";
-      font-size: 11px;
+      content: "\25B6";
+      font-size: 23px;
+      line-height: 1;
       color: var(--color-label-secondary);
       flex-shrink: 0;
     }
   }
 
   details[open] > summary::before {
-    content: "\25BE";
+    content: "\25BC";
   }
 
   .faq-content {
