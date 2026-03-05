@@ -1,4 +1,4 @@
-pub mod cli_detect;
+pub mod ua_detect;
 pub mod config;
 pub mod db;
 pub mod error;

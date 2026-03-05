@@ -394,6 +394,119 @@ async fn ipv6_via_cf_header() {
     assert_eq!(body.trim(), "2606:4700:4700::1111");
 }
 
+#[tokio::test]
+async fn python_requests_returns_plain_ip() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/",
+        vec![
+            ("User-Agent", "python-requests/2.31.0"),
+            ("CF-Connecting-IP", "1.2.3.4"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "1.2.3.4");
+}
+
+#[tokio::test]
+async fn go_http_client_returns_plain_ip() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/",
+        vec![
+            ("User-Agent", "Go-http-client/2.0"),
+            ("CF-Connecting-IP", "1.2.3.4"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "1.2.3.4");
+}
+
+#[tokio::test]
+async fn axios_returns_plain_ip() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/",
+        vec![
+            ("User-Agent", "axios/1.7.2"),
+            ("CF-Connecting-IP", "1.2.3.4"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "1.2.3.4");
+}
+
+#[tokio::test]
+async fn guzzle_returns_plain_ip() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/",
+        vec![
+            ("User-Agent", "GuzzleHttp/7.8.1 curl/8.4.0 PHP/8.3.3"),
+            ("CF-Connecting-IP", "1.2.3.4"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "1.2.3.4");
+}
+
+#[tokio::test]
+async fn reqwest_returns_plain_ip() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/",
+        vec![
+            ("User-Agent", "reqwest/0.12.4"),
+            ("CF-Connecting-IP", "1.2.3.4"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "1.2.3.4");
+}
+
+#[tokio::test]
+async fn http_lib_on_lang_path_returns_plain_ip() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/en",
+        vec![
+            ("User-Agent", "python-requests/2.31.0"),
+            ("CF-Connecting-IP", "1.2.3.4"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "1.2.3.4");
+}
+
+#[tokio::test]
+async fn http_lib_with_query_param_returns_html() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/en?ip=45.77.77.77",
+        vec![
+            ("User-Agent", "python-requests/2.31.0"),
+            ("CF-Connecting-IP", "1.2.3.4"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(body.contains("<!DOCTYPE html>"));
+    assert!(body.contains("45.77.77.77"));
+}
+
 // --- Edge case tests ---
 
 #[tokio::test]

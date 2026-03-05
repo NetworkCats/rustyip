@@ -6,7 +6,7 @@ use axum::extract::{Path, Query, State};
 use axum::http::{HeaderMap, StatusCode, header};
 use axum::response::{Html, IntoResponse, Redirect, Response};
 
-use crate::cli_detect::is_cli_user_agent;
+use crate::ua_detect::is_plain_text_agent;
 use crate::db::{self, SharedDb};
 use crate::error::AppError;
 use crate::i18n::{self, Locale};
@@ -449,7 +449,7 @@ pub async fn root_redirect(
         .unwrap_or("");
 
     // CLI clients and JSON requests bypass i18n entirely.
-    if is_cli_user_agent(ua) && query.ip.is_none() {
+    if is_plain_text_agent(ua) && query.ip.is_none() {
         return match extract_client_ip(&headers, state.dev_mode) {
             Ok(ip) => format!("{ip}\n").into_response(),
             Err(e) => e.into_response(),
@@ -515,7 +515,7 @@ pub async fn root(
         .and_then(|v| v.to_str().ok())
         .unwrap_or("");
 
-    if is_cli_user_agent(ua) && query.ip.is_none() {
+    if is_plain_text_agent(ua) && query.ip.is_none() {
         return match extract_client_ip(&headers, state.dev_mode) {
             Ok(ip) => format!("{ip}\n").into_response(),
             Err(e) => e.into_response(),
