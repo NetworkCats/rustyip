@@ -2,11 +2,70 @@
 
 ## Prerequisites
 
-- [Rust](https://rustup.rs/) 1.93.1+
-- [Docker](https://docs.docker.com/get-docker/)
-- A [Vultr](https://www.vultr.com/) account
-- A [Cloudflare](https://www.cloudflare.com/) account (for DNS, CDN, and Origin certificates)
-- An S3-compatible bucket for Terraform state (e.g. Cloudflare R2)
+- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
+- A [Cloudflare](https://www.cloudflare.com/) account with your domain proxied through it
+- A Cloudflare Origin certificate for TLS between Cloudflare and your server
+
+For building from source without Docker, you also need [Rust](https://rustup.rs/) 1.93.1+.
+
+This project is designed to run behind Cloudflare. The application relies on the `CF-Connecting-IP` header to identify clients, and the included HAProxy configuration assumes Cloudflare as the TLS edge.
+
+## Quick Start with Docker Compose
+
+This is the recommended way to deploy RustyIP. It runs the application behind HAProxy with TLS termination and rate limiting.
+
+### 1. Configure environment
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and set at minimum:
+
+```
+SITE_DOMAIN=your-domain.example.com
+```
+
+### 2. Provide TLS certificates
+
+Generate an Origin certificate in the Cloudflare dashboard under **SSL/TLS > Origin Server**. Place the combined certificate and key in PEM format at `haproxy/certs/origin.pem`:
+
+```bash
+mkdir -p haproxy/certs
+cat origin-cert.pem origin-key.pem > haproxy/certs/origin.pem
+```
+
+The file must contain the certificate followed by the private key.
+
+### 3. Start the stack
+
+A prebuilt image is available on Docker Hub at [`networkcat/rustyip`](https://hub.docker.com/r/networkcat/rustyip). Update the `app` service in `docker-compose.yml` to use it:
+
+```yaml
+app:
+  image: networkcat/rustyip
+```
+
+Then start the stack:
+
+```bash
+docker compose up -d
+```
+
+If you prefer to build from source instead, keep the default `build: .` and run:
+
+```bash
+docker compose up -d --build
+```
+
+The service will be available on port 443 (HTTPS). The MMDB database is downloaded automatically on first start and updated periodically (every 24 hours by default).
+
+### 4. Configure Cloudflare
+
+In the Cloudflare dashboard for your domain:
+
+1. Add a DNS A record pointing to your server IP with the proxy enabled (orange cloud).
+2. Set **SSL/TLS** mode to **Full (strict)**.
 
 ## Local Development
 
@@ -18,87 +77,20 @@ curl -fsSL -o data/Merged-IP.mmdb \
 cargo run
 ```
 
-The server starts at `http://localhost:3000` by default.
+The server starts at `http://localhost:3000` by default. Set `DEV_MODE=true` in `.env` to use a fallback IP when the `CF-Connecting-IP` header is absent.
 
-For the full local stack with HAProxy and TLS termination:
+## Environment Variables
 
-```bash
-docker compose up --build
-```
+| Variable | Default | Description |
+|---|---|---|
+| `LISTEN_ADDR` | `0.0.0.0:3000` | Address and port the server listens on |
+| `DB_PATH` | `data/Merged-IP.mmdb` | Path to the MMDB database file |
+| `DB_UPDATE_URL` | *(GitHub release URL)* | URL to download the MMDB database from |
+| `DB_UPDATE_INTERVAL_HOURS` | `24` | How often to check for database updates |
+| `SITE_DOMAIN` | `localhost` | Domain name used for display and metadata |
+| `DEV_MODE` | `false` | Uses `1.1.1.1` as fallback when `CF-Connecting-IP` is absent |
+| `CERT_PATH` | `./haproxy/certs` | Path to the TLS certificate directory for HAProxy |
 
-## Automated Deployment via GitHub Actions
+## Automated CI/CD Deployment
 
-Pushing a version tag (e.g. `v1.0.0`) triggers the full deployment pipeline:
-
-```
-v* tag push --> CI checks --> Docker build + push to Docker Hub --> Terraform + Ansible deploy
-```
-
-### Pipeline Overview
-
-1. **Check** -- Runs `cargo fmt`, `cargo clippy`, and `cargo test`.
-2. **Build** -- Builds a Docker image and pushes it to Docker Hub (`docker.io/networkcat/rustyip`).
-3. **Deploy** -- Provisions infrastructure with Terraform and configures/deploys with Ansible.
-
-The deploy job uses a `production` environment with concurrency control to prevent overlapping deployments.
-
-### Required GitHub Secrets
-
-Go to **Settings > Secrets and variables > Actions** in your GitHub repository and add the following secrets.
-
-If you are using environments, add them under the `production` environment (**Settings > Environments > production**).
-
-#### Terraform State (S3-compatible backend)
-
-| Secret | Description |
-|---|---|
-| `TF_STATE_ACCESS_KEY` | Access key for the S3-compatible state backend (e.g. Cloudflare R2) |
-| `TF_STATE_SECRET_KEY` | Secret key for the S3-compatible state backend |
-| `TF_STATE_BUCKET` | Bucket name where Terraform state is stored |
-| `TF_STATE_ENDPOINT` | S3-compatible endpoint URL (e.g. `https://<account_id>.r2.cloudflarestorage.com`) |
-
-#### Infrastructure
-
-| Secret | Description |
-|---|---|
-| `VULTR_API_KEY` | Vultr API key for provisioning VPS and firewall resources |
-| `SSH_PUBLIC_KEY` | Public key deployed to the VPS for SSH access |
-| `SSH_PRIVATE_KEY` | Corresponding private key used by the pipeline to connect via SSH |
-
-#### Application
-
-| Secret | Description |
-|---|---|
-| `SITE_DOMAIN` | Production domain name (e.g. `ip.nc.gy`) |
-| `DB_UPDATE_URL` | URL to download the MMDB database from |
-
-#### TLS
-
-| Secret | Description |
-|---|---|
-| `ORIGIN_CERT` | Cloudflare Origin certificate (PEM) for TLS termination at HAProxy |
-| `ORIGIN_KEY` | Corresponding private key (PEM) for the Origin certificate |
-
-#### Docker Hub
-
-| Secret | Description |
-|---|---|
-| `DOCKERHUB_USERNAME` | Docker Hub username used for image push and pull |
-| `DOCKERHUB_TOKEN` | Docker Hub access token for authentication |
-
-### Deploying
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-This triggers the full pipeline. Monitor progress under the **Actions** tab in the repository.
-
-### Infrastructure Details
-
-- **VPS**: Vultr High Frequency (`vhf-2c-2gb`), Debian 13, region `dfw` (Dallas)
-- **Firewall**: SSH open, HTTPS restricted to Cloudflare IP ranges
-- **Deployment**: Blue-green with HAProxy traffic switching
-- **First deploy**: Automatically applies base OS hardening (UFW, fail2ban, sysctl tuning) and installs Docker
-- **Subsequent deploys**: Only the application container is updated via blue-green swap
+For production deployment with Terraform and Ansible via GitHub Actions, see [deploy/INSTALL.md](deploy/INSTALL.md).
