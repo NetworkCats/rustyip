@@ -491,8 +491,13 @@ main {
       align-items: flex-start;
     }
 
+    .footer-right {
+      order: -1;
+    }
+
     .footer-lang {
-      margin-block-start: 16px;
+      margin-block-start: 0;
+      margin-block-end: 16px;
     }
   }
 
