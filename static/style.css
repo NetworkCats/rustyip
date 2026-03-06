@@ -136,6 +136,13 @@ main {
   }
 }
 
+.ip-copy-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .ip-display {
   text-align: center;
   font-size: clamp(28px, 6vw, 42px);
@@ -144,6 +151,22 @@ main {
   letter-spacing: -0.5px;
   overflow-wrap: break-word;
   word-break: break-all;
+}
+
+.ip-copied-tooltip {
+  font-size: 13px;
+  font-weight: 500;
+  color: #FFF;
+  background: var(--color-label);
+  padding: 4px 12px;
+  border-radius: 6px;
+  pointer-events: none;
+  animation: ip-tooltip-fade 1.5s ease-out;
+}
+
+@keyframes ip-tooltip-fade {
+  0%, 70% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 .info-table {

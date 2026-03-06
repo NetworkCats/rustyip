@@ -188,3 +188,6 @@ msgstr "Echec de la recherche dans la base de donnees"
 
 msgid "Template render failed"
 msgstr "Echec du rendu du modele"
+
+msgid "Copied"
+msgstr "Copie"

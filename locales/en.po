@@ -188,3 +188,6 @@ msgstr "Database lookup failed"
 
 msgid "Template render failed"
 msgstr "Template render failed"
+
+msgid "Copied"
+msgstr "Copied"

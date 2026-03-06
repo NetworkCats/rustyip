@@ -188,3 +188,6 @@ msgstr "データベース検索に失敗しました"
 
 msgid "Template render failed"
 msgstr "テンプレートのレンダリングに失敗しました"
+
+msgid "Copied"
+msgstr "コピーしました"

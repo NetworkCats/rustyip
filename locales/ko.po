@@ -188,3 +188,6 @@ msgstr "데이터베이스 조회 실패"
 
 msgid "Template render failed"
 msgstr "템플릿 렌더링 실패"
+
+msgid "Copied"
+msgstr "복사됨"

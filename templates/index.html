@@ -145,7 +145,10 @@
     {% include "_search_form.html" %}
 
     <div itemscope itemtype="https://schema.org/WebPage">
-    <h1 class="ip-display" itemprop="name">{{ ip }}</h1>
+    <div class="ip-copy-wrap" data-copied="{{ t_copied }}">
+      <h1 class="ip-display" itemprop="name">{{ ip }}</h1>
+      <span class="ip-copied-tooltip" aria-live="polite" hidden>{{ t_copied }}</span>
+    </div>
 
     <table class="info-table" aria-label="{{ t_table_aria }}">
       <tbody>

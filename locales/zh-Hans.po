@@ -188,3 +188,6 @@ msgstr "数据库查询失败"
 
 msgid "Template render failed"
 msgstr "模板渲染失败"
+
+msgid "Copied"
+msgstr "已复制"

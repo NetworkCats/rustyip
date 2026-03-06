@@ -188,3 +188,6 @@ msgstr "Ошибка поиска в базе данных"
 
 msgid "Template render failed"
 msgstr "Ошибка рендеринга шаблона"
+
+msgid "Copied"
+msgstr "Скопировано"

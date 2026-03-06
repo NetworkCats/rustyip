@@ -136,3 +136,33 @@
     if(!error.hidden)showError(validate(input.value));
   });
 })();
+
+(function(){
+  "use strict";
+  var wrap=document.querySelector(".ip-copy-wrap");
+  if(!wrap)return;
+  var h1=wrap.querySelector(".ip-display");
+  var tooltip=wrap.querySelector(".ip-copied-tooltip");
+  if(!h1||!tooltip||!navigator.clipboard)return;
+  var timer=0;
+  wrap.style.cursor="pointer";
+  wrap.setAttribute("role","button");
+  wrap.setAttribute("tabindex","0");
+
+  function copyIp(){
+    var ip=h1.textContent.trim();
+    navigator.clipboard.writeText(ip).then(function(){
+      tooltip.hidden=false;
+      clearTimeout(timer);
+      timer=setTimeout(function(){tooltip.hidden=true;},1500);
+    });
+  }
+
+  wrap.addEventListener("click",copyIp);
+  wrap.addEventListener("keydown",function(e){
+    if(e.key==="Enter"||e.key===" "){
+      e.preventDefault();
+      copyIp();
+    }
+  });
+})();

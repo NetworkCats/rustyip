@@ -188,3 +188,6 @@ msgstr "La consulta a la base de datos fallo"
 
 msgid "Template render failed"
 msgstr "La renderizacion de la plantilla fallo"
+
+msgid "Copied"
+msgstr "Copiado"

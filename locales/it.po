@@ -188,3 +188,6 @@ msgstr "Ricerca nel database fallita"
 
 msgid "Template render failed"
 msgstr "Rendering del template fallito"
+
+msgid "Copied"
+msgstr "Copiato"

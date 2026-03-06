@@ -188,3 +188,6 @@ msgstr "Pencarian basis data gagal"
 
 msgid "Template render failed"
 msgstr "Render template gagal"
+
+msgid "Copied"
+msgstr "Disalin"

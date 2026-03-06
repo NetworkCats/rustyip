@@ -188,3 +188,6 @@ msgstr "Datenbankabfrage fehlgeschlagen"
 
 msgid "Template render failed"
 msgstr "Vorlagen-Rendering fehlgeschlagen"
+
+msgid "Copied"
+msgstr "Kopiert"

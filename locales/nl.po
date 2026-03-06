@@ -188,3 +188,6 @@ msgstr "Database-opzoeking mislukt"
 
 msgid "Template render failed"
 msgstr "Sjabloonweergave mislukt"
+
+msgid "Copied"
+msgstr "Gekopieerd"

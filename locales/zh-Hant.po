@@ -188,3 +188,6 @@ msgstr "資料庫查詢失敗"
 
 msgid "Template render failed"
 msgstr "範本渲染失敗"
+
+msgid "Copied"
+msgstr "已複製"

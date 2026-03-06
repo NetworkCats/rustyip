@@ -188,3 +188,6 @@ msgstr "فشل البحث في قاعدة البيانات"
 
 msgid "Template render failed"
 msgstr "فشل عرض القالب"
+
+msgid "Copied"
+msgstr "تم النسخ"
