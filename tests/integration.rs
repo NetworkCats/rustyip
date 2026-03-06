@@ -674,11 +674,14 @@ async fn html_contains_seo_meta_tags() {
     let app = build_test_app();
     let (status, body) = get_with_headers(
         &app,
-        "/en?ip=45.77.77.77",
-        vec![(
-            "User-Agent",
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        )],
+        "/en",
+        vec![
+            (
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            ),
+            ("CF-Connecting-IP", "45.77.77.77"),
+        ],
     )
     .await;
     assert_eq!(status, StatusCode::OK);
@@ -692,6 +695,28 @@ async fn html_contains_seo_meta_tags() {
     assert!(body.contains("hreflang=\"en\""));
     assert!(body.contains("hreflang=\"x-default\""));
     assert!(body.contains("hreflang=\"es\""));
+    assert!(!body.contains("noindex"));
+}
+
+#[tokio::test]
+async fn html_query_result_has_noindex() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/en?ip=45.77.77.77",
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(body.contains("<meta name=\"robots\" content=\"noindex, nofollow\">"));
+    assert!(!body.contains("<meta name=\"description\""));
+    assert!(!body.contains("<link rel=\"canonical\""));
+    assert!(!body.contains("<meta property=\"og:title\""));
+    assert!(!body.contains("hreflang="));
+    assert!(body.contains("<meta name=\"theme-color\""));
 }
 
 #[tokio::test]

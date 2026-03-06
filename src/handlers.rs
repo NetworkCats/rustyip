@@ -34,6 +34,7 @@ pub struct AppState {
 struct IndexTemplate {
     ip: String,
     query: String,
+    is_query: bool,
     site_domain: Arc<str>,
     css_version: u64,
     asn: String,
@@ -554,9 +555,11 @@ pub async fn root(
 
     let t = build_translations(locale);
 
+    let is_query = query.ip.is_some();
     let template = IndexTemplate {
         ip: info.ip.clone(),
         query: query.ip.unwrap_or_default(),
+        is_query,
         site_domain: state.site_domain.clone(),
         css_version: static_assets::asset_version("style.css"),
         asn: format_asn(&info),
