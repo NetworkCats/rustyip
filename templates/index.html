@@ -12,9 +12,13 @@
   <meta property="og:description" content="{{ t_description }}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://{{ site_domain }}/{{ lang_tag }}">
+  <meta property="og:image" content="https://{{ site_domain }}/static/icons/android-chrome-512x512.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{{ t_title }} - {{ site_domain }}">
   <meta name="twitter:description" content="{{ t_description }}">
+  <meta name="twitter:image" content="https://{{ site_domain }}/static/icons/android-chrome-512x512.png">
   {% for l in all_locales %}
   <link rel="alternate" hreflang="{{ l.tag() }}" href="https://{{ site_domain }}/{{ l.tag() }}">
   {% endfor %}
