@@ -180,6 +180,15 @@ main {
   .bool-false {
     color: var(--color-label-secondary);
   }
+
+  a {
+    color: var(--color-link);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 .faq {
