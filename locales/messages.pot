@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: templates/index.html - page title
-msgid "What is my IP address?"
+msgid "Accurate IP proxy information and geographic location"
 msgstr ""
 
 #: templates/index.html - meta description

@@ -9,8 +9,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "What is my IP address?"
-msgstr "내 IP 주소는 무엇인가요?"
+msgid "Accurate IP proxy information and geographic location"
+msgstr "정확한 IP 프록시 정보 및 지리적 위치"
 
 msgid "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."
 msgstr "공인 IP 주소를 즉시 확인하세요. 모든 IP 주소의 지리적 위치, ASN, 조직 정보, 프록시/VPN/Tor 탐지 결과를 조회할 수 있습니다."

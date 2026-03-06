@@ -216,7 +216,7 @@ fn format_city(info: &IpInfo, locale: Locale) -> &str {
 
 fn build_translations(locale: Locale) -> Translations {
     Translations {
-        t_title: i18n::translate(locale, "What is my IP address?"),
+        t_title: i18n::translate(locale, "Accurate IP proxy information and geographic location"),
         t_description: i18n::translate(
             locale,
             "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address.",

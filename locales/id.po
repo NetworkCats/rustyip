@@ -9,8 +9,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "What is my IP address?"
-msgstr "Apa alamat IP saya?"
+msgid "Accurate IP proxy information and geographic location"
+msgstr "Informasi proksi IP dan lokasi geografis yang akurat"
 
 msgid "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."
 msgstr "Temukan alamat IP publik Anda secara instan. Cari geolokasi, ASN, organisasi, dan deteksi proxy/VPN/Tor untuk alamat IP apa pun."

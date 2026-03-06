@@ -9,8 +9,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "What is my IP address?"
-msgstr "Wie lautet meine IP-Adresse?"
+msgid "Accurate IP proxy information and geographic location"
+msgstr "Genaue IP-Proxy-Informationen und geografischer Standort"
 
 msgid "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."
 msgstr "Finden Sie Ihre öffentliche IP-Adresse sofort heraus. Suchen Sie Geolokalisierung, ASN, Organisation und Proxy-/VPN-/Tor-Erkennung für jede IP-Adresse."

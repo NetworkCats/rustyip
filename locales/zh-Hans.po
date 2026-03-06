@@ -9,8 +9,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "What is my IP address?"
-msgstr "我的 IP 地址是什么？"
+msgid "Accurate IP proxy information and geographic location"
+msgstr "准确的 IP 代理信息与地理位置"
 
 msgid "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."
 msgstr "即时查询您的公网 IP 地址。查找任意 IP 地址的地理位置、ASN、组织以及代理/VPN/Tor 检测信息。"
