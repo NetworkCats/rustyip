@@ -27,6 +27,10 @@
     </div>
 {% endblock %}
 
+{% block scripts %}
+  <script src="/static/script.js?v={{ js_version }}" defer></script>
+{% endblock %}
+
 {% block footer %}
   <footer class="site-footer">
     <div class="footer-inner">

@@ -37,6 +37,7 @@ struct IndexTemplate {
     is_query: bool,
     site_domain: Arc<str>,
     css_version: u64,
+    js_version: u64,
     asn: String,
     asn_number: Option<u32>,
     org: String,
@@ -111,6 +112,7 @@ struct IndexTemplate {
 struct ErrorAlertTemplate {
     site_domain: Arc<str>,
     css_version: u64,
+    js_version: u64,
     query: String,
     error_message: String,
     locale: Locale,
@@ -401,6 +403,7 @@ fn render_error_alert(state: &AppState, locale: Locale, query: &str, error: &App
     let template = ErrorAlertTemplate {
         site_domain: state.site_domain.clone(),
         css_version: static_assets::asset_version("style.css"),
+        js_version: static_assets::asset_version("script.js"),
         query: query.to_owned(),
         error_message: error_msg.to_owned(),
         locale,
@@ -570,6 +573,7 @@ pub async fn root(
         is_query,
         site_domain: state.site_domain.clone(),
         css_version: static_assets::asset_version("style.css"),
+        js_version: static_assets::asset_version("script.js"),
         asn: format_asn(&info),
         asn_number: asn_number(&info),
         org: format_org(&info).to_owned(),
