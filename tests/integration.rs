@@ -1109,6 +1109,150 @@ async fn german_page_contains_translated_escaped_quote_strings() {
     );
 }
 
+// --- JSON-LD and Microdata tests ---
+
+#[tokio::test]
+async fn html_contains_jsonld_on_landing_page() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/en",
+        vec![
+            ("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"),
+            ("CF-Connecting-IP", "45.77.77.77"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(
+        body.contains("application/ld+json"),
+        "landing page should contain JSON-LD script tag"
+    );
+    assert!(
+        body.contains("\"@type\": \"WebApplication\""),
+        "landing page should contain WebApplication JSON-LD"
+    );
+    assert!(
+        body.contains("\"@type\": \"FAQPage\""),
+        "landing page should contain FAQPage JSON-LD"
+    );
+    assert!(
+        body.contains("\"applicationCategory\": \"UtilitiesApplication\""),
+        "WebApplication should have applicationCategory"
+    );
+    assert!(
+        body.contains("\"@type\": \"Question\""),
+        "FAQPage should contain Question entities"
+    );
+    assert!(
+        body.contains("\"@type\": \"Answer\""),
+        "FAQPage should contain Answer entities"
+    );
+}
+
+#[tokio::test]
+async fn html_query_result_has_no_jsonld() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/en?ip=45.77.77.77",
+        vec![("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(
+        !body.contains("application/ld+json"),
+        "query result page should not contain JSON-LD"
+    );
+}
+
+#[tokio::test]
+async fn html_contains_microdata_faq() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/en?ip=45.77.77.77",
+        vec![("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(
+        body.contains("itemtype=\"https://schema.org/FAQPage\""),
+        "FAQ section should have FAQPage microdata"
+    );
+    assert!(
+        body.contains("itemtype=\"https://schema.org/Question\""),
+        "FAQ items should have Question microdata"
+    );
+    assert!(
+        body.contains("itemtype=\"https://schema.org/Answer\""),
+        "FAQ items should have Answer microdata"
+    );
+    assert!(
+        body.contains("itemprop=\"name\""),
+        "FAQ questions should have name itemprop"
+    );
+    assert!(
+        body.contains("itemprop=\"acceptedAnswer\""),
+        "FAQ questions should have acceptedAnswer itemprop"
+    );
+    assert!(
+        body.contains("itemprop=\"text\""),
+        "FAQ answers should have text itemprop"
+    );
+}
+
+#[tokio::test]
+async fn html_contains_microdata_ip_result() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/en?ip=45.77.77.77",
+        vec![("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(
+        body.contains("itemtype=\"https://schema.org/WebPage\""),
+        "IP result section should have WebPage microdata"
+    );
+    assert!(
+        body.contains("itemtype=\"https://schema.org/Organization\""),
+        "Org row should have Organization microdata"
+    );
+    assert!(
+        body.contains("itemprop=\"addressCountry\""),
+        "Country row should have addressCountry itemprop"
+    );
+    assert!(
+        body.contains("itemtype=\"https://schema.org/Place\""),
+        "Location rows should have Place microdata"
+    );
+}
+
+#[tokio::test]
+async fn jsonld_contains_available_languages() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/en",
+        vec![
+            ("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"),
+            ("CF-Connecting-IP", "45.77.77.77"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(
+        body.contains("\"availableLanguage\""),
+        "WebApplication JSON-LD should list available languages"
+    );
+    assert!(
+        body.contains("\"inLanguage\": \"en\""),
+        "WebApplication JSON-LD should specify current language"
+    );
+}
+
 // --- Non-public IP rejection tests ---
 
 #[tokio::test]

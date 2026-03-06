@@ -41,6 +41,7 @@ struct IndexTemplate {
     asn_number: Option<u32>,
     org: String,
     country: String,
+    country_code: String,
     city: String,
     is_proxy: bool,
     is_vpn: bool,
@@ -205,6 +206,13 @@ fn format_country(info: &IpInfo, locale: Locale) -> &str {
     info.country
         .as_ref()
         .map(|c| get_localized_name(&c.names, locale.mmdb_key()))
+        .unwrap_or_default()
+}
+
+fn format_country_code(info: &IpInfo) -> &str {
+    info.country
+        .as_ref()
+        .and_then(|c| c.iso_code.as_deref())
         .unwrap_or_default()
 }
 
@@ -566,6 +574,7 @@ pub async fn root(
         asn_number: asn_number(&info),
         org: format_org(&info).to_owned(),
         country: format_country(&info, locale).to_owned(),
+        country_code: format_country_code(&info).to_owned(),
         city: format_city(&info, locale).to_owned(),
         is_proxy: info.proxy.is_proxy,
         is_vpn: info.proxy.is_vpn,

@@ -28,6 +28,110 @@
   <meta name="theme-color" content="#0A84FF" media="(prefers-color-scheme: dark)">
 {% endblock %}
 
+{% block head_extra %}
+  {% if !is_query %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "{{ site_domain }}",
+    "url": "https://{{ site_domain }}/",
+    "description": "{{ t_description }}",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "inLanguage": "{{ lang_tag }}",
+    "availableLanguage": [{% for l in all_locales %}{% if !loop.first %}, {% endif %}"{{ l.tag() }}"{% endfor %}],
+    "image": "https://{{ site_domain }}/static/icons/android-chrome-512x512.png"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "{{ t_faq_cli_q }}",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "{{ t_faq_cli_a }}"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "{{ t_faq_ipv46_q }}",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "{{ t_faq_ipv46_a }}"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "{{ t_faq_json_q }}",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "{{ t_faq_json_a }}"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "{{ t_faq_automate_q }}",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "{{ t_faq_automate_a1 }}"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "{{ t_faq_data_q }}",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "{{ t_faq_data_a }}"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "{{ t_faq_selfhost_q }}",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "{{ t_faq_selfhost_a }}"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "{{ t_faq_diff_q }}",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "{{ t_faq_diff_a1 }}"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "{{ t_faq_stable_q }}",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "{{ t_faq_stable_a1 }}"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "{{ t_faq_sponsor_q }}",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "{{ t_faq_sponsor_a }}"
+        }
+      }
+    ]
+  }
+  </script>
+  {% endif %}
+{% endblock %}
+
 {% block head_preconnect %}
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 {% endblock %}
@@ -40,7 +144,8 @@
     {% let autofocus = false %}
     {% include "_search_form.html" %}
 
-    <h1 class="ip-display">{{ ip }}</h1>
+    <div itemscope itemtype="https://schema.org/WebPage">
+    <h1 class="ip-display" itemprop="name">{{ ip }}</h1>
 
     <table class="info-table" aria-label="{{ t_table_aria }}">
       <tbody>
@@ -53,19 +158,19 @@
         {% if !org.is_empty() %}
         <tr>
           <th scope="row">{{ t_org }}</th>
-          <td>{{ org }}</td>
+          <td itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><span itemprop="name">{{ org }}</span></td>
         </tr>
         {% endif %}
         {% if !country.is_empty() %}
-        <tr>
+        <tr itemprop="contentLocation" itemscope itemtype="https://schema.org/Place">
           <th scope="row">{{ t_country }}</th>
-          <td>{{ country }}</td>
+          <td itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"><span itemprop="addressCountry">{{ country }}</span>{% if !country_code.is_empty() %}<meta itemprop="addressCountry" content="{{ country_code }}">{% endif %}</td>
         </tr>
         {% endif %}
         {% if !city.is_empty() %}
         <tr>
           <th scope="row">{{ t_city }}</th>
-          <td>{{ city }}</td>
+          <td itemprop="contentLocation" itemscope itemtype="https://schema.org/Place"><span itemprop="name">{{ city }}</span></td>
         </tr>
         {% endif %}
         <tr>
@@ -87,12 +192,15 @@
       </tbody>
     </table>
 
-    <section class="faq" aria-label="{{ t_faq_aria }}">
+    </div>
+
+    <section class="faq" aria-label="{{ t_faq_aria }}" itemscope itemtype="https://schema.org/FAQPage">
       <h2 class="faq-title">{{ t_faq }}</h2>
 
-      <details open>
-        <summary>{{ t_faq_cli_q }}</summary>
-        <div class="faq-content">
+      <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">{{ t_faq_cli_q }}</summary>
+        <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div itemprop="text">
           <p>{{ t_faq_cli_a }}</p>
           <p>{{ t_faq_cli_query_current }}</p>
           <pre><code>curl {{ site_domain }}</code></pre>
@@ -134,34 +242,42 @@ curl {{ site_domain }}/tor</code></pre>
   "asn": { ... },
   "proxy": { ... }
 }</code></pre>
+          </div>
         </div>
       </details>
 
-      <details open>
-        <summary>{{ t_faq_ipv46_q }}</summary>
-        <div class="faq-content">
+      <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">{{ t_faq_ipv46_q }}</summary>
+        <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div itemprop="text">
           <p>{{ t_faq_ipv46_a|safe }}</p>
+          </div>
         </div>
       </details>
 
-      <details open>
-        <summary>{{ t_faq_json_q }}</summary>
-        <div class="faq-content">
+      <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">{{ t_faq_json_q }}</summary>
+        <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div itemprop="text">
           <p>{{ t_faq_json_a|safe }}</p>
+          </div>
         </div>
       </details>
 
-      <details open>
-        <summary>{{ t_faq_automate_q }}</summary>
-        <div class="faq-content">
+      <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">{{ t_faq_automate_q }}</summary>
+        <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div itemprop="text">
           <p>{{ t_faq_automate_a1 }}</p>
           <p>{{ t_faq_automate_a2|safe }}</p>
+          </div>
         </div>
       </details>
 
-      <details open>
-        <summary>{{ t_faq_data_q }}</summary>
-        <div class="faq-content">
+      <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">{{ t_faq_data_q }}</summary>
+        <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div itemprop="text">
           <p>{{ t_faq_data_a|safe }}</p>
           <p>{{ t_faq_data_attr }}</p>
           <ul>
@@ -171,42 +287,51 @@ curl {{ site_domain }}/tor</code></pre>
             <li>RouteViews ASN: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0</a></li>
             <li>OpenProxyDB: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0</a></li>
           </ul>
+          </div>
         </div>
       </details>
 
-      <details open>
-        <summary>{{ t_faq_selfhost_q }}</summary>
-        <div class="faq-content">
+      <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">{{ t_faq_selfhost_q }}</summary>
+        <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div itemprop="text">
           <p>{{ t_faq_selfhost_a }}</p>
           <ul>
             <li><a href="https://github.com/NetworkCats/rustyip">https://github.com/NetworkCats/rustyip</a></li>
             <li><a href="https://github.com/NetworkCats/Merged-IP-Data">https://github.com/NetworkCats/Merged-IP-Data</a></li>
           </ul>
+          </div>
         </div>
       </details>
 
-      <details open>
-        <summary>{{ t_faq_diff_q }}</summary>
-        <div class="faq-content">
+      <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">{{ t_faq_diff_q }}</summary>
+        <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div itemprop="text">
           <p>{{ t_faq_diff_a1 }}</p>
           <p>{{ t_faq_diff_a2 }}</p>
           <p>{{ t_faq_diff_a3 }}</p>
+          </div>
         </div>
       </details>
 
-      <details open>
-        <summary>{{ t_faq_stable_q }}</summary>
-        <div class="faq-content">
+      <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">{{ t_faq_stable_q }}</summary>
+        <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div itemprop="text">
           <p>{{ t_faq_stable_a1 }}</p>
           <p>{{ t_faq_stable_a2 }}</p>
           <p>{{ t_faq_stable_a3 }}</p>
+          </div>
         </div>
       </details>
 
-      <details open>
-        <summary>{{ t_faq_sponsor_q }}</summary>
-        <div class="faq-content">
+      <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">{{ t_faq_sponsor_q }}</summary>
+        <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div itemprop="text">
           <p>{{ t_faq_sponsor_a }} <a href="mailto:networkcatlol@gmail.com">networkcatlol@gmail.com</a></p>
+          </div>
         </div>
       </details>
     </section>
