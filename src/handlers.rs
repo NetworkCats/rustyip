@@ -831,6 +831,46 @@ pub async fn sitemap_xml(State(state): State<AppState>) -> Response {
         .into_response()
 }
 
+pub async fn favicon() -> Response {
+    Redirect::permanent("/static/icons/favicon.ico").into_response()
+}
+
+pub async fn manifest(State(state): State<AppState>) -> Response {
+    let manifest = serde_json::json!({
+        "name": state.site_domain.as_ref(),
+        "short_name": state.site_domain.as_ref(),
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#FFFFFF",
+        "theme_color": "#007AFF",
+        "icons": [
+            {
+                "src": "/static/icons/android-chrome-192x192.png",
+                "sizes": "192x192",
+                "type": "image/png"
+            },
+            {
+                "src": "/static/icons/android-chrome-512x512.png",
+                "sizes": "512x512",
+                "type": "image/png"
+            },
+            {
+                "src": "/static/icons/android-chrome-512x512.png",
+                "sizes": "512x512",
+                "type": "image/png",
+                "purpose": "maskable"
+            }
+        ]
+    });
+
+    let body = serde_json::to_string_pretty(&manifest).expect("manifest serialization cannot fail");
+    (
+        [(header::CONTENT_TYPE, "application/manifest+json; charset=utf-8")],
+        body,
+    )
+        .into_response()
+}
+
 pub async fn not_found(State(state): State<AppState>, headers: HeaderMap) -> Response {
     let locale = i18n::negotiate_locale(&headers);
     render_error_page(
