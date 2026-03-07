@@ -140,9 +140,8 @@ jobs:
           DEPLOY_COLOR=$(ssh $SSH_OPTS "$VPS_HOST" "cat /opt/rustyip/.active_color")
           echo "Active deployment color: ${DEPLOY_COLOR}"
           for i in $(seq 1 30); do
-            status=$(ssh $SSH_OPTS "$VPS_HOST" \
-              "docker inspect --format {{ '{{' }}.State.Health.Status{{ '}}' }} rustyip-app-${DEPLOY_COLOR}" 2>/dev/null) || true
-            if [ "$status" = "healthy" ]; then
+            if ssh $SSH_OPTS "$VPS_HOST" \
+              "docker exec rustyip-app-${DEPLOY_COLOR} wget -qO /dev/null http://127.0.0.1:3000/health" 2>/dev/null; then
               echo "Deployment verified: app-${DEPLOY_COLOR} is healthy"
               exit 0
             fi
