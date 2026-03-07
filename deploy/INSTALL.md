@@ -1,47 +1,5 @@
 # Installation
 
-## Prerequisites
-
-- [Rust](https://rustup.rs/) 1.93.1+
-- [Docker](https://docs.docker.com/get-docker/)
-- A [Vultr](https://www.vultr.com/) account
-- A [Cloudflare](https://www.cloudflare.com/) account (for DNS, CDN, and Origin certificates)
-- An S3-compatible bucket for Terraform state (e.g. Cloudflare R2)
-
-## Local Development
-
-```bash
-cp .env.example .env
-mkdir -p data
-curl -fsSL -o data/Merged-IP.mmdb \
-  "https://github.com/NetworkCats/Merged-IP-Data/releases/latest/download/Merged-IP.mmdb"
-cargo run
-```
-
-The server starts at `http://localhost:3000` by default.
-
-For the full local stack with HAProxy and TLS termination:
-
-```bash
-docker compose up --build
-```
-
-## Automated Deployment via GitHub Actions
-
-Pushing a version tag (e.g. `v1.0.0`) triggers the full deployment pipeline:
-
-```
-v* tag push --> CI checks --> Docker build + push to Docker Hub --> Terraform + Ansible deploy
-```
-
-### Pipeline Overview
-
-1. **Check** -- Runs `cargo fmt`, `cargo clippy`, and `cargo test`.
-2. **Build** -- Builds a Docker image and pushes it to Docker Hub (`docker.io/networkcat/rustyip`).
-3. **Deploy** -- Provisions infrastructure with Terraform and configures/deploys with Ansible.
-
-The deploy job uses a `production` environment with concurrency control to prevent overlapping deployments.
-
 ### Required GitHub Secrets
 
 Go to **Settings > Secrets and variables > Actions** in your GitHub repository and add the following secrets.
