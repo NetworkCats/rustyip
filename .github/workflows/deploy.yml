@@ -134,17 +134,17 @@ jobs:
         run: |
           DEPLOY_COLOR=$(ssh -i ~/.ssh/deploy_key root@"${{ steps.vps.outputs.ip }}" \
             "cat /opt/rustyip/.active_color")
-          for i in $(seq 1 15); do
+          for i in $(seq 1 30); do
             status=$(ssh -i ~/.ssh/deploy_key root@"${{ steps.vps.outputs.ip }}" \
               "docker inspect --format='{{ '{{' }}.State.Health.Status{{ '}}' }}' rustyip-app-${DEPLOY_COLOR}" 2>/dev/null)
             if [ "$status" = "healthy" ]; then
               echo "Deployment verified: app-${DEPLOY_COLOR} is healthy"
               exit 0
             fi
-            echo "Waiting for health check... (attempt $i/15)"
+            echo "Waiting for health check... (attempt $i/30)"
             sleep 4
           done
-          echo "Health check failed after 60 seconds"
+          echo "Health check failed after 120 seconds"
           exit 1
 
       # ---- Cleanup ----

@@ -110,7 +110,7 @@
 
 - name: Wait for target container health check (first deploy)
   ansible.builtin.shell: |
-    for i in $(seq 1 30); do
+    for i in $(seq 1 60); do
       status=$(docker inspect --format='{% raw %}{{.State.Health.Status}}{% endraw %}' "rustyip-app-{{ deploy_target }}" 2>/dev/null)
       if [ "$status" = "healthy" ]; then
         echo "healthy"
@@ -152,7 +152,7 @@
 
     - name: Wait for standby container health check
       ansible.builtin.shell: |
-        for i in $(seq 1 30); do
+        for i in $(seq 1 60); do
           status=$(docker inspect --format='{% raw %}{{.State.Health.Status}}{% endraw %}' "rustyip-app-{{ deploy_target }}" 2>/dev/null)
           if [ "$status" = "healthy" ]; then
             echo "healthy"
