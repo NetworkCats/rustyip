@@ -91,6 +91,16 @@ The server starts at `http://localhost:3000` by default. Set `DEV_MODE=true` in 
 | `DEV_MODE` | `false` | Uses `1.1.1.1` as fallback when `CF-Connecting-IP` is absent |
 | `CERT_PATH` | `./haproxy/certs` | Path to the TLS certificate directory for HAProxy |
 
+## Code Coverage with Codecov
+
+The CI workflow automatically generates a coverage report and uploads it to [Codecov](https://codecov.io). To enable this for your fork or repository:
+
+1. Sign up at [codecov.io](https://codecov.io) and add your repository.
+2. Copy the upload token from the Codecov repository settings page.
+3. Add a `CODECOV_TOKEN` secret to your GitHub repository under **Settings > Secrets and variables > Actions**.
+
+Coverage is collected using [cargo-llvm-cov](https://github.com/taiki-e/cargo-llvm-cov) with LLVM source-based instrumentation and uploaded in LCOV format.
+
 ## Automated CI/CD Deployment
 
 For production deployment with Terraform and Ansible via GitHub Actions, see [deploy/INSTALL.md](deploy/INSTALL.md).
