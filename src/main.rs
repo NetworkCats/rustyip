@@ -61,11 +61,11 @@ async fn main() {
     let init_cancel = cancel.clone();
     let updater_handle = tokio::spawn(async move {
         // Only download if the DB was not loaded synchronously above.
-        if !db::is_ready(&init_db) {
-            if let Err(e) = updater::init_db(&init_db, &init_path, &init_url).await {
-                error!("failed to initialize database: {e}");
-                std::process::exit(1);
-            }
+        if !db::is_ready(&init_db)
+            && let Err(e) = updater::init_db(&init_db, &init_path, &init_url).await
+        {
+            error!("failed to initialize database: {e}");
+            std::process::exit(1);
         }
 
         // Start periodic updater after the initial load succeeds.
