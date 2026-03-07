@@ -3,6 +3,7 @@ services:
     image: haproxy:3.3.4-alpine3.23
     container_name: rustyip-haproxy
     ports:
+      - "80:80"
       - "443:443"
     volumes:
       - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro

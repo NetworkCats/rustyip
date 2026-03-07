@@ -26,14 +26,14 @@ defaults
     timeout http-keep-alive 60s
     timeout queue 30s
 
-frontend https_in
-    bind *:443 ssl crt /etc/haproxy/certs/origin.pem alpn h2,http/1.1 strict-sni
+frontend http_in
+    bind *:80
 
     # Gzip compression
     compression algo gzip
     compression type text/html text/plain application/json text/css
 
-    # Access to port 443 is already restricted to Cloudflare IPs at the firewall level
+    # Access to port 80 is restricted to Cloudflare IPs at the firewall level
     # All requests reaching HAProxy come from Cloudflare; no additional ACL validation is required.
 
     # HAProxy's own forwardfor is not enabled; real IP is set explicitly below via CF-Connecting-IP
@@ -55,6 +55,40 @@ frontend https_in
     http-request deny deny_status 429 if { sc_http_req_rate(1,global_rate_tracking) ge 100 } { sc_http_req_rate(0) gt 10 }
     # Tier 1: default -> limit each IP to 30 RPM
     http-request deny deny_status 429 if { sc_http_req_rate(0) gt 30 }
+
+    # Block /health from external access
+    acl is_health path /health
+    http-request deny deny_status 403 if is_health
+
+    default_backend app
+
+frontend https_in
+    bind *:443 ssl crt /etc/haproxy/certs/origin.pem alpn h2,http/1.1 strict-sni
+
+    # Gzip compression
+    compression algo gzip
+    compression type text/html text/plain application/json text/css
+
+    # Access to port 443 is restricted to Cloudflare IPs at the firewall level
+    # All requests reaching HAProxy come from Cloudflare; no additional ACL validation is required.
+
+    # HAProxy's own forwardfor is not enabled; real IP is set explicitly below via CF-Connecting-IP
+
+    # Overwrite standard headers directly with the real IP forcibly added by Cloudflare
+    http-request set-header X-Forwarded-For %[req.hdr(CF-Connecting-IP)]
+    http-request set-header X-Real-IP      %[req.hdr(CF-Connecting-IP)]
+
+    # Rate limiting uses the shared stick-table from http_in frontend
+    http-request track-sc0 req.hdr(CF-Connecting-IP) table http_in
+    # Track global request rate (per second)
+    http-request track-sc1 str(global) table global_rate_tracking
+
+    # Tier 3: global >= 200 RPS -> limit each IP to 5 RPM
+    http-request deny deny_status 429 if { sc_http_req_rate(1,global_rate_tracking) ge 200 } { sc_http_req_rate(0,http_in) gt 5 }
+    # Tier 2: global >= 100 RPS -> limit each IP to 10 RPM
+    http-request deny deny_status 429 if { sc_http_req_rate(1,global_rate_tracking) ge 100 } { sc_http_req_rate(0,http_in) gt 10 }
+    # Tier 1: default -> limit each IP to 30 RPM
+    http-request deny deny_status 429 if { sc_http_req_rate(0,http_in) gt 30 }
 
     # Block /health from external access
     acl is_health path /health

@@ -45,6 +45,13 @@
     proto: tcp
     comment: "SSH"
 
+- name: Allow HTTP (port 80) through UFW
+  community.general.ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+    comment: "HTTP"
+
 - name: Allow HTTPS (port 443) through UFW
   community.general.ufw:
     rule: allow
