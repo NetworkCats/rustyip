@@ -137,10 +137,9 @@ main {
 }
 
 .ip-copy-wrap {
+  position: relative;
   display: flex;
-  align-items: baseline;
   justify-content: center;
-  gap: 8px;
 }
 
 .ip-display {
@@ -154,6 +153,10 @@ main {
 }
 
 .ip-copied-tooltip {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  translate: 0 -50%;
   font-size: 13px;
   font-weight: 500;
   color: var(--color-gray);
