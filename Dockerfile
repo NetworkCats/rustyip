@@ -4,10 +4,11 @@ FROM rust:1.93.1-alpine3.23 AS builder
 RUN apk add --no-cache musl-dev
 
 WORKDIR /build
-COPY Cargo.toml Cargo.lock build.rs ./
+COPY Cargo.toml Cargo.lock build.rs openapi.json ./
 COPY src ./src
 COPY templates ./templates
 COPY static ./static
+COPY locales ./locales
 
 RUN cargo build --release
 
