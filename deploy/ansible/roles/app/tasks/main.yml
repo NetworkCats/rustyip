@@ -21,7 +21,7 @@
     state: directory
     owner: root
     group: root
-    mode: "0700"
+    mode: "0755"
 
 - name: Deploy TLS origin certificate
   ansible.builtin.copy:
@@ -29,7 +29,7 @@
     dest: /opt/rustyip/haproxy/certs/origin.pem
     owner: root
     group: root
-    mode: "0600"
+    mode: "0644"
   notify: Reload haproxy
 
 - name: Deploy environment file
