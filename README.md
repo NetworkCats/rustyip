@@ -2,8 +2,6 @@
 
 Live demo: [ip.nc.gy](ip.nc.gy)
 
-This project is released under the [GNU Affero General Public License version 3 (AGPLv3)](https://www.gnu.org/licenses/agpl-3.0.html).
-
 ### What
 
 RustyIP is a lightweight IP lookup service with both a web interface and an API. The frontend is minimal and works without JavaScript. The backend is written in Rust and handles high traffic reliably.
