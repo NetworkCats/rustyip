@@ -75,7 +75,9 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           for i in 1 2 3; do
-            if ssh-keyscan -H "${{ steps.vps.outputs.ip }}" >> ~/.ssh/known_hosts 2>/dev/null; then
+            keys=$(ssh-keyscan -H "${{ steps.vps.outputs.ip }}" 2>/dev/null)
+            if [ -n "$keys" ]; then
+              echo "$keys" >> ~/.ssh/known_hosts
               echo "ssh-keyscan succeeded on attempt $i"
               exit 0
             fi
@@ -131,11 +133,14 @@ jobs:
 
       # ---- Verify deployment ----
       - name: Verify deployment health
+        env:
+          SSH_OPTS: -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new -i ~/.ssh/deploy_key
+          VPS_HOST: root@${{ steps.vps.outputs.ip }}
         run: |
-          DEPLOY_COLOR=$(ssh -i ~/.ssh/deploy_key root@"${{ steps.vps.outputs.ip }}" \
-            "cat /opt/rustyip/.active_color")
+          DEPLOY_COLOR=$(ssh $SSH_OPTS "$VPS_HOST" "cat /opt/rustyip/.active_color")
+          echo "Active deployment color: ${DEPLOY_COLOR}"
           for i in $(seq 1 30); do
-            status=$(ssh -i ~/.ssh/deploy_key root@"${{ steps.vps.outputs.ip }}" \
+            status=$(ssh $SSH_OPTS "$VPS_HOST" \
               "docker inspect --format='{{ '{{' }}.State.Health.Status{{ '}}' }}' rustyip-app-${DEPLOY_COLOR}" 2>/dev/null)
             if [ "$status" = "healthy" ]; then
               echo "Deployment verified: app-${DEPLOY_COLOR} is healthy"
