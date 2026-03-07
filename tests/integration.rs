@@ -1118,7 +1118,10 @@ async fn html_contains_jsonld_on_landing_page() {
         &app,
         "/en",
         vec![
-            ("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"),
+            (
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            ),
             ("CF-Connecting-IP", "45.77.77.77"),
         ],
     )
@@ -1156,7 +1159,10 @@ async fn html_query_result_has_no_jsonld() {
     let (status, body) = get_with_headers(
         &app,
         "/en?ip=45.77.77.77",
-        vec![("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")],
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
     )
     .await;
     assert_eq!(status, StatusCode::OK);
@@ -1172,7 +1178,10 @@ async fn html_contains_microdata_faq() {
     let (status, body) = get_with_headers(
         &app,
         "/en?ip=45.77.77.77",
-        vec![("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")],
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
     )
     .await;
     assert_eq!(status, StatusCode::OK);
@@ -1208,7 +1217,10 @@ async fn html_contains_microdata_ip_result() {
     let (status, body) = get_with_headers(
         &app,
         "/en?ip=45.77.77.77",
-        vec![("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")],
+        vec![(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        )],
     )
     .await;
     assert_eq!(status, StatusCode::OK);
@@ -1237,7 +1249,10 @@ async fn jsonld_contains_available_languages() {
         &app,
         "/en",
         vec![
-            ("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"),
+            (
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            ),
             ("CF-Connecting-IP", "45.77.77.77"),
         ],
     )

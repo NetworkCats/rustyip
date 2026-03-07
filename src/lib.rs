@@ -1,4 +1,3 @@
-pub mod ua_detect;
 pub mod config;
 pub mod db;
 pub mod error;
@@ -9,4 +8,5 @@ pub mod middleware;
 pub mod models;
 pub mod routes;
 pub mod static_assets;
+pub mod ua_detect;
 pub mod updater;

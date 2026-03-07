@@ -6,13 +6,13 @@ use axum::extract::{Path, Query, State};
 use axum::http::{HeaderMap, StatusCode, header};
 use axum::response::{Html, IntoResponse, Redirect, Response};
 
-use crate::ua_detect::is_plain_text_agent;
 use crate::db::{self, SharedDb};
 use crate::error::AppError;
 use crate::i18n::{self, Locale};
 use crate::ip_validate;
 use crate::models::{IpInfo, get_localized_name};
 use crate::static_assets;
+use crate::ua_detect::is_plain_text_agent;
 
 #[derive(serde::Deserialize)]
 pub struct IpQuery {
@@ -228,7 +228,10 @@ fn format_city(info: &IpInfo, locale: Locale) -> &str {
 
 fn build_translations(locale: Locale) -> Translations {
     Translations {
-        t_title: i18n::translate(locale, "Accurate IP proxy information and geographic location"),
+        t_title: i18n::translate(
+            locale,
+            "Accurate IP proxy information and geographic location",
+        ),
         t_description: i18n::translate(
             locale,
             "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address.",
@@ -257,10 +260,7 @@ fn build_translations(locale: Locale) -> Translations {
         t_faq_cli_query_own: i18n::translate(locale, "Look up information about your own IP:"),
         t_faq_cli_json: i18n::translate(locale, "Or get everything in JSON format:"),
         t_faq_cli_specific: i18n::translate(locale, "Look up information about a specific IP:"),
-        t_faq_ipv46_q: i18n::translate(
-            locale,
-            "How do I force IPv4 or IPv6?",
-        ),
+        t_faq_ipv46_q: i18n::translate(locale, "How do I force IPv4 or IPv6?"),
         t_faq_ipv46_a: i18n::translate(
             locale,
             "Use <code>curl -4</code> or <code>curl -6</code> to specifically check your IPv4 or IPv6 address.",
@@ -270,10 +270,7 @@ fn build_translations(locale: Locale) -> Translations {
             locale,
             "Send a request to the <code>/json</code> endpoint, or send a request with the <code>application/json</code> header.",
         ),
-        t_faq_automate_q: i18n::translate(
-            locale,
-            "Can I call your service programmatically?",
-        ),
+        t_faq_automate_q: i18n::translate(locale, "Can I call your service programmatically?"),
         t_faq_automate_a1: i18n::translate(
             locale,
             "Sure, but please respect our rate limits. Normally it's 30 RPM, and under heavy load we may drop it to 10 or 5 RPM.",
@@ -318,10 +315,7 @@ fn build_translations(locale: Locale) -> Translations {
             locale,
             "It costs me $18.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads.",
         ),
-        t_faq_stable_a3: i18n::translate(
-            locale,
-            "This service is not going to rug pull on you.",
-        ),
+        t_faq_stable_a3: i18n::translate(locale, "This service is not going to rug pull on you."),
         t_faq_sponsor_q: i18n::translate(locale, "How can I support this service?"),
         t_faq_sponsor_a: i18n::translate(
             locale,
@@ -882,7 +876,10 @@ pub async fn manifest(State(state): State<AppState>) -> Response {
 
     let body = serde_json::to_string_pretty(&manifest).expect("manifest serialization cannot fail");
     (
-        [(header::CONTENT_TYPE, "application/manifest+json; charset=utf-8")],
+        [(
+            header::CONTENT_TYPE,
+            "application/manifest+json; charset=utf-8",
+        )],
         body,
     )
         .into_response()
