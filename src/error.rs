@@ -6,6 +6,7 @@ pub enum AppError {
     InvalidIp,
     NonPublicIp,
     MissingClientIp,
+    DbNotReady,
     DbLookupFailed,
     TemplateRenderFailed,
 }
@@ -16,6 +17,7 @@ impl AppError {
             Self::IpNotFound => StatusCode::NOT_FOUND,
             Self::InvalidIp | Self::NonPublicIp => StatusCode::BAD_REQUEST,
             Self::MissingClientIp => StatusCode::BAD_REQUEST,
+            Self::DbNotReady => StatusCode::SERVICE_UNAVAILABLE,
             Self::DbLookupFailed => StatusCode::INTERNAL_SERVER_ERROR,
             Self::TemplateRenderFailed => StatusCode::INTERNAL_SERVER_ERROR,
         }
@@ -27,6 +29,7 @@ impl AppError {
             Self::InvalidIp => "Invalid IP address",
             Self::NonPublicIp => "Only public IP addresses can be queried",
             Self::MissingClientIp => "Missing client IP address",
+            Self::DbNotReady => "Service is starting up, please try again shortly",
             Self::DbLookupFailed => "Database lookup failed",
             Self::TemplateRenderFailed => "Template render failed",
         }
@@ -92,6 +95,16 @@ mod tests {
             AppError::MissingClientIp,
             StatusCode::BAD_REQUEST,
             "Missing client IP address",
+        )
+        .await;
+    }
+
+    #[tokio::test]
+    async fn db_not_ready_returns_503() {
+        check_error_response(
+            AppError::DbNotReady,
+            StatusCode::SERVICE_UNAVAILABLE,
+            "Service is starting up, please try again shortly",
         )
         .await;
     }

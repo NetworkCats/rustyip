@@ -177,8 +177,10 @@ fn extract_client_ip(headers: &HeaderMap, dev_mode: bool) -> Result<IpAddr, AppE
 }
 
 fn lookup_ip(db: &SharedDb, ip: IpAddr) -> Result<IpInfo, AppError> {
-    let reader = db.load();
-    db::lookup(&reader, ip).ok_or(AppError::DbLookupFailed)
+    if !db::is_ready(db) {
+        return Err(AppError::DbNotReady);
+    }
+    db::lookup(db, ip).ok_or(AppError::DbLookupFailed)
 }
 
 fn wants_json(headers: &HeaderMap) -> bool {
@@ -675,9 +677,11 @@ pub async fn asn_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
+    if !db::is_ready(&state.db) {
+        return Err(AppError::DbNotReady);
+    }
     let ip = resolve_ip(&headers, &query, state.dev_mode)?;
-    let reader = state.db.load();
-    let text = db::lookup_asn_number(&reader, ip)
+    let text = db::lookup_asn_number(&state.db, ip)
         .map(|n| format!("AS{n}"))
         .unwrap_or_default();
     Ok(format!("{text}\n"))
@@ -688,9 +692,11 @@ pub async fn org_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
+    if !db::is_ready(&state.db) {
+        return Err(AppError::DbNotReady);
+    }
     let ip = resolve_ip(&headers, &query, state.dev_mode)?;
-    let reader = state.db.load();
-    let org = db::lookup_asn_org(&reader, ip).unwrap_or_default();
+    let org = db::lookup_asn_org(&state.db, ip).unwrap_or_default();
     Ok(format!("{org}\n"))
 }
 
@@ -699,9 +705,11 @@ pub async fn country_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
+    if !db::is_ready(&state.db) {
+        return Err(AppError::DbNotReady);
+    }
     let ip = resolve_ip(&headers, &query, state.dev_mode)?;
-    let reader = state.db.load();
-    let country = db::lookup_country_name(&reader, ip).unwrap_or_default();
+    let country = db::lookup_country_name(&state.db, ip).unwrap_or_default();
     Ok(format!("{country}\n"))
 }
 
@@ -710,9 +718,11 @@ pub async fn city_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
+    if !db::is_ready(&state.db) {
+        return Err(AppError::DbNotReady);
+    }
     let ip = resolve_ip(&headers, &query, state.dev_mode)?;
-    let reader = state.db.load();
-    let city = db::lookup_city_name(&reader, ip).unwrap_or_default();
+    let city = db::lookup_city_name(&state.db, ip).unwrap_or_default();
     Ok(format!("{city}\n"))
 }
 
@@ -721,9 +731,11 @@ pub async fn proxy_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
+    if !db::is_ready(&state.db) {
+        return Err(AppError::DbNotReady);
+    }
     let ip = resolve_ip(&headers, &query, state.dev_mode)?;
-    let reader = state.db.load();
-    let proxy = db::lookup_proxy(&reader, ip).ok_or(AppError::DbLookupFailed)?;
+    let proxy = db::lookup_proxy(&state.db, ip).ok_or(AppError::DbLookupFailed)?;
     Ok(format!("{}\n", proxy.is_proxy))
 }
 
@@ -732,9 +744,11 @@ pub async fn vpn_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
+    if !db::is_ready(&state.db) {
+        return Err(AppError::DbNotReady);
+    }
     let ip = resolve_ip(&headers, &query, state.dev_mode)?;
-    let reader = state.db.load();
-    let proxy = db::lookup_proxy(&reader, ip).ok_or(AppError::DbLookupFailed)?;
+    let proxy = db::lookup_proxy(&state.db, ip).ok_or(AppError::DbLookupFailed)?;
     Ok(format!("{}\n", proxy.is_vpn))
 }
 
@@ -743,9 +757,11 @@ pub async fn hosting_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
+    if !db::is_ready(&state.db) {
+        return Err(AppError::DbNotReady);
+    }
     let ip = resolve_ip(&headers, &query, state.dev_mode)?;
-    let reader = state.db.load();
-    let proxy = db::lookup_proxy(&reader, ip).ok_or(AppError::DbLookupFailed)?;
+    let proxy = db::lookup_proxy(&state.db, ip).ok_or(AppError::DbLookupFailed)?;
     Ok(format!("{}\n", proxy.is_hosting))
 }
 
@@ -754,9 +770,11 @@ pub async fn tor_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
+    if !db::is_ready(&state.db) {
+        return Err(AppError::DbNotReady);
+    }
     let ip = resolve_ip(&headers, &query, state.dev_mode)?;
-    let reader = state.db.load();
-    let proxy = db::lookup_proxy(&reader, ip).ok_or(AppError::DbLookupFailed)?;
+    let proxy = db::lookup_proxy(&state.db, ip).ok_or(AppError::DbLookupFailed)?;
     Ok(format!("{}\n", proxy.is_tor))
 }
 

@@ -10,6 +10,9 @@ use tracing::{error, info};
 
 use crate::db::{DbReader, SharedDb, load_db};
 
+#[cfg(test)]
+use crate::db::new_shared;
+
 pub async fn ensure_db_exists(
     db_path: &Path,
     update_url: &str,
@@ -23,6 +26,21 @@ pub async fn ensure_db_exists(
     }
 
     download_db(update_url, db_path).await?;
+    Ok(())
+}
+
+/// Ensures the database file exists (downloading if needed), loads it, and
+/// stores the reader into the shared DB. Called during startup to initialize
+/// the database before the application can serve requests.
+pub async fn init_db(
+    shared_db: &SharedDb,
+    db_path: &Path,
+    update_url: &str,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    ensure_db_exists(db_path, update_url).await?;
+    let reader = load_db(db_path)?;
+    shared_db.store(Arc::new(Some(reader)));
+    info!("database loaded successfully");
     Ok(())
 }
 
@@ -86,21 +104,37 @@ pub fn spawn_updater(
     interval_hours: u64,
     cancel: CancellationToken,
 ) -> JoinHandle<()> {
-    tokio::spawn(async move {
-        let interval = Duration::from_secs(interval_hours * 3600);
-        loop {
-            tokio::select! {
-                () = tokio::time::sleep(interval) => {}
-                () = cancel.cancelled() => {
-                    info!("updater task cancelled, stopping");
-                    break;
-                }
-            }
-            if let Err(e) = update_db(&shared_db, &db_path, &update_url).await {
-                error!("database update failed: {e}");
+    tokio::spawn(run_updater(
+        shared_db,
+        db_path,
+        update_url,
+        interval_hours,
+        cancel,
+    ))
+}
+
+/// Runs the periodic database updater loop. This is the inner async function
+/// that can be called directly when already inside a spawned task.
+pub async fn run_updater(
+    shared_db: SharedDb,
+    db_path: PathBuf,
+    update_url: String,
+    interval_hours: u64,
+    cancel: CancellationToken,
+) {
+    let interval = Duration::from_secs(interval_hours * 3600);
+    loop {
+        tokio::select! {
+            () = tokio::time::sleep(interval) => {}
+            () = cancel.cancelled() => {
+                info!("updater task cancelled, stopping");
+                break;
             }
         }
-    })
+        if let Err(e) = update_db(&shared_db, &db_path, &update_url).await {
+            error!("database update failed: {e}");
+        }
+    }
 }
 
 async fn update_db(
@@ -109,7 +143,7 @@ async fn update_db(
     update_url: &str,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let reader = download_db(update_url, db_path).await?;
-    shared_db.store(Arc::new(reader));
+    shared_db.store(Arc::new(Some(reader)));
     info!("database updated successfully");
     Ok(())
 }
@@ -210,7 +244,7 @@ mod tests {
     #[tokio::test]
     async fn spawn_updater_stops_on_cancellation() {
         let reader = load_db(&test_db_path()).unwrap();
-        let shared_db = crate::db::new_shared(reader);
+        let shared_db = new_shared(reader);
         let cancel = CancellationToken::new();
 
         let handle = spawn_updater(
@@ -239,16 +273,17 @@ mod tests {
         std::fs::copy(test_db_path(), &dest).unwrap();
 
         let original_reader = load_db(&dest).unwrap();
-        let shared_db = crate::db::new_shared(original_reader);
+        let shared_db = new_shared(original_reader);
 
         // Load a new reader and manually swap it to verify the mechanism
         let new_reader = load_db(&dest).unwrap();
-        shared_db.store(Arc::new(new_reader));
+        shared_db.store(Arc::new(Some(new_reader)));
 
         // Verify the shared DB still works after the swap
         let guard = shared_db.load();
+        let reader = Option::as_ref(&guard).unwrap();
         let ip: IpAddr = "1.1.1.1".parse().unwrap();
-        let result = guard.lookup(ip);
+        let result = reader.lookup(ip);
         assert!(result.is_ok());
     }
 }
