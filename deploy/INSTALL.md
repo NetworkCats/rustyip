@@ -44,6 +44,12 @@ If you are using environments, add them under the `production` environment (**Se
 | `DOCKERHUB_USERNAME` | Docker Hub username used for image push and pull |
 | `DOCKERHUB_TOKEN` | Docker Hub access token for authentication |
 
+## Code Coverage with Codecov
+
+1. Sign up at [codecov.io](https://codecov.io) and add your repository.
+2. Copy the upload token from the Codecov repository settings page.
+3. Add a `CODECOV_TOKEN` secret to your GitHub repository under **Settings > Secrets and variables > Actions**.
+
 ### Deploying
 
 ```bash
