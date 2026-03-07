@@ -179,9 +179,21 @@
         docker kill -s HUP rustyip-haproxy
       changed_when: true
 
-    - name: Wait for HAProxy to settle
-      ansible.builtin.pause:
-        seconds: 5
+    - name: Wait for new backend to be UP in HAProxy
+      ansible.builtin.shell: |
+        for i in $(seq 1 30); do
+          csv=$(docker exec rustyip-haproxy wget -qO- \
+            "http://127.0.0.1:9000/stats;csv;norefresh" 2>/dev/null)
+          status=$(echo "$csv" | awk -F, '$1 == "app" && $2 == "{{ deploy_target }}" {print $18}')
+          if [ "$status" = "UP" ]; then
+            echo "backend {{ deploy_target }} is UP in HAProxy"
+            exit 0
+          fi
+          sleep 2
+        done
+        echo "timeout waiting for backend {{ deploy_target }} to become UP"
+        exit 1
+      changed_when: false
 
     - name: Stop old active container
       ansible.builtin.shell: |

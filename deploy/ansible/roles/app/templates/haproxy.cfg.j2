@@ -65,13 +65,21 @@ frontend https_in
 backend global_rate_tracking
     stick-table type string len 6 size 1 expire 10m store http_req_rate(1s)
 
+frontend stats_internal
+    bind 127.0.0.1:9000
+    mode http
+    stats enable
+    stats uri /stats
+    stats refresh 2s
+
 resolvers docker_dns
     nameserver dns1 127.0.0.11:53
     resolve_retries 3
     timeout resolve 1s
     timeout retry 1s
     hold valid 10s
-    hold nx 5s
+    hold nx 30s
+    hold obsolete 30s
 
 backend app
     balance roundrobin
