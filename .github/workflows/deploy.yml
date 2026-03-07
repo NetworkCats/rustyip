@@ -75,7 +75,7 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           for i in 1 2 3; do
-            keys=$(ssh-keyscan -H "${{ steps.vps.outputs.ip }}" 2>/dev/null)
+            keys=$(ssh-keyscan -H "${{ steps.vps.outputs.ip }}" 2>/dev/null) || true
             if [ -n "$keys" ]; then
               echo "$keys" >> ~/.ssh/known_hosts
               echo "ssh-keyscan succeeded on attempt $i"
