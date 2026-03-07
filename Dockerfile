@@ -21,6 +21,8 @@ RUN apk add --no-cache ca-certificates \
 
 COPY --from=builder /build/target/release/rustyip /usr/local/bin/rustyip
 
+RUN mkdir -p /data && chown -R rustyip:rustyip /data
+
 WORKDIR /app
 RUN chown -R rustyip:rustyip /app
 
