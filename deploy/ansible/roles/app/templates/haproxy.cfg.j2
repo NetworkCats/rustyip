@@ -65,11 +65,20 @@ frontend https_in
 backend global_rate_tracking
     stick-table type string len 6 size 1 expire 10m store http_req_rate(1s)
 
+resolvers docker_dns
+    nameserver dns1 127.0.0.11:53
+    resolve_retries 3
+    timeout resolve 1s
+    timeout retry 1s
+    hold valid 10s
+    hold nx 5s
+
 backend app
     balance roundrobin
     option httpchk GET /health
     http-check expect status 200
 
     # Blue-green backends: only the active color is enabled
-    server blue app-blue:3000 check inter 2s fall 3 rise 2 {{ 'disabled' if active_color == 'green' else '' }}
-    server green app-green:3000 check inter 2s fall 3 rise 2 {{ 'disabled' if active_color == 'blue' else '' }}
+    # init-addr none allows HAProxy to start when the inactive container does not exist
+    server blue app-blue:3000 resolvers docker_dns check inter 2s fall 3 rise 2 init-addr none {{ 'disabled' if active_color == 'green' else '' }}
+    server green app-green:3000 resolvers docker_dns check inter 2s fall 3 rise 2 init-addr none {{ 'disabled' if active_color == 'blue' else '' }}
