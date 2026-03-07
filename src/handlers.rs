@@ -480,11 +480,11 @@ pub async fn root_redirect(
     let locale = i18n::negotiate_locale(&headers);
     let mut redirect_path = format!("/{}", locale.tag());
 
-    if let Some(ref ip) = query.ip {
-        if !ip.trim().is_empty() {
-            redirect_path.push_str("?ip=");
-            redirect_path.push_str(&urlencoding::encode(ip));
-        }
+    if let Some(ref ip) = query.ip
+        && !ip.trim().is_empty()
+    {
+        redirect_path.push_str("?ip=");
+        redirect_path.push_str(&urlencoding::encode(ip));
     }
 
     Redirect::temporary(&redirect_path).into_response()
@@ -495,11 +495,11 @@ pub async fn root_trailing_slash(
     Query(query): Query<IpQuery>,
 ) -> Response {
     let mut redirect_path = format!("/{lang}");
-    if let Some(ref ip) = query.ip {
-        if !ip.trim().is_empty() {
-            redirect_path.push_str("?ip=");
-            redirect_path.push_str(&urlencoding::encode(ip));
-        }
+    if let Some(ref ip) = query.ip
+        && !ip.trim().is_empty()
+    {
+        redirect_path.push_str("?ip=");
+        redirect_path.push_str(&urlencoding::encode(ip));
     }
     Redirect::permanent(&redirect_path).into_response()
 }
@@ -543,10 +543,10 @@ pub async fn root(
         };
     }
 
-    if let Some(ref ip_str) = query.ip {
-        if ip_str.trim().is_empty() {
-            return Redirect::temporary(&format!("/{}", locale.tag())).into_response();
-        }
+    if let Some(ref ip_str) = query.ip
+        && ip_str.trim().is_empty()
+    {
+        return Redirect::temporary(&format!("/{}", locale.tag())).into_response();
     }
 
     let query_str = query.ip.clone().unwrap_or_default();
