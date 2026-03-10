@@ -6,6 +6,7 @@ services:
     volumes:
       - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
       - ${CERT_PATH:-./haproxy/certs}:/etc/haproxy/certs:ro
+      - ${IPV4_CERT_PATH:-./haproxy/certs-ipv4}:/etc/haproxy/certs-ipv4:ro
     depends_on:
       app:
         condition: service_healthy
@@ -21,6 +22,7 @@ services:
       - DB_UPDATE_URL=${DB_UPDATE_URL:-https://github.com/NetworkCats/Merged-IP-Data/releases/latest/download/Merged-IP.mmdb}
       - DB_UPDATE_INTERVAL_HOURS=${DB_UPDATE_INTERVAL_HOURS:-24}
       - SITE_DOMAIN=${SITE_DOMAIN:-localhost}
+      - IPV4_DOMAIN=${IPV4_DOMAIN:-}
     volumes:
       - db_data:/data
     healthcheck:

@@ -7,6 +7,7 @@ pub struct Config {
     pub db_update_url: String,
     pub db_update_interval_hours: u64,
     pub site_domain: String,
+    pub ipv4_domain: String,
     pub dev_mode: bool,
 }
 
@@ -31,6 +32,8 @@ impl Config {
 
         let site_domain = env::var("SITE_DOMAIN").unwrap_or_else(|_| "localhost".to_string());
 
+        let ipv4_domain = env::var("IPV4_DOMAIN").unwrap_or_default();
+
         let dev_mode = env::var("DEV_MODE")
             .unwrap_or_default()
             .eq_ignore_ascii_case("true");
@@ -41,6 +44,7 @@ impl Config {
             db_update_url,
             db_update_interval_hours,
             site_domain,
+            ipv4_domain,
             dev_mode,
         }
     }
@@ -67,6 +71,7 @@ mod tests {
         "DB_UPDATE_URL",
         "DB_UPDATE_INTERVAL_HOURS",
         "SITE_DOMAIN",
+        "IPV4_DOMAIN",
         "DEV_MODE",
     ];
 
@@ -98,6 +103,7 @@ mod tests {
         assert!(config.db_update_url.contains("Merged-IP.mmdb"));
         assert_eq!(config.db_update_interval_hours, 24);
         assert_eq!(config.site_domain, "localhost");
+        assert!(config.ipv4_domain.is_empty());
         assert!(!config.dev_mode);
     }
 
@@ -179,6 +185,22 @@ mod tests {
 
         // SAFETY: ENV_LOCK is held.
         unsafe { remove_var("SITE_DOMAIN") };
+    }
+
+    #[test]
+    fn custom_ipv4_domain() {
+        let _guard = lock_env();
+        // SAFETY: ENV_LOCK is held.
+        unsafe {
+            clear_config_vars();
+            set_var("IPV4_DOMAIN", "noipv6.org");
+        }
+
+        let config = Config::from_env();
+        assert_eq!(config.ipv4_domain, "noipv6.org");
+
+        // SAFETY: ENV_LOCK is held.
+        unsafe { remove_var("IPV4_DOMAIN") };
     }
 
     #[test]

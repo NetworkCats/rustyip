@@ -39,11 +39,13 @@ async fn main() {
     let cancel = CancellationToken::new();
 
     let site_domain: std::sync::Arc<str> = config.site_domain.into();
+    let ipv4_domain: std::sync::Arc<str> = config.ipv4_domain.into();
     let openapi_json = handlers::build_openapi_json(&site_domain);
 
     let state = handlers::AppState {
         db: shared_db.clone(),
         site_domain,
+        ipv4_domain,
         dev_mode: config.dev_mode,
         openapi_json,
     };

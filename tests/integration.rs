@@ -26,9 +26,11 @@ fn build_test_app_with_dev_mode(dev_mode: bool) -> axum::Router {
     let shared_db = db::new_shared(reader);
     let site_domain: std::sync::Arc<str> = "test.example.com".into();
     let openapi_json = build_openapi_json(&site_domain);
+    let ipv4_domain: std::sync::Arc<str> = "noipv6.test.example.com".into();
     let state = AppState {
         db: shared_db,
         site_domain,
+        ipv4_domain,
         dev_mode,
         openapi_json,
     };

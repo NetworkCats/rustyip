@@ -25,6 +25,7 @@ const DEV_FALLBACK_IP: IpAddr = IpAddr::V4(std::net::Ipv4Addr::new(1, 1, 1, 1));
 pub struct AppState {
     pub db: SharedDb,
     pub site_domain: Arc<str>,
+    pub ipv4_domain: Arc<str>,
     pub dev_mode: bool,
     pub openapi_json: Arc<str>,
 }
@@ -36,6 +37,7 @@ struct IndexTemplate {
     query: String,
     is_query: bool,
     site_domain: Arc<str>,
+    ipv4_domain: Arc<str>,
     css_version: u64,
     js_version: u64,
     asn: String,
@@ -571,6 +573,7 @@ pub async fn root(
         query: query.ip.unwrap_or_default(),
         is_query,
         site_domain: state.site_domain.clone(),
+        ipv4_domain: state.ipv4_domain.clone(),
         css_version: static_assets::asset_version("style.css"),
         js_version: static_assets::asset_version("script.js"),
         asn: format_asn(&info),
