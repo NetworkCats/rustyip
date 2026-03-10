@@ -1395,6 +1395,215 @@ async fn browser_loopback_shows_error() {
     assert!(body.contains("alert("));
 }
 
+// --- IPv4 domain tests ---
+
+const IPV4_DOMAIN: &str = "noipv6.test.example.com";
+
+#[tokio::test]
+async fn ipv4_domain_returns_ip_from_header() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/",
+        vec![
+            ("Host", IPV4_DOMAIN),
+            ("X-IPv4-Client-IP", "203.0.113.42"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "203.0.113.42");
+}
+
+#[tokio::test]
+async fn ipv4_domain_returns_cors_headers() {
+    let app = build_test_app();
+    let response = get_response(
+        &app,
+        "/",
+        vec![
+            ("Host", IPV4_DOMAIN),
+            ("X-IPv4-Client-IP", "203.0.113.42"),
+        ],
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::OK);
+    let cors = response
+        .headers()
+        .get("access-control-allow-origin")
+        .unwrap()
+        .to_str()
+        .unwrap();
+    assert_eq!(cors, "https://test.example.com");
+
+    let methods = response
+        .headers()
+        .get("access-control-allow-methods")
+        .unwrap()
+        .to_str()
+        .unwrap();
+    assert_eq!(methods, "GET");
+}
+
+#[tokio::test]
+async fn ipv4_domain_without_header_returns_400() {
+    let app = build_test_app();
+    let (status, _) = get_with_headers(&app, "/", vec![("Host", IPV4_DOMAIN)]).await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+}
+
+#[tokio::test]
+async fn ipv4_domain_dev_mode_returns_fallback_ip() {
+    let app = build_test_app_with_dev_mode(true);
+    let (status, body) = get_with_headers(&app, "/", vec![("Host", IPV4_DOMAIN)]).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "1.1.1.1");
+}
+
+#[tokio::test]
+async fn ipv4_domain_non_root_returns_404() {
+    let app = build_test_app();
+    let paths = ["/json", "/ip", "/asn", "/en", "/static/style.css"];
+    for path in paths {
+        let (status, _) = get_with_headers(
+            &app,
+            path,
+            vec![
+                ("Host", IPV4_DOMAIN),
+                ("X-IPv4-Client-IP", "203.0.113.42"),
+            ],
+        )
+        .await;
+        assert_eq!(
+            status,
+            StatusCode::NOT_FOUND,
+            "expected 404 for IPv4 domain {path}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn ipv4_domain_health_returns_200() {
+    let app = build_test_app();
+    let (status, _) =
+        get_with_headers(&app, "/health", vec![("Host", IPV4_DOMAIN)]).await;
+    assert_eq!(status, StatusCode::OK);
+}
+
+#[tokio::test]
+async fn ipv4_domain_has_cross_origin_resource_policy() {
+    let app = build_test_app();
+    let response = get_response(
+        &app,
+        "/",
+        vec![
+            ("Host", IPV4_DOMAIN),
+            ("X-IPv4-Client-IP", "203.0.113.42"),
+        ],
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::OK);
+    let corp = response
+        .headers()
+        .get("cross-origin-resource-policy")
+        .unwrap()
+        .to_str()
+        .unwrap();
+    assert_eq!(corp, "cross-origin");
+}
+
+#[tokio::test]
+async fn ipv4_domain_has_security_headers() {
+    let app = build_test_app();
+    let response = get_response(
+        &app,
+        "/",
+        vec![
+            ("Host", IPV4_DOMAIN),
+            ("X-IPv4-Client-IP", "203.0.113.42"),
+        ],
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(
+        response.headers().get("x-content-type-options").unwrap(),
+        "nosniff"
+    );
+    assert_eq!(
+        response.headers().get("x-frame-options").unwrap(),
+        "DENY"
+    );
+    assert!(response
+        .headers()
+        .get("strict-transport-security")
+        .is_some());
+}
+
+#[tokio::test]
+async fn main_domain_unaffected_by_ipv4_routing() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/",
+        vec![
+            ("Host", "test.example.com"),
+            ("User-Agent", "curl/8.7.1"),
+            ("CF-Connecting-IP", "8.8.8.8"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "8.8.8.8");
+}
+
+#[tokio::test]
+async fn ipv4_domain_ignores_cf_connecting_ip() {
+    let app = build_test_app();
+    let (status, body) = get_with_headers(
+        &app,
+        "/",
+        vec![
+            ("Host", IPV4_DOMAIN),
+            ("CF-Connecting-IP", "8.8.8.8"),
+            ("X-IPv4-Client-IP", "203.0.113.42"),
+        ],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.trim(), "203.0.113.42");
+}
+
+#[tokio::test]
+async fn html_contains_ipv4_domain_data_attribute() {
+    let app = build_test_app_with_dev_mode(true);
+    let (status, body) = get_with_headers(
+        &app,
+        "/en",
+        vec![("User-Agent", "Mozilla/5.0")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(
+        body.contains("data-ipv4-domain=\"noipv6.test.example.com\""),
+        "HTML should contain the ipv4_domain data attribute"
+    );
+}
+
+#[tokio::test]
+async fn html_contains_alt_ip_section() {
+    let app = build_test_app_with_dev_mode(true);
+    let (status, body) = get_with_headers(
+        &app,
+        "/en",
+        vec![("User-Agent", "Mozilla/5.0")],
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(
+        body.contains("id=\"alt-ip-section\""),
+        "HTML should contain alt-ip-section container"
+    );
+}
 #[tokio::test]
 async fn browser_broadcast_shows_error() {
     let app = build_test_app();
