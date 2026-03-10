@@ -186,6 +186,15 @@ function initCopyIp(wrap){
 
   var primaryIsIPv6=primaryIp.indexOf(":")!==-1;
 
+  var langTag=document.documentElement.getAttribute("lang")||"en";
+  var mmdbKeyMap={"en":"en","de":"de","es":"es","fr":"fr","ja":"ja","ru":"ru","pt":"pt-BR","zh-Hans":"zh-CN","zh-Hant":"zh-CN"};
+  var mmdbKey=mmdbKeyMap[langTag]||"en";
+
+  function localizedName(names){
+    if(!names)return "";
+    return names[mmdbKey]||names.en||"";
+  }
+
   function readLabels(){
     var labels={};
     var rows=root.querySelectorAll(".info-table tbody tr");
@@ -230,9 +239,9 @@ function initCopyIp(wrap){
     var asnNum=asn.autonomous_system_number;
     var asnOrg=asn.autonomous_system_organization||"";
     var country=info.country||{};
-    var countryName=(country.names&&country.names.en)||"";
+    var countryName=localizedName(country.names);
     var city=info.city||{};
-    var cityName=(city.names&&city.names.en)||"";
+    var cityName=localizedName(city.names);
     var proxy=info.proxy||{};
 
     if(asnNum){
