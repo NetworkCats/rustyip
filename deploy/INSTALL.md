@@ -29,6 +29,7 @@ If you are using environments, add them under the `production` environment (**Se
 |---|---|
 | `SITE_DOMAIN` | Production domain name (e.g. `ip.nc.gy`) |
 | `DB_UPDATE_URL` | URL to download the MMDB database from |
+| `IPV4_DOMAIN` | *(Optional)* IPv4-only domain for dual-stack detection (e.g. `noipv6.org`). Omit to disable. |
 
 #### TLS
 
@@ -36,6 +37,8 @@ If you are using environments, add them under the `production` environment (**Se
 |---|---|
 | `ORIGIN_CERT` | Cloudflare Origin certificate (PEM) for TLS termination at HAProxy |
 | `ORIGIN_KEY` | Corresponding private key (PEM) for the Origin certificate |
+| `IPV4_ORIGIN_CERT` | *(Optional)* Cloudflare Origin certificate (PEM) for the IPv4-only domain. Required when `IPV4_DOMAIN` is set. |
+| `IPV4_ORIGIN_KEY` | *(Optional)* Corresponding private key (PEM) for the IPv4-only domain certificate. Required when `IPV4_DOMAIN` is set. |
 
 #### Docker Hub
 
