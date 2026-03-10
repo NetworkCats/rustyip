@@ -144,7 +144,10 @@
     {% let autofocus = false %}
     {% include "_search_form.html" %}
 
-    <div itemscope itemtype="https://schema.org/WebPage">
+    <div itemscope itemtype="https://schema.org/WebPage"
+         data-ipv4-domain="{{ ipv4_domain }}"
+         data-copied-text="{{ t_copied }}"
+         id="ip-info-root">
     <div class="ip-copy-wrap" data-copied="{{ t_copied }}">
       <h1 class="ip-display" itemprop="name">{{ ip }}</h1>
       <span class="ip-copied-tooltip" aria-live="polite" hidden>{{ t_copied }}</span>
@@ -194,6 +197,8 @@
         </tr>
       </tbody>
     </table>
+
+    <div id="alt-ip-section" hidden></div>
 
     </div>
 

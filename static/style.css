@@ -501,7 +501,11 @@ main {
     font-size: 14px;
   }
 
-  .faq {
+#alt-ip-section {
+  margin-block-start: 32px;
+}
+
+.faq {
     margin-block-start: 32px;
 
     summary {

@@ -137,9 +137,8 @@
   });
 })();
 
-(function(){
+function initCopyIp(wrap){
   "use strict";
-  var wrap=document.querySelector(".ip-copy-wrap");
   if(!wrap)return;
   var h1=wrap.querySelector(".ip-display");
   var tooltip=wrap.querySelector(".ip-copied-tooltip");
@@ -165,4 +164,152 @@
       copyIp();
     }
   });
+}
+
+(function(){
+  "use strict";
+  initCopyIp(document.querySelector(".ip-copy-wrap"));
+})();
+
+(function(){
+  "use strict";
+  var root=document.getElementById("ip-info-root");
+  if(!root)return;
+  var section=document.getElementById("alt-ip-section");
+  if(!section)return;
+
+  var ipv4Domain=root.getAttribute("data-ipv4-domain");
+  var copiedText=root.getAttribute("data-copied-text");
+  var primaryIp=(root.querySelector(".ip-display")||{}).textContent;
+  if(!primaryIp)return;
+  primaryIp=primaryIp.trim();
+
+  var primaryIsIPv6=primaryIp.indexOf(":")!==-1;
+
+  function readLabels(){
+    var labels={};
+    var rows=root.querySelectorAll(".info-table tbody tr");
+    for(var i=0;i<rows.length;i++){
+      var th=rows[i].querySelector("th");
+      var td=rows[i].querySelector("td");
+      if(th&&td){
+        labels[i]={label:th.textContent.trim(),html:td.innerHTML};
+      }
+    }
+    return labels;
+  }
+
+  var existingLabels=readLabels();
+
+  function escapeHtml(s){
+    var d=document.createElement("div");
+    d.appendChild(document.createTextNode(s));
+    return d.innerHTML;
+  }
+
+  function boolHtml(val){
+    if(val){
+      return '<i class="icon-check bool-true" aria-hidden="true"></i>';
+    }
+    return '<i class="icon-minus bool-false" aria-hidden="true"></i>';
+  }
+
+  function labelAt(index){
+    return existingLabels[index]?existingLabels[index].label:"";
+  }
+
+  function buildBlock(ip,info){
+    var html='<div class="ip-copy-wrap" data-copied="'+escapeHtml(copiedText)+'">';
+    html+='<h1 class="ip-display">'+escapeHtml(ip)+'</h1>';
+    html+='<span class="ip-copied-tooltip" aria-live="polite" hidden>'+escapeHtml(copiedText)+'</span>';
+    html+='</div>';
+
+    html+='<table class="info-table"><tbody>';
+
+    var asn=info.asn||{};
+    var asnNum=asn.autonomous_system_number;
+    var asnOrg=asn.autonomous_system_organization||"";
+    var country=info.country||{};
+    var countryName=(country.names&&country.names.en)||"";
+    var city=info.city||{};
+    var cityName=(city.names&&city.names.en)||"";
+    var proxy=info.proxy||{};
+
+    if(asnNum){
+      var asnStr="AS"+asnNum;
+      html+='<tr><th scope="row">'+escapeHtml(labelAt(0))+'</th>';
+      html+='<td><a href="https://bgp.tools/as/'+asnNum+'" target="_blank" rel="noopener noreferrer">'+escapeHtml(asnStr)+'</a></td></tr>';
+    }
+    if(asnOrg){
+      html+='<tr><th scope="row">'+escapeHtml(labelAt(1))+'</th>';
+      html+='<td>'+escapeHtml(asnOrg)+'</td></tr>';
+    }
+    if(countryName){
+      html+='<tr><th scope="row">'+escapeHtml(labelAt(2))+'</th>';
+      html+='<td>'+escapeHtml(countryName)+'</td></tr>';
+    }
+    if(cityName){
+      html+='<tr><th scope="row">'+escapeHtml(labelAt(3))+'</th>';
+      html+='<td>'+escapeHtml(cityName)+'</td></tr>';
+    }
+
+    var boolStart=Object.keys(existingLabels).length-4;
+    html+='<tr><th scope="row">'+escapeHtml(labelAt(boolStart))+'</th><td>'+boolHtml(proxy.is_proxy)+'</td></tr>';
+    html+='<tr><th scope="row">'+escapeHtml(labelAt(boolStart+1))+'</th><td>'+boolHtml(proxy.is_vpn)+'</td></tr>';
+    html+='<tr><th scope="row">'+escapeHtml(labelAt(boolStart+2))+'</th><td>'+boolHtml(proxy.is_hosting)+'</td></tr>';
+    html+='<tr><th scope="row">'+escapeHtml(labelAt(boolStart+3))+'</th><td>'+boolHtml(proxy.is_tor)+'</td></tr>';
+
+    html+='</tbody></table>';
+    return html;
+  }
+
+  function showAltIp(ip,info){
+    section.innerHTML=buildBlock(ip,info);
+    section.hidden=false;
+    initCopyIp(section.querySelector(".ip-copy-wrap"));
+  }
+
+  function fetchJson(ip){
+    return fetch("/json?ip="+encodeURIComponent(ip)).then(function(r){
+      if(!r.ok)throw new Error(r.status);
+      return r.json();
+    });
+  }
+
+  function detectAltIp(){
+    if(primaryIsIPv6&&ipv4Domain){
+      var controller=new AbortController();
+      var timeout=setTimeout(function(){controller.abort();},5000);
+      fetch("https://"+ipv4Domain+"/",{signal:controller.signal})
+        .then(function(r){
+          clearTimeout(timeout);
+          if(!r.ok)throw new Error(r.status);
+          return r.text();
+        })
+        .then(function(text){
+          var ip=text.trim();
+          if(!ip||ip.indexOf(":")!==-1)return;
+          return fetchJson(ip).then(function(info){
+            showAltIp(ip,info);
+          });
+        })
+        .catch(function(){});
+    }else if(!primaryIsIPv6){
+      fetch("/ip")
+        .then(function(r){
+          if(!r.ok)throw new Error(r.status);
+          return r.text();
+        })
+        .then(function(text){
+          var ip=text.trim();
+          if(!ip||ip===primaryIp||ip.indexOf(":")===-1)return;
+          return fetchJson(ip).then(function(info){
+            showAltIp(ip,info);
+          });
+        })
+        .catch(function(){});
+    }
+  }
+
+  detectAltIp();
 })();
