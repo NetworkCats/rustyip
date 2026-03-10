@@ -656,6 +656,45 @@ pub async fn health() -> StatusCode {
     StatusCode::OK
 }
 
+fn extract_ipv4_client_ip(headers: &HeaderMap, dev_mode: bool) -> Result<IpAddr, AppError> {
+    if let Some(ip) = headers
+        .get("X-IPv4-Client-IP")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|s| s.trim().parse().ok())
+    {
+        return Ok(ip);
+    }
+
+    if dev_mode {
+        return Ok(DEV_FALLBACK_IP);
+    }
+
+    Err(AppError::MissingClientIp)
+}
+
+pub async fn ipv4_ip_handler(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+) -> Result<Response, AppError> {
+    let ip = extract_ipv4_client_ip(&headers, state.dev_mode)?;
+    let origin = format!("https://{}", state.site_domain);
+    Ok((
+        [
+            (header::ACCESS_CONTROL_ALLOW_ORIGIN, origin),
+            (
+                header::ACCESS_CONTROL_ALLOW_METHODS,
+                "GET".to_owned(),
+            ),
+            (
+                header::HeaderName::from_static("access-control-max-age"),
+                "86400".to_owned(),
+            ),
+        ],
+        format!("{ip}\n"),
+    )
+        .into_response())
+}
+
 pub async fn json_handler(
     State(state): State<AppState>,
     headers: HeaderMap,
@@ -914,4 +953,8 @@ pub async fn not_found(State(state): State<AppState>, headers: HeaderMap) -> Res
         StatusCode::NOT_FOUND,
         "The page you are looking for does not exist.",
     )
+}
+
+pub async fn ipv4_not_found() -> StatusCode {
+    StatusCode::NOT_FOUND
 }
