@@ -32,6 +32,44 @@
     mode: "0644"
   notify: Reload haproxy
 
+- name: Create IPv4 domain TLS certificate directory
+  ansible.builtin.file:
+    path: /opt/rustyip/haproxy/certs-ipv4
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: ipv4_domain | length > 0
+
+- name: Deploy IPv4 domain TLS origin certificate
+  ansible.builtin.copy:
+    content: "{{ ipv4_origin_cert }}\n{{ ipv4_origin_key }}"
+    dest: /opt/rustyip/haproxy/certs-ipv4/origin.pem
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload haproxy
+  when: ipv4_domain | length > 0
+
+- name: Deploy IPv4 domain list for HAProxy
+  ansible.builtin.copy:
+    content: "{{ ipv4_domain }}\n"
+    dest: /opt/rustyip/haproxy/ipv4_domain.lst
+    owner: root
+    group: root
+    mode: "0644"
+  when: ipv4_domain | length > 0
+  notify: Reload haproxy
+
+- name: Deploy empty IPv4 domain list when not configured
+  ansible.builtin.copy:
+    content: "# IPv4-only domain not configured\n"
+    dest: /opt/rustyip/haproxy/ipv4_domain.lst
+    owner: root
+    group: root
+    mode: "0644"
+  when: ipv4_domain | length == 0
+
 - name: Deploy environment file
   ansible.builtin.template:
     src: env.j2

@@ -125,6 +125,9 @@ jobs:
           DB_UPDATE_URL: ${{ secrets.DB_UPDATE_URL }}
           ORIGIN_CERT: ${{ secrets.ORIGIN_CERT }}
           ORIGIN_KEY: ${{ secrets.ORIGIN_KEY }}
+          IPV4_DOMAIN: ${{ secrets.IPV4_DOMAIN }}
+          IPV4_ORIGIN_CERT: ${{ secrets.IPV4_ORIGIN_CERT }}
+          IPV4_ORIGIN_KEY: ${{ secrets.IPV4_ORIGIN_KEY }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           FIRST_DEPLOY: ${{ steps.detect.outputs.first_deploy }}

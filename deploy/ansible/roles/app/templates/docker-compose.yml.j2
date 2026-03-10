@@ -7,7 +7,11 @@ services:
       - "443:443"
     volumes:
       - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - ./haproxy/ipv4_domain.lst:/usr/local/etc/haproxy/ipv4_domain.lst:ro
       - ./haproxy/certs:/etc/haproxy/certs:ro
+{% if ipv4_domain %}
+      - ./haproxy/certs-ipv4:/etc/haproxy/certs-ipv4:ro
+{% endif %}
     restart: unless-stopped
     ulimits:
       nofile:
