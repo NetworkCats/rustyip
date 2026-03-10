@@ -681,10 +681,7 @@ pub async fn ipv4_ip_handler(
     Ok((
         [
             (header::ACCESS_CONTROL_ALLOW_ORIGIN, origin),
-            (
-                header::ACCESS_CONTROL_ALLOW_METHODS,
-                "GET".to_owned(),
-            ),
+            (header::ACCESS_CONTROL_ALLOW_METHODS, "GET".to_owned()),
             (
                 header::HeaderName::from_static("access-control-max-age"),
                 "86400".to_owned(),

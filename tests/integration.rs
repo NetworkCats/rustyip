@@ -1405,10 +1405,7 @@ async fn ipv4_domain_returns_ip_from_header() {
     let (status, body) = get_with_headers(
         &app,
         "/",
-        vec![
-            ("Host", IPV4_DOMAIN),
-            ("X-IPv4-Client-IP", "203.0.113.42"),
-        ],
+        vec![("Host", IPV4_DOMAIN), ("X-IPv4-Client-IP", "203.0.113.42")],
     )
     .await;
     assert_eq!(status, StatusCode::OK);
@@ -1421,10 +1418,7 @@ async fn ipv4_domain_returns_cors_headers() {
     let response = get_response(
         &app,
         "/",
-        vec![
-            ("Host", IPV4_DOMAIN),
-            ("X-IPv4-Client-IP", "203.0.113.42"),
-        ],
+        vec![("Host", IPV4_DOMAIN), ("X-IPv4-Client-IP", "203.0.113.42")],
     )
     .await;
     assert_eq!(response.status(), StatusCode::OK);
@@ -1468,10 +1462,7 @@ async fn ipv4_domain_non_root_returns_404() {
         let (status, _) = get_with_headers(
             &app,
             path,
-            vec![
-                ("Host", IPV4_DOMAIN),
-                ("X-IPv4-Client-IP", "203.0.113.42"),
-            ],
+            vec![("Host", IPV4_DOMAIN), ("X-IPv4-Client-IP", "203.0.113.42")],
         )
         .await;
         assert_eq!(
@@ -1485,8 +1476,7 @@ async fn ipv4_domain_non_root_returns_404() {
 #[tokio::test]
 async fn ipv4_domain_health_returns_200() {
     let app = build_test_app();
-    let (status, _) =
-        get_with_headers(&app, "/health", vec![("Host", IPV4_DOMAIN)]).await;
+    let (status, _) = get_with_headers(&app, "/health", vec![("Host", IPV4_DOMAIN)]).await;
     assert_eq!(status, StatusCode::OK);
 }
 
@@ -1496,10 +1486,7 @@ async fn ipv4_domain_has_cross_origin_resource_policy() {
     let response = get_response(
         &app,
         "/",
-        vec![
-            ("Host", IPV4_DOMAIN),
-            ("X-IPv4-Client-IP", "203.0.113.42"),
-        ],
+        vec![("Host", IPV4_DOMAIN), ("X-IPv4-Client-IP", "203.0.113.42")],
     )
     .await;
     assert_eq!(response.status(), StatusCode::OK);
@@ -1518,10 +1505,7 @@ async fn ipv4_domain_has_security_headers() {
     let response = get_response(
         &app,
         "/",
-        vec![
-            ("Host", IPV4_DOMAIN),
-            ("X-IPv4-Client-IP", "203.0.113.42"),
-        ],
+        vec![("Host", IPV4_DOMAIN), ("X-IPv4-Client-IP", "203.0.113.42")],
     )
     .await;
     assert_eq!(response.status(), StatusCode::OK);
@@ -1529,14 +1513,13 @@ async fn ipv4_domain_has_security_headers() {
         response.headers().get("x-content-type-options").unwrap(),
         "nosniff"
     );
-    assert_eq!(
-        response.headers().get("x-frame-options").unwrap(),
-        "DENY"
+    assert_eq!(response.headers().get("x-frame-options").unwrap(), "DENY");
+    assert!(
+        response
+            .headers()
+            .get("strict-transport-security")
+            .is_some()
     );
-    assert!(response
-        .headers()
-        .get("strict-transport-security")
-        .is_some());
 }
 
 #[tokio::test]
@@ -1576,12 +1559,7 @@ async fn ipv4_domain_ignores_cf_connecting_ip() {
 #[tokio::test]
 async fn html_contains_ipv4_domain_data_attribute() {
     let app = build_test_app_with_dev_mode(true);
-    let (status, body) = get_with_headers(
-        &app,
-        "/en",
-        vec![("User-Agent", "Mozilla/5.0")],
-    )
-    .await;
+    let (status, body) = get_with_headers(&app, "/en", vec![("User-Agent", "Mozilla/5.0")]).await;
     assert_eq!(status, StatusCode::OK);
     assert!(
         body.contains("data-ipv4-domain=\"noipv6.test.example.com\""),
@@ -1592,12 +1570,7 @@ async fn html_contains_ipv4_domain_data_attribute() {
 #[tokio::test]
 async fn html_contains_alt_ip_section() {
     let app = build_test_app_with_dev_mode(true);
-    let (status, body) = get_with_headers(
-        &app,
-        "/en",
-        vec![("User-Agent", "Mozilla/5.0")],
-    )
-    .await;
+    let (status, body) = get_with_headers(&app, "/en", vec![("User-Agent", "Mozilla/5.0")]).await;
     assert_eq!(status, StatusCode::OK);
     assert!(
         body.contains("id=\"alt-ip-section\""),
