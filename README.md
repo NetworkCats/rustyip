@@ -4,7 +4,7 @@
 [![CodeQL](https://github.com/NetworkCats/rustyip/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/NetworkCats/rustyip/actions/workflows/github-code-scanning/codeql/)
 [![codecov](https://codecov.io/gh/NetworkCats/rustyip/branch/main/graph/badge.svg)](https://codecov.io/gh/NetworkCats/rustyip)
 
-Live demo: [ip.nc.gy](ip.nc.gy)
+Live demo: [ip.nc.gy](https://ip.nc.gy)
 
 ### What
 
