@@ -137,6 +137,7 @@ frontend stats_internal
     stats enable
     stats uri /stats
     stats refresh 2s
+    stats admin if TRUE
 
 resolvers docker_dns
     nameserver dns1 127.0.0.11:53
@@ -144,7 +145,7 @@ resolvers docker_dns
     timeout resolve 1s
     timeout retry 1s
     hold valid 10s
-    hold nx 30s
+    hold nx 5s
     hold obsolete 30s
 
 backend app

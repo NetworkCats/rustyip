@@ -217,12 +217,21 @@
         docker kill -s HUP rustyip-haproxy
       changed_when: true
 
+    - name: Force new backend out of maintenance via stats admin
+      ansible.builtin.shell: |
+        sleep 1
+        docker exec rustyip-haproxy wget -qO- \
+          --post-data='s=app/{{ deploy_target }}&action=ready' \
+          "http://127.0.0.1:9000/stats" 2>/dev/null
+      changed_when: true
+
     - name: Wait for new backend to be UP in HAProxy
       ansible.builtin.shell: |
         for i in $(seq 1 30); do
           csv=$(docker exec rustyip-haproxy wget -qO- \
             "http://127.0.0.1:9000/stats;csv;norefresh" 2>/dev/null)
           status=$(echo "$csv" | awk -F, '$1 == "app" && $2 == "{{ deploy_target }}" {print $18}')
+          echo "poll $i: status=$status"
           if [ "$status" = "UP" ]; then
             echo "backend {{ deploy_target }} is UP in HAProxy"
             exit 0
@@ -230,6 +239,9 @@
           sleep 2
         done
         echo "timeout waiting for backend {{ deploy_target }} to become UP"
+        echo "final csv output:"
+        docker exec rustyip-haproxy wget -qO- \
+          "http://127.0.0.1:9000/stats;csv;norefresh" 2>/dev/null || true
         exit 1
       changed_when: false
 
@@ -267,6 +279,15 @@
     - name: Reload HAProxy to restore original backend
       ansible.builtin.shell: |
         docker kill -s HUP rustyip-haproxy
+      changed_when: true
+      failed_when: false
+
+    - name: Force original backend out of maintenance via stats admin
+      ansible.builtin.shell: |
+        sleep 1
+        docker exec rustyip-haproxy wget -qO- \
+          --post-data='s=app/{{ current_active }}&action=ready' \
+          "http://127.0.0.1:9000/stats" 2>/dev/null
       changed_when: true
       failed_when: false
 
