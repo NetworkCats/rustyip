@@ -1138,20 +1138,12 @@ async fn html_contains_jsonld_on_landing_page() {
         "landing page should contain WebApplication JSON-LD"
     );
     assert!(
-        body.contains("\"@type\": \"FAQPage\""),
-        "landing page should contain FAQPage JSON-LD"
+        !body.contains("\"@type\": \"FAQPage\""),
+        "landing page should not contain FAQPage JSON-LD"
     );
     assert!(
         body.contains("\"applicationCategory\": \"UtilitiesApplication\""),
         "WebApplication should have applicationCategory"
-    );
-    assert!(
-        body.contains("\"@type\": \"Question\""),
-        "FAQPage should contain Question entities"
-    );
-    assert!(
-        body.contains("\"@type\": \"Answer\""),
-        "FAQPage should contain Answer entities"
     );
 }
 
