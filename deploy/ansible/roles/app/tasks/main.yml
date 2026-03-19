@@ -219,9 +219,17 @@
 
     - name: Force new backend out of maintenance via admin socket
       ansible.builtin.shell: |
-        sleep 1
-        docker exec rustyip-haproxy sh -c \
-          'echo "set server app/{{ deploy_target }} state ready" | socat stdio unix:/var/run/haproxy/admin.sock'
+        for i in $(seq 1 10); do
+          if docker exec rustyip-haproxy sh -c \
+            'echo "set server app/{{ deploy_target }} state ready" | socat stdio unix:/var/run/haproxy/admin.sock' 2>/dev/null; then
+            echo "admin socket command succeeded on attempt $i"
+            exit 0
+          fi
+          echo "attempt $i: admin socket not ready, retrying in 1s..."
+          sleep 1
+        done
+        echo "admin socket unavailable after 10 attempts"
+        exit 1
       changed_when: true
 
     - name: Wait for new backend to be UP in HAProxy
@@ -283,9 +291,17 @@
 
     - name: Force original backend out of maintenance via admin socket
       ansible.builtin.shell: |
-        sleep 1
-        docker exec rustyip-haproxy sh -c \
-          'echo "set server app/{{ current_active }} state ready" | socat stdio unix:/var/run/haproxy/admin.sock'
+        for i in $(seq 1 10); do
+          if docker exec rustyip-haproxy sh -c \
+            'echo "set server app/{{ current_active }} state ready" | socat stdio unix:/var/run/haproxy/admin.sock' 2>/dev/null; then
+            echo "admin socket command succeeded on attempt $i"
+            exit 0
+          fi
+          echo "attempt $i: admin socket not ready, retrying in 1s..."
+          sleep 1
+        done
+        echo "admin socket unavailable after 10 attempts"
+        exit 1
       changed_when: true
       failed_when: false
 
