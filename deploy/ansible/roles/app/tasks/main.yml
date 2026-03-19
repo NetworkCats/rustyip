@@ -217,12 +217,11 @@
         docker kill -s HUP rustyip-haproxy
       changed_when: true
 
-    - name: Force new backend out of maintenance via stats admin
+    - name: Force new backend out of maintenance via admin socket
       ansible.builtin.shell: |
         sleep 1
-        docker exec rustyip-haproxy wget -qO- \
-          --post-data='s=app/{{ deploy_target }}&action=ready' \
-          "http://127.0.0.1:9000/stats" 2>/dev/null
+        docker exec rustyip-haproxy sh -c \
+          'echo "set server app/{{ deploy_target }} state ready" | socat stdio unix:/var/run/haproxy/admin.sock'
       changed_when: true
 
     - name: Wait for new backend to be UP in HAProxy
@@ -282,12 +281,11 @@
       changed_when: true
       failed_when: false
 
-    - name: Force original backend out of maintenance via stats admin
+    - name: Force original backend out of maintenance via admin socket
       ansible.builtin.shell: |
         sleep 1
-        docker exec rustyip-haproxy wget -qO- \
-          --post-data='s=app/{{ current_active }}&action=ready' \
-          "http://127.0.0.1:9000/stats" 2>/dev/null
+        docker exec rustyip-haproxy sh -c \
+          'echo "set server app/{{ current_active }} state ready" | socat stdio unix:/var/run/haproxy/admin.sock'
       changed_when: true
       failed_when: false
 

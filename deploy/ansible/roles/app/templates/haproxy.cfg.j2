@@ -1,6 +1,7 @@
 global
     log stderr local0 err
     maxconn 10000
+    stats socket /var/run/haproxy/admin.sock mode 660 level admin
     # Performance tuning for high-throughput
     tune.bufsize 16384
     tune.maxrewrite 1024
@@ -137,7 +138,6 @@ frontend stats_internal
     stats enable
     stats uri /stats
     stats refresh 2s
-    stats admin if TRUE
 
 resolvers docker_dns
     nameserver dns1 127.0.0.11:53

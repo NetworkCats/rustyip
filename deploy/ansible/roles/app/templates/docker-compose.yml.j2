@@ -9,6 +9,7 @@ services:
       - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
       - ./haproxy/ipv4_domain.lst:/usr/local/etc/haproxy/ipv4_domain.lst:ro
       - ./haproxy/certs:/etc/haproxy/certs:ro
+      - haproxy_run:/var/run/haproxy
 {% if ipv4_domain %}
       - ./haproxy/certs-ipv4:/etc/haproxy/certs-ipv4:ro
 {% endif %}
@@ -64,6 +65,7 @@ services:
       - internal
 
 volumes:
+  haproxy_run:
   db_data_blue:
   db_data_green:
 
