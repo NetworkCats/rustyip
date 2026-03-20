@@ -136,7 +136,6 @@
     owner: root
     group: root
     mode: "0644"
-    unsafe_writes: yes
   vars:
     active_color: "{{ deploy_target }}"
   when: is_first_deploy
@@ -210,28 +209,12 @@
         owner: root
         group: root
         mode: "0644"
-        unsafe_writes: yes
       vars:
         active_color: "{{ deploy_target }}"
 
-    - name: Reload HAProxy in-place to switch traffic
+    - name: Recreate HAProxy container to switch traffic
       ansible.builtin.shell: |
-        docker kill -s HUP rustyip-haproxy
-      changed_when: true
-
-    - name: Force new backend out of maintenance via admin socket
-      ansible.builtin.shell: |
-        for i in $(seq 1 10); do
-          if docker exec rustyip-haproxy sh -c \
-            'echo "set server app/{{ deploy_target }} state ready" | socat stdio unix:/tmp/admin.sock' 2>/dev/null; then
-            echo "admin socket command succeeded on attempt $i"
-            exit 0
-          fi
-          echo "attempt $i: admin socket not ready, retrying in 1s..."
-          sleep 1
-        done
-        echo "admin socket unavailable after 10 attempts"
-        exit 1
+        docker compose -f /opt/rustyip/docker-compose.yml up -d --force-recreate haproxy
       changed_when: true
 
     - name: Wait for new backend to be UP in HAProxy
@@ -282,29 +265,12 @@
         owner: root
         group: root
         mode: "0644"
-        unsafe_writes: yes
       vars:
         active_color: "{{ current_active }}"
 
-    - name: Reload HAProxy to restore original backend
+    - name: Recreate HAProxy container to restore original backend
       ansible.builtin.shell: |
-        docker kill -s HUP rustyip-haproxy
-      changed_when: true
-      failed_when: false
-
-    - name: Force original backend out of maintenance via admin socket
-      ansible.builtin.shell: |
-        for i in $(seq 1 10); do
-          if docker exec rustyip-haproxy sh -c \
-            'echo "set server app/{{ current_active }} state ready" | socat stdio unix:/tmp/admin.sock' 2>/dev/null; then
-            echo "admin socket command succeeded on attempt $i"
-            exit 0
-          fi
-          echo "attempt $i: admin socket not ready, retrying in 1s..."
-          sleep 1
-        done
-        echo "admin socket unavailable after 10 attempts"
-        exit 1
+        docker compose -f /opt/rustyip/docker-compose.yml up -d --force-recreate haproxy
       changed_when: true
       failed_when: false
 
