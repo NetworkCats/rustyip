@@ -221,7 +221,7 @@
       ansible.builtin.shell: |
         for i in $(seq 1 10); do
           if docker exec rustyip-haproxy sh -c \
-            'echo "set server app/{{ deploy_target }} state ready" | socat stdio unix:/var/run/haproxy/admin.sock' 2>/dev/null; then
+            'echo "set server app/{{ deploy_target }} state ready" | socat stdio unix:/tmp/admin.sock' 2>/dev/null; then
             echo "admin socket command succeeded on attempt $i"
             exit 0
           fi
@@ -293,7 +293,7 @@
       ansible.builtin.shell: |
         for i in $(seq 1 10); do
           if docker exec rustyip-haproxy sh -c \
-            'echo "set server app/{{ current_active }} state ready" | socat stdio unix:/var/run/haproxy/admin.sock' 2>/dev/null; then
+            'echo "set server app/{{ current_active }} state ready" | socat stdio unix:/tmp/admin.sock' 2>/dev/null; then
             echo "admin socket command succeeded on attempt $i"
             exit 0
           fi

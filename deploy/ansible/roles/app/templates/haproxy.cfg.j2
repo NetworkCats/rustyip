@@ -1,7 +1,7 @@
 global
     log stderr local0 err
     maxconn 10000
-    stats socket /var/run/haproxy/admin.sock mode 660 level admin
+    stats socket /tmp/admin.sock mode 660 level admin expose-fd listeners
     # Performance tuning for high-throughput
     tune.bufsize 16384
     tune.maxrewrite 1024
