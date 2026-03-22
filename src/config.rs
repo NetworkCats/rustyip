@@ -5,10 +5,29 @@ pub struct Config {
     pub listen_addr: SocketAddr,
     pub db_path: String,
     pub db_update_url: String,
-    pub db_update_interval_hours: u64,
+    /// Daily UTC time to check for database updates, as (hour, minute).
+    pub db_update_time_utc: (u8, u8),
     pub site_domain: String,
     pub ipv4_domain: String,
     pub dev_mode: bool,
+}
+
+/// Parses a `"HH:MM"` string into `(hour, minute)`, panicking on invalid input.
+fn parse_time_utc(s: &str) -> (u8, u8) {
+    let parts: Vec<&str> = s.split(':').collect();
+    assert!(
+        parts.len() == 2,
+        "DB_UPDATE_TIME_UTC must be in HH:MM format"
+    );
+    let hour: u8 = parts[0]
+        .parse()
+        .expect("DB_UPDATE_TIME_UTC hour must be a valid integer");
+    let minute: u8 = parts[1]
+        .parse()
+        .expect("DB_UPDATE_TIME_UTC minute must be a valid integer");
+    assert!(hour < 24, "DB_UPDATE_TIME_UTC hour must be 0-23");
+    assert!(minute < 60, "DB_UPDATE_TIME_UTC minute must be 0-59");
+    (hour, minute)
 }
 
 impl Config {
@@ -25,10 +44,8 @@ impl Config {
                 .to_string()
         });
 
-        let db_update_interval_hours = env::var("DB_UPDATE_INTERVAL_HOURS")
-            .unwrap_or_else(|_| "24".to_string())
-            .parse()
-            .expect("DB_UPDATE_INTERVAL_HOURS must be a valid integer");
+        let db_update_time_utc =
+            parse_time_utc(&env::var("DB_UPDATE_TIME_UTC").unwrap_or_else(|_| "01:20".to_string()));
 
         let site_domain = env::var("SITE_DOMAIN").unwrap_or_else(|_| "localhost".to_string());
 
@@ -42,7 +59,7 @@ impl Config {
             listen_addr,
             db_path,
             db_update_url,
-            db_update_interval_hours,
+            db_update_time_utc,
             site_domain,
             ipv4_domain,
             dev_mode,
@@ -69,7 +86,7 @@ mod tests {
         "LISTEN_ADDR",
         "DB_PATH",
         "DB_UPDATE_URL",
-        "DB_UPDATE_INTERVAL_HOURS",
+        "DB_UPDATE_TIME_UTC",
         "SITE_DOMAIN",
         "IPV4_DOMAIN",
         "DEV_MODE",
@@ -101,7 +118,7 @@ mod tests {
         assert_eq!(config.listen_addr.to_string(), "0.0.0.0:3000");
         assert_eq!(config.db_path, "data/Merged-IP.mmdb");
         assert!(config.db_update_url.contains("Merged-IP.mmdb"));
-        assert_eq!(config.db_update_interval_hours, 24);
+        assert_eq!(config.db_update_time_utc, (1, 20));
         assert_eq!(config.site_domain, "localhost");
         assert!(config.ipv4_domain.is_empty());
         assert!(!config.dev_mode);
@@ -156,19 +173,19 @@ mod tests {
     }
 
     #[test]
-    fn custom_update_interval() {
+    fn custom_update_time() {
         let _guard = lock_env();
         // SAFETY: ENV_LOCK is held.
         unsafe {
             clear_config_vars();
-            set_var("DB_UPDATE_INTERVAL_HOURS", "12");
+            set_var("DB_UPDATE_TIME_UTC", "03:45");
         }
 
         let config = Config::from_env();
-        assert_eq!(config.db_update_interval_hours, 12);
+        assert_eq!(config.db_update_time_utc, (3, 45));
 
         // SAFETY: ENV_LOCK is held.
-        unsafe { remove_var("DB_UPDATE_INTERVAL_HOURS") };
+        unsafe { remove_var("DB_UPDATE_TIME_UTC") };
     }
 
     #[test]
@@ -259,13 +276,39 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "DB_UPDATE_INTERVAL_HOURS must be a valid integer")]
-    fn invalid_update_interval_panics() {
+    #[should_panic(expected = "DB_UPDATE_TIME_UTC must be in HH:MM format")]
+    fn invalid_update_time_panics() {
         let _guard = lock_env();
         // SAFETY: ENV_LOCK is held.
         unsafe {
             clear_config_vars();
-            set_var("DB_UPDATE_INTERVAL_HOURS", "not-a-number");
+            set_var("DB_UPDATE_TIME_UTC", "not-a-time");
+        }
+
+        let _config = Config::from_env();
+    }
+
+    #[test]
+    #[should_panic(expected = "DB_UPDATE_TIME_UTC hour must be 0-23")]
+    fn update_time_invalid_hour_panics() {
+        let _guard = lock_env();
+        // SAFETY: ENV_LOCK is held.
+        unsafe {
+            clear_config_vars();
+            set_var("DB_UPDATE_TIME_UTC", "25:00");
+        }
+
+        let _config = Config::from_env();
+    }
+
+    #[test]
+    #[should_panic(expected = "DB_UPDATE_TIME_UTC minute must be 0-59")]
+    fn update_time_invalid_minute_panics() {
+        let _guard = lock_env();
+        // SAFETY: ENV_LOCK is held.
+        unsafe {
+            clear_config_vars();
+            set_var("DB_UPDATE_TIME_UTC", "01:60");
         }
 
         let _config = Config::from_env();

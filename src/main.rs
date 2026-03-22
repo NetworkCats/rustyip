@@ -75,7 +75,7 @@ async fn main() {
             init_db,
             init_path,
             init_url,
-            config.db_update_interval_hours,
+            config.db_update_time_utc,
             init_cancel,
         )
         .await;

@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use std::time::Duration;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use tokio::fs;
 use tokio::io::AsyncWriteExt;
@@ -101,31 +101,57 @@ pub fn spawn_updater(
     shared_db: SharedDb,
     db_path: PathBuf,
     update_url: String,
-    interval_hours: u64,
+    update_time_utc: (u8, u8),
     cancel: CancellationToken,
 ) -> JoinHandle<()> {
     tokio::spawn(run_updater(
         shared_db,
         db_path,
         update_url,
-        interval_hours,
+        update_time_utc,
         cancel,
     ))
 }
 
-/// Runs the periodic database updater loop. This is the inner async function
-/// that can be called directly when already inside a spawned task.
+/// Returns the number of seconds from `now_secs` (seconds since UNIX epoch)
+/// until the next occurrence of the given UTC `(hour, minute)`.
+fn secs_until_next(now_secs: u64, hour: u8, minute: u8) -> u64 {
+    const SECS_PER_DAY: u64 = 86_400;
+    let time_of_day = now_secs % SECS_PER_DAY;
+    let target = u64::from(hour) * 3600 + u64::from(minute) * 60;
+    if target > time_of_day {
+        target - time_of_day
+    } else {
+        // Target time already passed today; schedule for tomorrow.
+        SECS_PER_DAY - time_of_day + target
+    }
+}
+
+/// Runs the daily database updater loop. Sleeps until the configured UTC time
+/// each day, then downloads and swaps in a fresh database.
 pub async fn run_updater(
     shared_db: SharedDb,
     db_path: PathBuf,
     update_url: String,
-    interval_hours: u64,
+    update_time_utc: (u8, u8),
     cancel: CancellationToken,
 ) {
-    let interval = Duration::from_secs(interval_hours * 3600);
+    let (hour, minute) = update_time_utc;
     loop {
+        let now_secs = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("system clock before UNIX epoch")
+            .as_secs();
+        let delay = Duration::from_secs(secs_until_next(now_secs, hour, minute));
+        info!(
+            "next database update in {}h {}m (at {:02}:{:02} UTC)",
+            delay.as_secs() / 3600,
+            (delay.as_secs() % 3600) / 60,
+            hour,
+            minute,
+        );
         tokio::select! {
-            () = tokio::time::sleep(interval) => {}
+            () = tokio::time::sleep(delay) => {}
             () = cancel.cancelled() => {
                 info!("updater task cancelled, stopping");
                 break;
@@ -251,7 +277,7 @@ mod tests {
             shared_db,
             PathBuf::from("/nonexistent/path.mmdb"),
             "https://invalid.example.com/db.mmdb".to_string(),
-            24,
+            (1, 20),
             cancel.clone(),
         );
 
@@ -262,6 +288,34 @@ mod tests {
             result.is_ok(),
             "updater task should exit promptly on cancellation"
         );
+    }
+
+    #[test]
+    fn secs_until_next_later_today() {
+        // 00:00:00 UTC, target 01:20 UTC => 1h 20m = 4800s
+        assert_eq!(secs_until_next(0, 1, 20), 4800);
+    }
+
+    #[test]
+    fn secs_until_next_wraps_to_tomorrow() {
+        // 02:00:00 UTC (7200s into the day), target 01:20 (4800s into the day)
+        // => should wrap to next day: 86400 - 7200 + 4800 = 84000s
+        let now_secs = 7200; // midnight + 2 hours
+        assert_eq!(secs_until_next(now_secs, 1, 20), 84000);
+    }
+
+    #[test]
+    fn secs_until_next_exact_time_wraps_to_tomorrow() {
+        // Exactly at the target time => should schedule for next day (full 24h).
+        let target_secs = 1 * 3600 + 20 * 60; // 01:20 = 4800s
+        assert_eq!(secs_until_next(target_secs, 1, 20), 86400);
+    }
+
+    #[test]
+    fn secs_until_next_midnight_target() {
+        // 23:00:00 UTC, target 00:00 UTC => 1 hour = 3600s
+        let now_secs = 23 * 3600;
+        assert_eq!(secs_until_next(now_secs, 0, 0), 3600);
     }
 
     #[tokio::test]
