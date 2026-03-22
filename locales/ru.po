@@ -87,8 +87,8 @@ msgstr "Отправьте запрос на эндпоинт <code>/json</code>
 msgid "Can I call your service programmatically?"
 msgstr "Могу ли я обращаться к вашему сервису программно?"
 
-msgid "Sure, but please respect our rate limits. Normally it's 30 RPM, and under heavy load we may drop it to 10 or 5 RPM."
-msgstr "Конечно, но пожалуйста, соблюдайте наши ограничения частоты запросов. Обычно это 30 RPM, а при высокой нагрузке мы можем снизить до 10 или 5 RPM."
+msgid "Sure, but please respect our rate limits. Normally it's 100 RPM, and under heavy load we may drop it to 50 or 30 RPM."
+msgstr "Конечно, но пожалуйста, соблюдайте наши ограничения частоты запросов. Обычно это 100 RPM, а при высокой нагрузке мы можем снизить до 50 или 30 RPM."
 
 msgid "The API is meant for manual use or small projects. If your site uses our API to look up visitor IPs, please use a message queue so requests don't block. If your project has high traffic or needs low latency, you're better off using our open source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. That's actually what this project uses under the hood."
 msgstr "API предназначен для ручного использования или небольших проектов. Если ваш сайт использует наш API для поиска IP-адресов посетителей, используйте очередь сообщений, чтобы запросы не блокировались. Если ваш проект имеет высокий трафик или нуждается в низкой задержке, лучше воспользоваться нашей офлайн-базой данных с открытым исходным кодом: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. Собственно, именно её и использует этот проект."

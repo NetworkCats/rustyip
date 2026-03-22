@@ -115,7 +115,7 @@ msgid "Can I call your service programmatically?"
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 1
-msgid "Sure, but please respect our rate limits. Normally it's 30 RPM, and under heavy load we may drop it to 10 or 5 RPM."
+msgid "Sure, but please respect our rate limits. Normally it's 100 RPM, and under heavy load we may drop it to 50 or 30 RPM."
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 2

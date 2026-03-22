@@ -87,8 +87,8 @@ msgstr "向 <code>/json</code> 端点发送请求，或发送带有 <code>applic
 msgid "Can I call your service programmatically?"
 msgstr "我可以通过程序调用你们的服务吗？"
 
-msgid "Sure, but please respect our rate limits. Normally it's 30 RPM, and under heavy load we may drop it to 10 or 5 RPM."
-msgstr "当然可以，但请遵守我们的速率限制。通常为 30 RPM，在高负载时可能会降至 10 或 5 RPM。"
+msgid "Sure, but please respect our rate limits. Normally it's 100 RPM, and under heavy load we may drop it to 50 or 30 RPM."
+msgstr "当然可以，但请遵守我们的速率限制。通常为 100 RPM，在高负载时可能会降至 50 或 30 RPM。"
 
 msgid "The API is meant for manual use or small projects. If your site uses our API to look up visitor IPs, please use a message queue so requests don't block. If your project has high traffic or needs low latency, you're better off using our open source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. That's actually what this project uses under the hood."
 msgstr "本 API 适用于手动使用或小型项目。如果您的网站使用我们的 API 查询访客 IP，请使用消息队列以避免请求阻塞。如果您的项目流量较大或需要低延迟，建议使用我们的开源离线数据库：<a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>。实际上这就是本项目底层使用的数据库。"

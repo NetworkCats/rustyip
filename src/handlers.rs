@@ -277,7 +277,7 @@ fn build_translations(locale: Locale) -> Translations {
         t_faq_automate_q: i18n::translate(locale, "Can I call your service programmatically?"),
         t_faq_automate_a1: i18n::translate(
             locale,
-            "Sure, but please respect our rate limits. Normally it's 30 RPM, and under heavy load we may drop it to 10 or 5 RPM.",
+            "Sure, but please respect our rate limits. Normally it's 100 RPM, and under heavy load we may drop it to 50 or 30 RPM.",
         ),
         t_faq_automate_a2: i18n::translate(
             locale,
