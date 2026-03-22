@@ -1,3 +1,5 @@
+//! Background database updater: downloads and hot-swaps the MMDB database on a daily schedule.
+
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};

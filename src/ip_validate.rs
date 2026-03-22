@@ -1,3 +1,5 @@
+//! IP address validation: determines whether an address is publicly routable.
+
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 /// Returns `true` if the given IPv4 address is a globally routable public address.

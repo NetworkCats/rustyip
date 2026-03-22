@@ -1,3 +1,5 @@
+//! User-agent detection for distinguishing CLI/HTTP-library clients from browsers.
+
 const CLI_PREFIXES: &[&str] = &[
     "curl/",
     "Wget/",
@@ -53,16 +55,16 @@ const HTTP_LIB_PREFIXES: &[&str] = &[
     "mint/",
 ];
 
+fn matches_any_prefix(user_agent: &str, prefixes: &[&str]) -> bool {
+    prefixes.iter().any(|prefix| user_agent.starts_with(prefix))
+}
+
 fn is_cli_user_agent(user_agent: &str) -> bool {
-    CLI_PREFIXES
-        .iter()
-        .any(|prefix| user_agent.starts_with(prefix))
+    matches_any_prefix(user_agent, CLI_PREFIXES)
 }
 
 fn is_http_lib_user_agent(user_agent: &str) -> bool {
-    HTTP_LIB_PREFIXES
-        .iter()
-        .any(|prefix| user_agent.starts_with(prefix))
+    matches_any_prefix(user_agent, HTTP_LIB_PREFIXES)
 }
 
 pub fn is_plain_text_agent(user_agent: &str) -> bool {

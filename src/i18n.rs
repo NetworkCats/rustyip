@@ -1,3 +1,5 @@
+//! Internationalization support with PO-file-based translations and locale negotiation.
+
 use std::collections::HashMap;
 use std::sync::LazyLock;
 

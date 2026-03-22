@@ -1,6 +1,9 @@
+//! Application error types with HTTP status code mapping.
+
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 
+#[derive(Debug)]
 pub enum AppError {
     IpNotFound,
     InvalidIp,
@@ -35,6 +38,14 @@ impl AppError {
         }
     }
 }
+
+impl std::fmt::Display for AppError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.message())
+    }
+}
+
+impl std::error::Error for AppError {}
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {

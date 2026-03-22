@@ -1,3 +1,5 @@
+//! MaxMind MMDB database loading, shared state, and lookup functions.
+
 use std::net::IpAddr;
 use std::path::Path;
 use std::sync::Arc;
@@ -7,7 +9,7 @@ use maxminddb::Reader;
 use serde::Deserialize;
 
 use crate::models::{
-    IpInfo, MmdbAsn, MmdbCity, MmdbCountry, MmdbProxy, MmdbRecord, ProxyInfo, from_mmdb_record,
+    from_mmdb_record, IpInfo, MmdbAsn, MmdbCity, MmdbCountry, MmdbProxy, MmdbRecord, ProxyInfo,
 };
 
 pub type DbReader = Reader<Vec<u8>>;
@@ -30,11 +32,24 @@ pub fn is_ready(db: &SharedDb) -> bool {
 }
 
 pub fn lookup(db: &SharedDb, ip: IpAddr) -> Option<IpInfo> {
+    with_reader(db, ip, |result| {
+        let record: MmdbRecord<'_> = result.decode().ok()??;
+        Some(from_mmdb_record(ip, &record))
+    })?
+}
+
+/// Loads the shared reader, performs a lookup, and passes the raw lookup result
+/// to `f` for decoding. This eliminates the repeated load-guard-lookup boilerplate
+/// while letting callers choose their own deserialization type and lifetime.
+fn with_reader<R>(
+    db: &SharedDb,
+    ip: IpAddr,
+    f: impl FnOnce(maxminddb::LookupResult<'_, Vec<u8>>) -> R,
+) -> Option<R> {
     let guard = db.load();
     let reader = Option::as_ref(&guard)?;
     let result = reader.lookup(ip).ok()?;
-    let record: MmdbRecord<'_> = result.decode().ok()??;
-    Some(from_mmdb_record(ip, &record))
+    Some(f(result))
 }
 
 // Lightweight deserialization structs for single-field endpoints.
@@ -65,51 +80,38 @@ struct CityOnly<'a> {
 }
 
 pub fn lookup_proxy(db: &SharedDb, ip: IpAddr) -> Option<ProxyInfo> {
-    let guard = db.load();
-    let reader = Option::as_ref(&guard)?;
-    let result = reader.lookup(ip).ok()?;
-    let record: ProxyOnly = result.decode().ok()??;
-    Some(ProxyInfo {
-        is_proxy: record.proxy.is_proxy,
-        is_vpn: record.proxy.is_vpn,
-        is_tor: record.proxy.is_tor,
-        is_hosting: record.proxy.is_hosting,
-        is_cdn: record.proxy.is_cdn,
-        is_school: record.proxy.is_school,
-        is_anonymous: record.proxy.is_anonymous,
-    })
+    with_reader(db, ip, |result| {
+        let record: ProxyOnly = result.decode().ok()??;
+        Some(record.proxy.into())
+    })?
 }
 
 pub fn lookup_asn_number(db: &SharedDb, ip: IpAddr) -> Option<u32> {
-    let guard = db.load();
-    let reader = Option::as_ref(&guard)?;
-    let result = reader.lookup(ip).ok()?;
-    let record: AsnOnly<'_> = result.decode().ok()??;
-    record.asn.autonomous_system_number
+    with_reader(db, ip, |result| {
+        let record: AsnOnly<'_> = result.decode().ok()??;
+        record.asn.autonomous_system_number
+    })?
 }
 
 pub fn lookup_asn_org(db: &SharedDb, ip: IpAddr) -> Option<String> {
-    let guard = db.load();
-    let reader = Option::as_ref(&guard)?;
-    let result = reader.lookup(ip).ok()?;
-    let record: AsnOnly<'_> = result.decode().ok()??;
-    record.asn.autonomous_system_organization.map(str::to_owned)
+    with_reader(db, ip, |result| {
+        let record: AsnOnly<'_> = result.decode().ok()??;
+        record.asn.autonomous_system_organization.map(str::to_owned)
+    })?
 }
 
 pub fn lookup_country_name(db: &SharedDb, ip: IpAddr) -> Option<String> {
-    let guard = db.load();
-    let reader = Option::as_ref(&guard)?;
-    let result = reader.lookup(ip).ok()?;
-    let record: CountryOnly<'_> = result.decode().ok()??;
-    record.country.names.english.map(str::to_owned)
+    with_reader(db, ip, |result| {
+        let record: CountryOnly<'_> = result.decode().ok()??;
+        record.country.names.english.map(str::to_owned)
+    })?
 }
 
 pub fn lookup_city_name(db: &SharedDb, ip: IpAddr) -> Option<String> {
-    let guard = db.load();
-    let reader = Option::as_ref(&guard)?;
-    let result = reader.lookup(ip).ok()?;
-    let record: CityOnly<'_> = result.decode().ok()??;
-    record.city.names.english.map(str::to_owned)
+    with_reader(db, ip, |result| {
+        let record: CityOnly<'_> = result.decode().ok()??;
+        record.city.names.english.map(str::to_owned)
+    })?
 }
 
 #[cfg(test)]

@@ -1,3 +1,5 @@
+//! Axum router construction with host-based routing for IPv4 and main domains.
+
 use std::sync::Arc;
 
 use axum::Router;

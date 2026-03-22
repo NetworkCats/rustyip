@@ -1,3 +1,5 @@
+//! Axum middleware for applying security headers to responses.
+
 use axum::extract::Request;
 use axum::http::header::{self, HeaderValue};
 use axum::middleware::Next;

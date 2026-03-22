@@ -1,3 +1,5 @@
+//! Application configuration loaded from environment variables.
+
 use std::env;
 use std::net::SocketAddr;
 

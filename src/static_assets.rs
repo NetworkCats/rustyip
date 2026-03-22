@@ -1,3 +1,5 @@
+//! Embedded static file serving with immutable cache headers.
+
 use std::collections::HashMap;
 use std::sync::LazyLock;
 
