@@ -272,10 +272,37 @@ function initCopyIp(wrap){
     return html;
   }
 
-  function showAltIp(ip,info){
-    section.innerHTML=buildBlock(ip,info);
+  function buildSkeleton(){
+    var html='<div class="skeleton-block">';
+    html+='<div class="skeleton-bone skeleton-ip"></div>';
+    html+='</div>';
+    html+='<div class="skeleton-table">';
+    for(var i=0;i<8;i++){
+      html+='<div class="skeleton-row">';
+      html+='<div class="skeleton-row-label"><div class="skeleton-bone"></div></div>';
+      html+='<div class="skeleton-row-value"><div class="skeleton-bone"></div></div>';
+      html+='</div>';
+    }
+    html+='</div>';
+    return html;
+  }
+
+  function showSkeleton(){
+    section.innerHTML=buildSkeleton();
     section.hidden=false;
-    initCopyIp(section.querySelector(".ip-copy-wrap"));
+    section.classList.add("alt-visible");
+  }
+
+  function showAltIp(ip,info){
+    section.classList.remove("alt-visible");
+    setTimeout(function(){
+      section.innerHTML=buildBlock(ip,info);
+      initCopyIp(section.querySelector(".ip-copy-wrap"));
+      section.hidden=false;
+      // Force reflow before adding the visible class for transition
+      void section.offsetHeight;
+      section.classList.add("alt-visible");
+    },primaryIsIPv6?300:0);
   }
 
   function fetchJson(ip){
@@ -285,8 +312,17 @@ function initCopyIp(wrap){
     });
   }
 
+  function hideSkeleton(){
+    section.classList.remove("alt-visible");
+    setTimeout(function(){
+      section.innerHTML="";
+      section.hidden=true;
+    },300);
+  }
+
   function detectAltIp(){
     if(primaryIsIPv6&&ipv4Domain){
+      showSkeleton();
       var controller=new AbortController();
       var timeout=setTimeout(function(){controller.abort();},5000);
       fetch("https://"+ipv4Domain+"/",{signal:controller.signal})
@@ -297,12 +333,12 @@ function initCopyIp(wrap){
         })
         .then(function(text){
           var ip=text.trim();
-          if(!ip||ip.indexOf(":")!==-1)return;
+          if(!ip||ip.indexOf(":")!==-1){hideSkeleton();return;}
           return fetchJson(ip).then(function(info){
             showAltIp(ip,info);
           });
         })
-        .catch(function(){});
+        .catch(function(){hideSkeleton();});
     }else if(!primaryIsIPv6){
       fetch("/ip")
         .then(function(r){

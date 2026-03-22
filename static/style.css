@@ -477,6 +477,82 @@ main {
   padding: 6px 10px 6px 28px;
 }
 
+#alt-ip-section {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#alt-ip-section.alt-visible {
+  opacity: 1;
+}
+
+.skeleton-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.skeleton-bone {
+  background: var(--color-gray5);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-bone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-bg-tertiary) 50%,
+    transparent 100%
+  );
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% { translate: -100% 0; }
+  100% { translate: 100% 0; }
+}
+
+.skeleton-ip {
+  inline-size: 260px;
+  block-size: 42px;
+  margin-block: 28px 20px;
+}
+
+.skeleton-table {
+  inline-size: 100%;
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  padding-block: 10px;
+  border-block-start: 1px solid var(--color-separator);
+}
+
+.skeleton-row:last-child {
+  border-block-end: 1px solid var(--color-separator);
+}
+
+.skeleton-row-label {
+  inline-size: 42%;
+  padding-inline: 35px 32px;
+}
+
+.skeleton-row-label .skeleton-bone {
+  inline-size: 60px;
+  block-size: 15px;
+}
+
+.skeleton-row-value .skeleton-bone {
+  inline-size: 100px;
+  block-size: 15px;
+}
+
 @media (width <= 480px) {
   main {
     margin-block-start: 40px;
