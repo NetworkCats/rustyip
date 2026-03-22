@@ -7,7 +7,7 @@ use maxminddb::Reader;
 use serde::Deserialize;
 
 use crate::models::{
-    IpInfo, MmdbAsn, MmdbCity, MmdbCountry, MmdbProxy, MmdbRecord, ProxyInfo, from_mmdb_record,
+    from_mmdb_record, IpInfo, MmdbAsn, MmdbCity, MmdbCountry, MmdbProxy, MmdbRecord, ProxyInfo,
 };
 
 pub type DbReader = Reader<Vec<u8>>;
@@ -193,7 +193,7 @@ mod tests {
         assert!(proxy.is_some());
         let proxy = proxy.unwrap();
         assert!(proxy.is_proxy);
-        assert!(proxy.is_hosting);
+        assert!(proxy.is_anonymous);
     }
 
     #[test]
