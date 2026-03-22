@@ -209,8 +209,8 @@ main {
   }
 
   th {
-    inline-size: 42%;
-    padding-inline: 35px 32px;
+    inline-size: 38%;
+    padding-inline: 35px 20px;
     font-weight: 600;
     color: var(--color-label);
     text-align: start;
@@ -587,8 +587,8 @@ main {
 }
 
 .skeleton-row-label {
-  inline-size: 42%;
-  padding-inline: 35px 32px;
+  inline-size: 38%;
+  padding-inline: 35px 20px;
 }
 
 .skeleton-row-label .skeleton-bone {
@@ -682,8 +682,8 @@ main {
 
 @media (width <= 360px) {
   .info-table th {
-    inline-size: 36%;
-    padding-inline: 12px 16px;
+    inline-size: 33%;
+    padding-inline: 12px 10px;
   }
 }
 
