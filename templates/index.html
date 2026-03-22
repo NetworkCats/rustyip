@@ -1,23 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %}{{ t_title }} - {{ site_domain }}{% endblock %}
+{% block title %}{{ "Accurate IP proxy information and geographic location"|t(locale) }} - {{ site_domain }}{% endblock %}
 
 {% block head_meta %}
   {% if is_query %}
   <meta name="robots" content="noindex, nofollow">
   {% else %}
-  <meta name="description" content="{{ t_description }}">
+  <meta name="description" content="{{ "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."|t(locale) }}">
   <link rel="canonical" href="https://{{ site_domain }}/{{ lang_tag }}">
-  <meta property="og:title" content="{{ t_title }} - {{ site_domain }}">
-  <meta property="og:description" content="{{ t_description }}">
+  <meta property="og:title" content="{{ "Accurate IP proxy information and geographic location"|t(locale) }} - {{ site_domain }}">
+  <meta property="og:description" content="{{ "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."|t(locale) }}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://{{ site_domain }}/{{ lang_tag }}">
   <meta property="og:image" content="https://{{ site_domain }}/static/icons/android-chrome-512x512.png">
   <meta property="og:image:width" content="512">
   <meta property="og:image:height" content="512">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="{{ t_title }} - {{ site_domain }}">
-  <meta name="twitter:description" content="{{ t_description }}">
+  <meta name="twitter:title" content="{{ "Accurate IP proxy information and geographic location"|t(locale) }} - {{ site_domain }}">
+  <meta name="twitter:description" content="{{ "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."|t(locale) }}">
   <meta name="twitter:image" content="https://{{ site_domain }}/static/icons/android-chrome-512x512.png">
   {% for l in all_locales %}
   <link rel="alternate" hreflang="{{ l.tag() }}" href="https://{{ site_domain }}/{{ l.tag() }}">
@@ -36,7 +36,7 @@
     "@type": "WebApplication",
     "name": "{{ site_domain }}",
     "url": "https://{{ site_domain }}/",
-    "description": "{{ t_description }}",
+    "description": "{{ "Find your public IP address instantly. Look up geolocation, ASN, organization, and proxy/VPN/Tor detection for any IP address."|t(locale) }}",
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "All",
     "offers": {
@@ -66,55 +66,55 @@
 
     <div itemscope itemtype="https://schema.org/WebPage"
          data-ipv4-domain="{{ ipv4_domain }}"
-         data-copied-text="{{ t_copied }}"
+         data-copied-text="{{ "Copied"|t(locale) }}"
          {% if is_query %}data-is-query="true"{% endif %}
          id="ip-info-root">
-    <div class="ip-copy-wrap" data-copied="{{ t_copied }}">
+    <div class="ip-copy-wrap" data-copied="{{ "Copied"|t(locale) }}">
       <h1 class="ip-display" itemprop="name">{{ ip }}</h1>
-      <span class="ip-copied-tooltip" aria-live="polite" hidden>{{ t_copied }}</span>
+      <span class="ip-copied-tooltip" aria-live="polite" hidden>{{ "Copied"|t(locale) }}</span>
     </div>
 
-    <table class="info-table" aria-label="{{ t_table_aria }}">
+    <table class="info-table" aria-label="{{ "IP address information"|t(locale) }}">
       <tbody>
         {% if !asn.is_empty() %}
         <tr data-label="asn">
-          <th scope="row">{{ t_asn }}</th>
+          <th scope="row">{{ "ASN"|t(locale) }}</th>
           <td>{% if let Some(n) = asn_number %}<a href="https://bgp.tools/as/{{ n }}" target="_blank" rel="noopener noreferrer">{{ asn }}</a>{% else %}{{ asn }}{% endif %}</td>
         </tr>
         {% endif %}
         {% if !org.is_empty() %}
         <tr data-label="org">
-          <th scope="row">{{ t_org }}</th>
+          <th scope="row">{{ "Org"|t(locale) }}</th>
           <td itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><span itemprop="name">{{ org }}</span></td>
         </tr>
         {% endif %}
         {% if !country.is_empty() %}
         <tr data-label="country" itemprop="contentLocation" itemscope itemtype="https://schema.org/Place">
-          <th scope="row">{{ t_country }}</th>
+          <th scope="row">{{ "Country"|t(locale) }}</th>
           <td itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"><span itemprop="addressCountry">{{ country }}</span>{% if !country_code.is_empty() %}<meta itemprop="addressCountry" content="{{ country_code }}">{% endif %}</td>
         </tr>
         {% endif %}
         {% if !city.is_empty() %}
         <tr data-label="city">
-          <th scope="row">{{ t_city }}</th>
+          <th scope="row">{{ "City"|t(locale) }}</th>
           <td itemprop="contentLocation" itemscope itemtype="https://schema.org/Place"><span itemprop="name">{{ city }}</span></td>
         </tr>
         {% endif %}
         <tr data-label="proxy">
-          <th scope="row">{{ t_proxy }}</th>
-          <td>{% if is_proxy %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ t_yes }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ t_no }}</span>{% endif %}</td>
+          <th scope="row">{{ "Proxy"|t(locale) }}</th>
+          <td>{% if is_proxy %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ "Yes"|t(locale) }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ "No"|t(locale) }}</span>{% endif %}</td>
         </tr>
         <tr data-label="vpn">
-          <th scope="row">{{ t_vpn }}</th>
-          <td>{% if is_vpn %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ t_yes }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ t_no }}</span>{% endif %}</td>
+          <th scope="row">{{ "VPN"|t(locale) }}</th>
+          <td>{% if is_vpn %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ "Yes"|t(locale) }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ "No"|t(locale) }}</span>{% endif %}</td>
         </tr>
         <tr data-label="hosting">
-          <th scope="row">{{ t_hosting }}</th>
-          <td>{% if is_hosting %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ t_yes }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ t_no }}</span>{% endif %}</td>
+          <th scope="row">{{ "Hosting"|t(locale) }}</th>
+          <td>{% if is_hosting %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ "Yes"|t(locale) }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ "No"|t(locale) }}</span>{% endif %}</td>
         </tr>
         <tr data-label="tor">
-          <th scope="row">{{ t_tor }}</th>
-          <td>{% if is_tor %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ t_yes }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ t_no }}</span>{% endif %}</td>
+          <th scope="row">{{ "Tor"|t(locale) }}</th>
+          <td>{% if is_tor %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ "Yes"|t(locale) }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ "No"|t(locale) }}</span>{% endif %}</td>
         </tr>
       </tbody>
     </table>
@@ -123,17 +123,17 @@
 
     </div>
 
-    <section class="faq" aria-label="{{ t_faq_aria }}" itemscope itemtype="https://schema.org/FAQPage">
-      <h2 class="faq-title">{{ t_faq }}</h2>
+    <section class="faq" aria-label="{{ "Frequently Asked Questions"|t(locale) }}" itemscope itemtype="https://schema.org/FAQPage">
+      <h2 class="faq-title">{{ "FAQ"|t(locale) }}</h2>
 
       <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">{{ t_faq_cli_q }}</summary>
+        <summary itemprop="name">{{ "How to use this service from the command line"|t(locale) }}</summary>
         <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
           <div itemprop="text">
-          <p>{{ t_faq_cli_a }}</p>
-          <p>{{ t_faq_cli_query_current }}</p>
+          <p>{{ "You can use curl, httpie, wget, or whatever command line tool you prefer. Here's an example with curl:"|t(locale) }}</p>
+          <p>{{ "Check your current IP:"|t(locale) }}</p>
           <pre><code>curl {{ site_domain }}</code></pre>
-          <p>{{ t_faq_cli_query_own }}</p>
+          <p>{{ "Look up information about your own IP:"|t(locale) }}</p>
           <pre><code>curl {{ site_domain }}/asn
 
 curl {{ site_domain }}/org
@@ -149,7 +149,7 @@ curl {{ site_domain }}/vpn
 curl {{ site_domain }}/hosting
 
 curl {{ site_domain }}/tor</code></pre>
-          <p>{{ t_faq_cli_json }}</p>
+          <p>{{ "Or get everything in JSON format:"|t(locale) }}</p>
           <pre><code>curl {{ site_domain }}/json
 {
   "ip": "1.1.1.1",
@@ -160,7 +160,7 @@ curl {{ site_domain }}/tor</code></pre>
   "asn": { ... },
   "proxy": { ... }
 }</code></pre>
-          <p>{{ t_faq_cli_specific }}</p>
+          <p>{{ "Look up information about a specific IP:"|t(locale) }}</p>
           <pre><code>curl {{ site_domain }}/json?ip=1.1.1.1
 {
   "ip": "1.1.1.1",
@@ -176,39 +176,39 @@ curl {{ site_domain }}/tor</code></pre>
       </details>
 
       <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">{{ t_faq_ipv46_q }}</summary>
+        <summary itemprop="name">{{ "How do I force IPv4 or IPv6?"|t(locale) }}</summary>
         <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
           <div itemprop="text">
-          <p>{{ t_faq_ipv46_a|safe }}</p>
+          <p>{{ "Use <code>curl -4</code> or <code>curl -6</code> to specifically check your IPv4 or IPv6 address."|t(locale)|safe }}</p>
           </div>
         </div>
       </details>
 
       <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">{{ t_faq_json_q }}</summary>
+        <summary itemprop="name">{{ "How do I get a JSON response?"|t(locale) }}</summary>
         <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
           <div itemprop="text">
-          <p>{{ t_faq_json_a|safe }}</p>
+          <p>{{ "Send a request to the <code>/json</code> endpoint, or send a request with the <code>application/json</code> header."|t(locale)|safe }}</p>
           </div>
         </div>
       </details>
 
       <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">{{ t_faq_automate_q }}</summary>
+        <summary itemprop="name">{{ "Can I call your service programmatically?"|t(locale) }}</summary>
         <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
           <div itemprop="text">
-          <p>{{ t_faq_automate_a1 }}</p>
-          <p>{{ t_faq_automate_a2|safe }}</p>
+          <p>{{ "Sure, but please respect our rate limits. Normally it's 100 RPM, and under heavy load we may drop it to 50 or 30 RPM."|t(locale) }}</p>
+          <p>{{ "The API is meant for manual use or small projects. If your site uses our API to look up visitor IPs, please use a message queue so requests don't block. If your project has high traffic or needs low latency, you're better off using our open source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. That's actually what this project uses under the hood."|t(locale)|safe }}</p>
           </div>
         </div>
       </details>
 
       <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">{{ t_faq_data_q }}</summary>
+        <summary itemprop="name">{{ "Where does the IP data come from?"|t(locale) }}</summary>
         <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
           <div itemprop="text">
-          <p>{{ t_faq_data_a|safe }}</p>
-          <p>{{ t_faq_data_attr }}</p>
+          <p>{{ "Geolocation data mainly comes from the free databases by Maxmind and DB-IP. AS data comes from IPinfo's free database. Proxy data comes from my own <a href=\"https://github.com/NetworkCats/OpenProxyDB\">OpenProxyDB</a>."|t(locale)|safe }}</p>
+          <p>{{ "Data attributions:"|t(locale) }}</p>
           <ul>
             <li>MaxMind GeoLite2: <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a></li>
             <li>IPinfo Lite: <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a></li>
@@ -221,10 +221,10 @@ curl {{ site_domain }}/tor</code></pre>
       </details>
 
       <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">{{ t_faq_selfhost_q }}</summary>
+        <summary itemprop="name">{{ "Can I run my own instance?"|t(locale) }}</summary>
         <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
           <div itemprop="text">
-          <p>{{ t_faq_selfhost_a }}</p>
+          <p>{{ "Yes, the source code and database are both open source and on GitHub:"|t(locale) }}</p>
           <ul>
             <li><a href="https://github.com/NetworkCats/rustyip">https://github.com/NetworkCats/rustyip</a></li>
             <li><a href="https://github.com/NetworkCats/Merged-IP-Data">https://github.com/NetworkCats/Merged-IP-Data</a></li>
@@ -234,32 +234,32 @@ curl {{ site_domain }}/tor</code></pre>
       </details>
 
       <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">{{ t_faq_diff_q }}</summary>
+        <summary itemprop="name">{{ "How is this website different from other IP lookup sites?"|t(locale) }}</summary>
         <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
           <div itemprop="text">
-          <p>{{ t_faq_diff_a1 }}</p>
-          <p>{{ t_faq_diff_a2 }}</p>
-          <p>{{ t_faq_diff_a3 }}</p>
+          <p>{{ "The biggest thing is proxy detection. Our database covers proxy related data and the accuracy is really good. We've tested it privately against commercial databases like IPinfo's, and we hold up just as well, and actually do better on residential proxy detection."|t(locale) }}</p>
+          <p>{{ "We also have better IPv6 geolocation coverage since we merge multiple databases together, so the data ends up being more complete."|t(locale) }}</p>
+          <p>{{ "The UX is also better than most IP lookup sites out there. The site runs without any JavaScript, and we only pull in a minimal amount of external resources (fonts and icons), so it loads fast on the first visit."|t(locale) }}</p>
           </div>
         </div>
       </details>
 
       <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">{{ t_faq_stable_q }}</summary>
+        <summary itemprop="name">{{ "Is this service reliable?"|t(locale) }}</summary>
         <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
           <div itemprop="text">
-          <p>{{ t_faq_stable_a1 }}</p>
-          <p>{{ t_faq_stable_a2 }}</p>
-          <p>{{ t_faq_stable_a3 }}</p>
+          <p>{{ "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 2 core 2 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."|t(locale) }}</p>
+          <p>{{ "It costs me $18.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."|t(locale) }}</p>
+          <p>{{ "This service is not going to rug pull on you."|t(locale) }}</p>
           </div>
         </div>
       </details>
 
       <details open itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">{{ t_faq_sponsor_q }}</summary>
+        <summary itemprop="name">{{ "How can I support this service?"|t(locale) }}</summary>
         <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
           <div itemprop="text">
-          <p>{{ t_faq_sponsor_a }} <a href="mailto:networkcatlol@gmail.com">networkcatlol@gmail.com</a></p>
+          <p>{{ "I accept crypto donations. If you want to contribute, reach out at:"|t(locale) }} <a href="mailto:networkcatlol@gmail.com">networkcatlol@gmail.com</a></p>
           </div>
         </div>
       </details>
@@ -276,7 +276,7 @@ curl {{ site_domain }}/tor</code></pre>
       <div class="footer-left">
         {% include "_footer.html" %}
         <div class="footer-attribution">
-          <p>{{ t_footer_attribution }}</p>
+          <p>{{ "IP data provided by:"|t(locale) }}</p>
           <ul>
             <li><a href="https://www.maxmind.com/">MaxMind GeoLite2</a></li>
             <li><a href="https://ipinfo.io/">IPinfo Lite</a></li>

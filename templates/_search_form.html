@@ -1,14 +1,14 @@
 <form method="GET" action="/{{ lang_tag }}" class="search-form" role="search"
-      data-msg-invalid="{{ t_invalid_ip }}"
-      data-msg-non-public="{{ t_non_public_ip }}">
+      data-msg-invalid="{{ "Invalid IP address"|t(locale) }}"
+      data-msg-non-public="{{ "Only public IP addresses can be queried"|t(locale) }}">
   <div class="search-input-wrap">
-    <label for="ip-search" class="sr-only">{{ t_search_label }}</label>
+    <label for="ip-search" class="sr-only">{{ "Search IP address"|t(locale) }}</label>
     <i class="icon-magnifier search-icon" aria-hidden="true"></i>
     <input
       id="ip-search"
       type="text"
       name="ip"
-      placeholder="{{ t_search_placeholder }}"
+      placeholder="{{ "Type to search IP data"|t(locale) }}"
       value="{{ query }}"
       autocomplete="off"
       autocapitalize="none"
