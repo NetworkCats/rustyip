@@ -639,6 +639,59 @@ main {
   }
 }
 
+/* noscript banner */
+.noscript-dismiss-checkbox {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.noscript-dismiss-checkbox:checked ~ .noscript-banner {
+  display: none;
+}
+
+.noscript-banner {
+  position: fixed;
+  inset-block-end: 0;
+  inset-inline: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 20px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  color: light-dark(#1a1a1a, #f0f0f0);
+  background-color: light-dark(#FFF3CD, #3A3000);
+  border-block-start: 1px solid light-dark(#FFECB5, #665200);
+
+  p {
+    margin: 0;
+  }
+
+  .noscript-close {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 28px;
+    block-size: 28px;
+    border: none;
+    border-radius: 4px;
+    font-size: 20px;
+    line-height: 1;
+    color: light-dark(#664D03, #FFD60A);
+    background: transparent;
+    cursor: pointer;
+
+    &:hover {
+      background-color: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.1));
+    }
+  }
+}
+
 @media (prefers-contrast: more) {
   :root {
     --color-separator: light-dark(
