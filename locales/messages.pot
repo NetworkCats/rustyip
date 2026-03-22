@@ -221,3 +221,19 @@ msgstr ""
 #: templates/base.html - language selector label
 msgid "Language"
 msgstr ""
+
+#: templates/_footer_lang.html - language submit button (noscript)
+msgid "Go"
+msgstr ""
+
+#: templates/index.html - ASN link new tab hint
+msgid "opens in a new tab"
+msgstr ""
+
+#: templates/index.html - copy IP button label
+msgid "Copy IP address to clipboard"
+msgstr ""
+
+#: templates/index.html, error_alert.html - footer landmark label
+msgid "Site footer"
+msgstr ""

@@ -191,3 +191,15 @@ msgstr "Rendering del template fallito"
 
 msgid "Copied"
 msgstr "Copiato"
+
+msgid "Go"
+msgstr "Vai"
+
+msgid "opens in a new tab"
+msgstr "si apre in una nuova scheda"
+
+msgid "Copy IP address to clipboard"
+msgstr "Copia l'indirizzo IP negli appunti"
+
+msgid "Site footer"
+msgstr "Piè di pagina"

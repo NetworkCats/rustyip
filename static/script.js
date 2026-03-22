@@ -177,6 +177,8 @@ function initCopyIp(wrap) {
   wrap.style.cursor = "pointer";
   wrap.setAttribute("role", "button");
   wrap.setAttribute("tabindex", "0");
+  const copyLabel = wrap.getAttribute("data-copy-label") || "Copy IP address to clipboard";
+  wrap.setAttribute("aria-label", copyLabel);
 
   const copyIp = () => {
     const ip = h1.textContent.trim();
@@ -282,10 +284,11 @@ function initAltIp(root, section) {
     const copyWrap = document.createElement("div");
     copyWrap.className = "ip-copy-wrap";
     copyWrap.setAttribute("data-copied", copiedText);
-    const h1 = document.createElement("h1");
-    h1.className = "ip-display";
-    h1.textContent = ip;
-    copyWrap.appendChild(h1);
+    copyWrap.setAttribute("data-copy-label", root.querySelector(".ip-copy-wrap")?.getAttribute("data-copy-label") || "Copy IP address to clipboard");
+    const h2 = document.createElement("h2");
+    h2.className = "ip-display";
+    h2.textContent = ip;
+    copyWrap.appendChild(h2);
     const tooltip = document.createElement("span");
     tooltip.className = "ip-copied-tooltip";
     tooltip.setAttribute("aria-live", "polite");
@@ -314,6 +317,10 @@ function initAltIp(root, section) {
       a.target = "_blank";
       a.rel = "noopener noreferrer";
       a.textContent = `AS${asnNum}`;
+      const newTabHint = document.createElement("span");
+      newTabHint.className = "sr-only";
+      newTabHint.textContent = ` (opens in a new tab)`;
+      a.appendChild(newTabHint);
       td.appendChild(a);
       addRow(tbody, labelFor("asn"), td);
     }
@@ -345,14 +352,24 @@ function initAltIp(root, section) {
   }
 
   function showSkeleton() {
+    section.setAttribute("aria-busy", "true");
+    section.setAttribute("aria-label", "Loading additional IP information");
+    section.setAttribute("role", "status");
     section.innerHTML = buildSkeleton();
     section.hidden = false;
     section.classList.add("alt-visible");
   }
 
+  function clearLoadingState() {
+    section.removeAttribute("aria-busy");
+    section.removeAttribute("aria-label");
+    section.removeAttribute("role");
+  }
+
   function showAltIp(ip, info) {
     section.classList.remove("alt-visible");
     setTimeout(() => {
+      clearLoadingState();
       section.replaceChildren(buildBlock(ip, info));
       initCopyIp(section.querySelector(".ip-copy-wrap"));
       scaleIpv6(section.querySelector(".ip-display"));
@@ -372,6 +389,7 @@ function initAltIp(root, section) {
   function hideSkeleton() {
     section.classList.remove("alt-visible");
     setTimeout(() => {
+      clearLoadingState();
       section.replaceChildren();
       section.hidden = true;
     }, 300);

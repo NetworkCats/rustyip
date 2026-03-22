@@ -191,3 +191,15 @@ msgstr "Vorlagen-Rendering fehlgeschlagen"
 
 msgid "Copied"
 msgstr "Kopiert"
+
+msgid "Go"
+msgstr "Los"
+
+msgid "opens in a new tab"
+msgstr "öffnet in neuem Tab"
+
+msgid "Copy IP address to clipboard"
+msgstr "IP-Adresse in die Zwischenablage kopieren"
+
+msgid "Site footer"
+msgstr "Seitenfuß"

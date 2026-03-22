@@ -916,7 +916,7 @@ async fn browser_invalid_ip_shows_alert_html() {
     .await;
     assert_eq!(status, StatusCode::BAD_REQUEST);
     assert!(body.contains("<!DOCTYPE html>"));
-    assert!(body.contains("alert("));
+    assert!(body.contains("role=\"alert\""));
     assert!(body.contains("not-an-ip"));
 }
 
@@ -934,7 +934,7 @@ async fn browser_non_public_ip_shows_alert_html() {
     .await;
     assert_eq!(status, StatusCode::BAD_REQUEST);
     assert!(body.contains("<!DOCTYPE html>"));
-    assert!(body.contains("alert("));
+    assert!(body.contains("role=\"alert\""));
 }
 
 #[tokio::test]
@@ -951,7 +951,7 @@ async fn browser_missing_client_ip_shows_alert_html() {
     .await;
     assert_eq!(status, StatusCode::BAD_REQUEST);
     assert!(body.contains("<!DOCTYPE html>"));
-    assert!(body.contains("alert("));
+    assert!(body.contains("role=\"alert\""));
 }
 
 #[tokio::test]
@@ -1367,7 +1367,7 @@ async fn browser_private_ipv4_shows_error() {
     .await;
     assert_eq!(status, StatusCode::BAD_REQUEST);
     assert!(body.contains("<!DOCTYPE html>"));
-    assert!(body.contains("alert("));
+    assert!(body.contains("role=\"alert\""));
     assert!(body.contains("192.168.1.1"));
 }
 
@@ -1384,7 +1384,7 @@ async fn browser_loopback_shows_error() {
     )
     .await;
     assert_eq!(status, StatusCode::BAD_REQUEST);
-    assert!(body.contains("alert("));
+    assert!(body.contains("role=\"alert\""));
 }
 
 // --- IPv4 domain tests ---
@@ -1582,5 +1582,5 @@ async fn browser_broadcast_shows_error() {
     )
     .await;
     assert_eq!(status, StatusCode::BAD_REQUEST);
-    assert!(body.contains("alert("));
+    assert!(body.contains("role=\"alert\""));
 }

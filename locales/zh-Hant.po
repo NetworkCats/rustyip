@@ -191,3 +191,15 @@ msgstr "範本渲染失敗"
 
 msgid "Copied"
 msgstr "已複製"
+
+msgid "Go"
+msgstr "前往"
+
+msgid "opens in a new tab"
+msgstr "在新分頁中開啟"
+
+msgid "Copy IP address to clipboard"
+msgstr "複製 IP 位址到剪貼簿"
+
+msgid "Site footer"
+msgstr "網站頁尾"

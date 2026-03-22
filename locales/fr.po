@@ -191,3 +191,15 @@ msgstr "Echec du rendu du modele"
 
 msgid "Copied"
 msgstr "Copie"
+
+msgid "Go"
+msgstr "Aller"
+
+msgid "opens in a new tab"
+msgstr "s'ouvre dans un nouvel onglet"
+
+msgid "Copy IP address to clipboard"
+msgstr "Copier l'adresse IP dans le presse-papiers"
+
+msgid "Site footer"
+msgstr "Pied de page"

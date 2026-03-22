@@ -191,3 +191,15 @@ msgstr "템플릿 렌더링 실패"
 
 msgid "Copied"
 msgstr "복사됨"
+
+msgid "Go"
+msgstr "이동"
+
+msgid "opens in a new tab"
+msgstr "새 탭에서 열림"
+
+msgid "Copy IP address to clipboard"
+msgstr "IP 주소를 클립보드에 복사"
+
+msgid "Site footer"
+msgstr "사이트 바닥글"

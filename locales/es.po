@@ -191,3 +191,15 @@ msgstr "La renderizacion de la plantilla fallo"
 
 msgid "Copied"
 msgstr "Copiado"
+
+msgid "Go"
+msgstr "Ir"
+
+msgid "opens in a new tab"
+msgstr "se abre en una pestaña nueva"
+
+msgid "Copy IP address to clipboard"
+msgstr "Copiar dirección IP al portapapeles"
+
+msgid "Site footer"
+msgstr "Pie de página"

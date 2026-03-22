@@ -191,3 +191,15 @@ msgstr "Sjabloonweergave mislukt"
 
 msgid "Copied"
 msgstr "Gekopieerd"
+
+msgid "Go"
+msgstr "Ga"
+
+msgid "opens in a new tab"
+msgstr "opent in een nieuw tabblad"
+
+msgid "Copy IP address to clipboard"
+msgstr "IP-adres kopiëren naar klembord"
+
+msgid "Site footer"
+msgstr "Sitefooter"

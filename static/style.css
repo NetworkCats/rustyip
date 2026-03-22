@@ -81,6 +81,25 @@ main {
   border: 0;
 }
 
+.skip-link {
+  position: absolute;
+  inset-inline-start: -9999px;
+  inset-block-start: 0;
+  z-index: 10000;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #FFF;
+  background: var(--color-blue);
+  border-radius: 0 0 6px 6px;
+  text-decoration: none;
+
+  &:focus {
+    inset-inline-start: 50%;
+    translate: -50% 0;
+  }
+}
+
 .search-form {
   display: flex;
 
@@ -207,10 +226,12 @@ main {
 
   a {
     color: var(--color-link);
-    text-decoration: none;
+    text-decoration: underline;
+    text-decoration-color: light-dark(rgb(0 122 255 / 0.4), rgb(9 132 255 / 0.4));
+    text-underline-offset: 2px;
 
     &:hover {
-      text-decoration: underline;
+      text-decoration-color: currentColor;
     }
   }
 }
@@ -267,10 +288,12 @@ main {
 
     a {
       color: var(--color-link);
-      text-decoration: none;
+      text-decoration: underline;
+      text-decoration-color: light-dark(rgb(0 122 255 / 0.4), rgb(9 132 255 / 0.4));
+      text-underline-offset: 2px;
 
       &:hover {
-        text-decoration: underline;
+        text-decoration-color: currentColor;
       }
     }
 
@@ -406,10 +429,12 @@ main {
 
   a {
     color: var(--color-link);
-    text-decoration: none;
+    text-decoration: underline;
+    text-decoration-color: light-dark(rgb(0 122 255 / 0.4), rgb(9 132 255 / 0.4));
+    text-underline-offset: 2px;
 
     &:hover {
-      text-decoration: underline;
+      text-decoration-color: currentColor;
     }
   }
 
@@ -430,11 +455,11 @@ main {
     p {
       margin-block-end: 6px;
       font-size: 11px;
-      color: var(--color-gray2);
+      color: light-dark(#6E6E73, #9A9A9F);
     }
 
     a {
-      color: var(--color-gray2);
+      color: light-dark(#6E6E73, #9A9A9F);
       font-size: 11px;
     }
 
@@ -449,6 +474,9 @@ main {
 
   .footer-lang {
     margin-block-start: 0;
+    display: flex;
+    gap: 6px;
+    align-items: center;
   }
 
   .lang-select {
@@ -464,6 +492,26 @@ main {
     background-repeat: no-repeat;
     background-position: right 10px center;
     cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-blue);
+      outline-offset: -1px;
+    }
+  }
+
+  .lang-submit {
+    padding: 6px 12px;
+    border: 1px solid var(--color-separator);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--color-label-secondary);
+    background: var(--color-bg);
+    cursor: pointer;
+
+    &:hover {
+      background: var(--color-bg-secondary);
+    }
 
     &:focus-visible {
       outline: 2px solid var(--color-blue);

@@ -191,3 +191,15 @@ msgstr "Ошибка рендеринга шаблона"
 
 msgid "Copied"
 msgstr "Скопировано"
+
+msgid "Go"
+msgstr "Перейти"
+
+msgid "opens in a new tab"
+msgstr "откроется в новой вкладке"
+
+msgid "Copy IP address to clipboard"
+msgstr "Скопировать IP-адрес в буфер обмена"
+
+msgid "Site footer"
+msgstr "Подвал сайта"

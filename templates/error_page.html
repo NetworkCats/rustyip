@@ -8,8 +8,8 @@
 
 {% block content %}
     <div class="error-page">
-      <h1 class="error-code">{{ status_code }}</h1>
-      <p class="error-status">{{ status_text }}</p>
+      <h1 class="error-code">{{ status_code }}<span class="sr-only"> - {{ status_text }}</span></h1>
+      <p class="error-status" aria-hidden="true">{{ status_text }}</p>
       <p class="error-detail">{{ error_message }}</p>
       <a href="/{{ locale.tag() }}" class="error-home-link">{{ "Go to Home"|t(locale) }}</a>
     </div>

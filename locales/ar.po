@@ -191,3 +191,15 @@ msgstr "فشل عرض القالب"
 
 msgid "Copied"
 msgstr "تم النسخ"
+
+msgid "Go"
+msgstr "انتقال"
+
+msgid "opens in a new tab"
+msgstr "يفتح في علامة تبويب جديدة"
+
+msgid "Copy IP address to clipboard"
+msgstr "نسخ عنوان IP إلى الحافظة"
+
+msgid "Site footer"
+msgstr "تذييل الموقع"

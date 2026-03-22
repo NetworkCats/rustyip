@@ -1,8 +1,9 @@
-<div class="footer-lang">
+<form class="footer-lang" method="GET" action="/{{ lang_tag }}">
   <label for="lang-select" class="sr-only">{{ "Language"|t(locale) }}</label>
-  <select id="lang-select" class="lang-select" autocomplete="off" onchange="if(this.value){var u=new(window.URL)(this.value,window.location.origin);u.search=window.location.search;window.location.href=u.href}">
+  <select id="lang-select" name="lang" class="lang-select" autocomplete="off" onchange="if(this.value){var u=new(window.URL)(this.value,window.location.origin);u.search=window.location.search;window.location.href=u.href}">
     {% for l in all_locales %}
     <option value="/{{ l.tag() }}"{% if *l == locale %} selected{% endif %}>{{ l.name() }}</option>
     {% endfor %}
   </select>
-</div>
+  <noscript><button type="submit" class="lang-submit">{{ "Go"|t(locale) }}</button></noscript>
+</form>

@@ -191,3 +191,15 @@ msgstr "Falha na renderização do template"
 
 msgid "Copied"
 msgstr "Copiado"
+
+msgid "Go"
+msgstr "Ir"
+
+msgid "opens in a new tab"
+msgstr "abre em uma nova aba"
+
+msgid "Copy IP address to clipboard"
+msgstr "Copiar endereço IP para a área de transferência"
+
+msgid "Site footer"
+msgstr "Rodapé do site"

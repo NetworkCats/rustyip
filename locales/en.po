@@ -191,3 +191,15 @@ msgstr "Template render failed"
 
 msgid "Copied"
 msgstr "Copied"
+
+msgid "Go"
+msgstr "Go"
+
+msgid "opens in a new tab"
+msgstr "opens in a new tab"
+
+msgid "Copy IP address to clipboard"
+msgstr "Copy IP address to clipboard"
+
+msgid "Site footer"
+msgstr "Site footer"

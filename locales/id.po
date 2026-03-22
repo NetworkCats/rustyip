@@ -191,3 +191,15 @@ msgstr "Render template gagal"
 
 msgid "Copied"
 msgstr "Disalin"
+
+msgid "Go"
+msgstr "Buka"
+
+msgid "opens in a new tab"
+msgstr "dibuka di tab baru"
+
+msgid "Copy IP address to clipboard"
+msgstr "Salin alamat IP ke papan klip"
+
+msgid "Site footer"
+msgstr "Footer situs"

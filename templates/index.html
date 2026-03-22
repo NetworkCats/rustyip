@@ -72,7 +72,7 @@
          data-table-label="{{ "IP address information"|t(locale) }}"
          {% if is_query %}data-is-query="true"{% endif %}
          id="ip-info-root">
-    <div class="ip-copy-wrap" data-copied="{{ "Copied"|t(locale) }}">
+    <div class="ip-copy-wrap" data-copied="{{ "Copied"|t(locale) }}" data-copy-label="{{ "Copy IP address to clipboard"|t(locale) }}">
       <h1 class="ip-display" itemprop="name">{{ ip }}</h1>
       <span class="ip-copied-tooltip" aria-live="polite" hidden>{{ "Copied"|t(locale) }}</span>
     </div>
@@ -82,7 +82,7 @@
         {% if !asn.is_empty() %}
         <tr data-label="asn">
           <th scope="row">{{ "ASN"|t(locale) }}</th>
-          <td>{% if let Some(n) = asn_number %}<a href="https://bgp.tools/as/{{ n }}" target="_blank" rel="noopener noreferrer">{{ asn }}</a>{% else %}{{ asn }}{% endif %}</td>
+          <td>{% if let Some(n) = asn_number %}<a href="https://bgp.tools/as/{{ n }}" target="_blank" rel="noopener noreferrer">{{ asn }}<span class="sr-only"> ({{ "opens in a new tab"|t(locale) }})</span></a>{% else %}{{ asn }}{% endif %}</td>
         </tr>
         {% endif %}
         {% if !org.is_empty() %}
@@ -274,7 +274,7 @@ curl {{ site_domain }}/tor</code></pre>
 {% endblock %}
 
 {% block footer %}
-  <footer class="site-footer">
+  <footer class="site-footer" aria-label="{{ "Site footer"|t(locale) }}">
     <div class="footer-inner">
       <div class="footer-left">
         {% include "_footer.html" %}

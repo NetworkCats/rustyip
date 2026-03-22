@@ -191,3 +191,15 @@ msgstr "テンプレートのレンダリングに失敗しました"
 
 msgid "Copied"
 msgstr "コピーしました"
+
+msgid "Go"
+msgstr "移動"
+
+msgid "opens in a new tab"
+msgstr "新しいタブで開きます"
+
+msgid "Copy IP address to clipboard"
+msgstr "IPアドレスをクリップボードにコピー"
+
+msgid "Site footer"
+msgstr "サイトフッター"

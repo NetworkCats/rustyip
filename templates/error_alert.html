@@ -14,9 +14,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.min.css">
 {% endblock %}
 
-{% block head_extra %}
-  <script>alert("{{ error_message }}");</script>
-{% endblock %}
+{% block head_extra %}{% endblock %}
 
 {% block content %}
     {% let autofocus = true %}
@@ -32,7 +30,7 @@
 {% endblock %}
 
 {% block footer %}
-  <footer class="site-footer">
+  <footer class="site-footer" aria-label="{{ "Site footer"|t(locale) }}">
     <div class="footer-inner">
       <div class="footer-left">
         {% include "_footer.html" %}
