@@ -320,5 +320,7 @@ function initCopyIp(wrap){
     }
   }
 
-  detectAltIp();
+  if(!root.hasAttribute("data-is-query")){
+    detectAltIp();
+  }
 })();
