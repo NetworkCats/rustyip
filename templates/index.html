@@ -67,6 +67,9 @@
     <div itemscope itemtype="https://schema.org/WebPage"
          data-ipv4-domain="{{ ipv4_domain }}"
          data-copied-text="{{ "Copied"|t(locale) }}"
+         data-yes-text="{{ "Yes"|t(locale) }}"
+         data-no-text="{{ "No"|t(locale) }}"
+         data-table-label="{{ "IP address information"|t(locale) }}"
          {% if is_query %}data-is-query="true"{% endif %}
          id="ip-info-root">
     <div class="ip-copy-wrap" data-copied="{{ "Copied"|t(locale) }}">

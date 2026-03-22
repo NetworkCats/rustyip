@@ -81,8 +81,8 @@ fn proxy_field_handler(
         return Err(AppError::DbNotReady);
     }
     let ip = resolve_ip(headers, query, state.dev_mode)?;
-    let proxy = db::lookup_proxy(&state.db, ip).ok_or(AppError::DbLookupFailed)?;
-    Ok(format!("{}\n", field(&proxy)))
+    let value = db::lookup_proxy(&state.db, ip).map_or(false, |p| field(&p));
+    Ok(format!("{value}\n"))
 }
 
 pub async fn asn_handler(

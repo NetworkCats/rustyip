@@ -208,6 +208,9 @@ function initCopyIp(wrap){
   var langTag=document.documentElement.getAttribute("lang")||"en";
   var mmdbKeyMap={"en":"en","de":"de","es":"es","fr":"fr","ja":"ja","ru":"ru","pt":"pt-BR","zh-Hans":"zh-CN","zh-Hant":"zh-CN"};
   var mmdbKey=mmdbKeyMap[langTag]||"en";
+  var yesText=root.getAttribute("data-yes-text")||"Yes";
+  var noText=root.getAttribute("data-no-text")||"No";
+  var tableLabel=root.getAttribute("data-table-label")||"IP address information";
 
   function localizedName(names){
     if(!names)return "";
@@ -237,9 +240,9 @@ function initCopyIp(wrap){
 
   function boolHtml(val){
     if(val){
-      return '<i class="icon-check bool-true" aria-hidden="true"></i>';
+      return '<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">'+escapeHtml(yesText)+'</span>';
     }
-    return '<i class="icon-minus bool-false" aria-hidden="true"></i>';
+    return '<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">'+escapeHtml(noText)+'</span>';
   }
 
   function labelFor(key){
@@ -252,7 +255,7 @@ function initCopyIp(wrap){
     html+='<span class="ip-copied-tooltip" aria-live="polite" hidden>'+escapeHtml(copiedText)+'</span>';
     html+='</div>';
 
-    html+='<table class="info-table"><tbody>';
+    html+='<table class="info-table" aria-label="'+escapeHtml(tableLabel)+'"><tbody>';
 
     var asn=info.asn||{};
     var asnNum=asn.autonomous_system_number;
@@ -359,8 +362,11 @@ function initCopyIp(wrap){
         })
         .catch(function(){hideSkeleton();});
     }else if(!primaryIsIPv6){
-      fetch("/ip")
+      var controller2=new AbortController();
+      var timeout2=setTimeout(function(){controller2.abort();},5000);
+      fetch("/ip",{signal:controller2.signal})
         .then(function(r){
+          clearTimeout(timeout2);
           if(!r.ok)throw new Error(r.status);
           return r.text();
         })

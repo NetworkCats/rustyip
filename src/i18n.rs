@@ -212,9 +212,10 @@ fn append_quoted(target: &mut String, quoted: &str) {
     if s.len() >= 2 && s.starts_with('"') && s.ends_with('"') {
         let inner = &s[1..s.len() - 1];
         let unescaped = inner
+            .replace("\\\\", "\x00")
             .replace("\\n", "\n")
             .replace("\\\"", "\"")
-            .replace("\\\\", "\\");
+            .replace('\x00', "\\");
         target.push_str(&unescaped);
     }
 }

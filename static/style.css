@@ -154,7 +154,7 @@ main {
 
 .ip-copied-tooltip {
   position: absolute;
-  right: 0;
+  inset-inline-end: 0;
   top: 50%;
   translate: 0 -50%;
   font-size: 13px;
