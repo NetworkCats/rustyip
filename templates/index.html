@@ -270,7 +270,7 @@ curl {{ site_domain }}/tor</code></pre>
 {% endblock %}
 
 {% block scripts %}
-  <script src="/static/script.js?v={{ js_version }}" defer></script>
+  <script type="module" src="/static/script.js?v={{ js_version }}"></script>
 {% endblock %}
 
 {% block footer %}
