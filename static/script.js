@@ -137,6 +137,23 @@
   });
 })();
 
+function scaleIpv6(el){
+  if(!el)return;
+  var ip=el.textContent.trim();
+  if(ip.indexOf(":")===-1)return;
+  var len=ip.length;
+  // IPv6 addresses range from ~5 chars (e.g. "::1") to 39 chars (full form).
+  // Scale font down for longer addresses. Short IPv6 (<= 16 chars) keeps default.
+  // At 39 chars (max), scale to ~60% of default size.
+  if(len<=16)return;
+  var scale=1-((len-16)/(39-16))*0.4;
+  if(scale<0.6)scale=0.6;
+  var maxPx=Math.round(42*scale);
+  var vw=+(6*scale).toFixed(2);
+  var minPx=Math.round(28*scale);
+  el.style.fontSize="clamp("+minPx+"px, "+vw+"vw, "+maxPx+"px)";
+}
+
 function initCopyIp(wrap){
   "use strict";
   if(!wrap)return;
@@ -168,7 +185,9 @@ function initCopyIp(wrap){
 
 (function(){
   "use strict";
-  initCopyIp(document.querySelector(".ip-copy-wrap"));
+  var wrap=document.querySelector(".ip-copy-wrap");
+  initCopyIp(wrap);
+  if(wrap)scaleIpv6(wrap.querySelector(".ip-display"));
 })();
 
 (function(){
@@ -298,6 +317,7 @@ function initCopyIp(wrap){
     setTimeout(function(){
       section.innerHTML=buildBlock(ip,info);
       initCopyIp(section.querySelector(".ip-copy-wrap"));
+      scaleIpv6(section.querySelector(".ip-display"));
       section.hidden=false;
       // Force reflow before adding the visible class for transition
       void section.offsetHeight;
