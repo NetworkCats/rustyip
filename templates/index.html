@@ -77,42 +77,42 @@
     <table class="info-table" aria-label="{{ t_table_aria }}">
       <tbody>
         {% if !asn.is_empty() %}
-        <tr>
+        <tr data-label="asn">
           <th scope="row">{{ t_asn }}</th>
           <td>{% if let Some(n) = asn_number %}<a href="https://bgp.tools/as/{{ n }}" target="_blank" rel="noopener noreferrer">{{ asn }}</a>{% else %}{{ asn }}{% endif %}</td>
         </tr>
         {% endif %}
         {% if !org.is_empty() %}
-        <tr>
+        <tr data-label="org">
           <th scope="row">{{ t_org }}</th>
           <td itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><span itemprop="name">{{ org }}</span></td>
         </tr>
         {% endif %}
         {% if !country.is_empty() %}
-        <tr itemprop="contentLocation" itemscope itemtype="https://schema.org/Place">
+        <tr data-label="country" itemprop="contentLocation" itemscope itemtype="https://schema.org/Place">
           <th scope="row">{{ t_country }}</th>
           <td itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"><span itemprop="addressCountry">{{ country }}</span>{% if !country_code.is_empty() %}<meta itemprop="addressCountry" content="{{ country_code }}">{% endif %}</td>
         </tr>
         {% endif %}
         {% if !city.is_empty() %}
-        <tr>
+        <tr data-label="city">
           <th scope="row">{{ t_city }}</th>
           <td itemprop="contentLocation" itemscope itemtype="https://schema.org/Place"><span itemprop="name">{{ city }}</span></td>
         </tr>
         {% endif %}
-        <tr>
+        <tr data-label="proxy">
           <th scope="row">{{ t_proxy }}</th>
           <td>{% if is_proxy %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ t_yes }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ t_no }}</span>{% endif %}</td>
         </tr>
-        <tr>
+        <tr data-label="vpn">
           <th scope="row">{{ t_vpn }}</th>
           <td>{% if is_vpn %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ t_yes }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ t_no }}</span>{% endif %}</td>
         </tr>
-        <tr>
+        <tr data-label="hosting">
           <th scope="row">{{ t_hosting }}</th>
           <td>{% if is_hosting %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ t_yes }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ t_no }}</span>{% endif %}</td>
         </tr>
-        <tr>
+        <tr data-label="tor">
           <th scope="row">{{ t_tor }}</th>
           <td>{% if is_tor %}<i class="icon-check bool-true" aria-hidden="true"></i><span class="sr-only">{{ t_yes }}</span>{% else %}<i class="icon-minus bool-false" aria-hidden="true"></i><span class="sr-only">{{ t_no }}</span>{% endif %}</td>
         </tr>

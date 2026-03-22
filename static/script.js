@@ -218,10 +218,10 @@ function initCopyIp(wrap){
     var labels={};
     var rows=root.querySelectorAll(".info-table tbody tr");
     for(var i=0;i<rows.length;i++){
+      var key=rows[i].getAttribute("data-label");
       var th=rows[i].querySelector("th");
-      var td=rows[i].querySelector("td");
-      if(th&&td){
-        labels[i]={label:th.textContent.trim(),html:td.innerHTML};
+      if(key&&th){
+        labels[key]=th.textContent.trim();
       }
     }
     return labels;
@@ -242,8 +242,8 @@ function initCopyIp(wrap){
     return '<i class="icon-minus bool-false" aria-hidden="true"></i>';
   }
 
-  function labelAt(index){
-    return existingLabels[index]?existingLabels[index].label:"";
+  function labelFor(key){
+    return existingLabels[key]||"";
   }
 
   function buildBlock(ip,info){
@@ -265,27 +265,26 @@ function initCopyIp(wrap){
 
     if(asnNum){
       var asnStr="AS"+asnNum;
-      html+='<tr><th scope="row">'+escapeHtml(labelAt(0))+'</th>';
+      html+='<tr><th scope="row">'+escapeHtml(labelFor("asn"))+'</th>';
       html+='<td><a href="https://bgp.tools/as/'+asnNum+'" target="_blank" rel="noopener noreferrer">'+escapeHtml(asnStr)+'</a></td></tr>';
     }
     if(asnOrg){
-      html+='<tr><th scope="row">'+escapeHtml(labelAt(1))+'</th>';
+      html+='<tr><th scope="row">'+escapeHtml(labelFor("org"))+'</th>';
       html+='<td>'+escapeHtml(asnOrg)+'</td></tr>';
     }
     if(countryName){
-      html+='<tr><th scope="row">'+escapeHtml(labelAt(2))+'</th>';
+      html+='<tr><th scope="row">'+escapeHtml(labelFor("country"))+'</th>';
       html+='<td>'+escapeHtml(countryName)+'</td></tr>';
     }
     if(cityName){
-      html+='<tr><th scope="row">'+escapeHtml(labelAt(3))+'</th>';
+      html+='<tr><th scope="row">'+escapeHtml(labelFor("city"))+'</th>';
       html+='<td>'+escapeHtml(cityName)+'</td></tr>';
     }
 
-    var boolStart=Object.keys(existingLabels).length-4;
-    html+='<tr><th scope="row">'+escapeHtml(labelAt(boolStart))+'</th><td>'+boolHtml(proxy.is_proxy)+'</td></tr>';
-    html+='<tr><th scope="row">'+escapeHtml(labelAt(boolStart+1))+'</th><td>'+boolHtml(proxy.is_vpn)+'</td></tr>';
-    html+='<tr><th scope="row">'+escapeHtml(labelAt(boolStart+2))+'</th><td>'+boolHtml(proxy.is_hosting)+'</td></tr>';
-    html+='<tr><th scope="row">'+escapeHtml(labelAt(boolStart+3))+'</th><td>'+boolHtml(proxy.is_tor)+'</td></tr>';
+    html+='<tr><th scope="row">'+escapeHtml(labelFor("proxy"))+'</th><td>'+boolHtml(proxy.is_proxy)+'</td></tr>';
+    html+='<tr><th scope="row">'+escapeHtml(labelFor("vpn"))+'</th><td>'+boolHtml(proxy.is_vpn)+'</td></tr>';
+    html+='<tr><th scope="row">'+escapeHtml(labelFor("hosting"))+'</th><td>'+boolHtml(proxy.is_hosting)+'</td></tr>';
+    html+='<tr><th scope="row">'+escapeHtml(labelFor("tor"))+'</th><td>'+boolHtml(proxy.is_tor)+'</td></tr>';
 
     html+='</tbody></table>';
     return html;
