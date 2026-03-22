@@ -23,9 +23,7 @@ pub use api::{
     vpn_handler,
 };
 pub use html::{not_found, root, root_redirect, root_trailing_slash};
-pub use seo::{
-    build_openapi_json, favicon, manifest, openapi_json, robots_txt, sitemap_xml,
-};
+pub use seo::{build_openapi_json, favicon, manifest, openapi_json, robots_txt, sitemap_xml};
 
 #[derive(serde::Deserialize)]
 pub struct IpQuery {
@@ -107,8 +105,7 @@ fn handle_non_browser_request(
 
     if wants_json(headers) && query.ip.is_none() {
         return Some(
-            match extract_client_ip(headers, state.dev_mode)
-                .and_then(|ip| lookup_ip(&state.db, ip))
+            match extract_client_ip(headers, state.dev_mode).and_then(|ip| lookup_ip(&state.db, ip))
             {
                 Ok(info) => axum::Json(info).into_response(),
                 Err(e) => e.into_response(),

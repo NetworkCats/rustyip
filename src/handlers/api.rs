@@ -81,7 +81,7 @@ fn proxy_field_handler(
         return Err(AppError::DbNotReady);
     }
     let ip = resolve_ip(headers, query, state.dev_mode)?;
-    let value = db::lookup_proxy(&state.db, ip).map_or(false, |p| field(&p));
+    let value = db::lookup_proxy(&state.db, ip).is_some_and(|p| field(&p));
     Ok(format!("{value}\n"))
 }
 

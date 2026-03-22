@@ -9,7 +9,7 @@ use maxminddb::Reader;
 use serde::Deserialize;
 
 use crate::models::{
-    from_mmdb_record, IpInfo, MmdbAsn, MmdbCity, MmdbCountry, MmdbProxy, MmdbRecord, ProxyInfo,
+    IpInfo, MmdbAsn, MmdbCity, MmdbCountry, MmdbProxy, MmdbRecord, ProxyInfo, from_mmdb_record,
 };
 
 pub type DbReader = Reader<Vec<u8>>;

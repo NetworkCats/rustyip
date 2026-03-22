@@ -17,8 +17,8 @@ pub async fn openapi_json(State(state): State<AppState>) -> Response {
 }
 
 pub fn build_openapi_json(site_domain: &str) -> Arc<str> {
-    let mut spec: serde_json::Value =
-        serde_json::from_str(include_str!("../../openapi.json")).expect("openapi.json must be valid");
+    let mut spec: serde_json::Value = serde_json::from_str(include_str!("../../openapi.json"))
+        .expect("openapi.json must be valid");
 
     let server_url = format!("https://{site_domain}");
     spec["servers"] = serde_json::json!([{ "url": server_url }]);
