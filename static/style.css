@@ -167,7 +167,7 @@ main {
   font-size: clamp(28px, 6vw, 42px);
   line-height: 1.2;
   font-weight: 200;
-  margin-block: 28px 20px;
+  margin-block: 28px 12px;
   letter-spacing: -0.5px;
   overflow-wrap: break-word;
   word-break: break-all;
@@ -202,7 +202,7 @@ main {
     border-block-start: 1px solid var(--color-separator);
     font-size: 15px;
     line-height: 1.5;
-    vertical-align: top;
+    vertical-align: middle;
     overflow-wrap: break-word;
   }
 
@@ -217,6 +217,10 @@ main {
     font-weight: 600;
     color: var(--color-label);
     text-align: start;
+  }
+
+  [class^="icon-"] {
+    line-height: 1.5;
   }
 
   .bool-true {
@@ -576,7 +580,7 @@ main {
 .skeleton-ip {
   inline-size: 260px;
   block-size: 42px;
-  margin-block: 28px 20px;
+  margin-block: 28px 12px;
 }
 
 .skeleton-table {
@@ -625,7 +629,7 @@ main {
   }
 
   .ip-display {
-    margin-block: 20px 16px;
+    margin-block: 20px 10px;
   }
 
   .info-table th,

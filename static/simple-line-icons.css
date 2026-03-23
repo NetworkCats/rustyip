@@ -1,0 +1,29 @@
+@font-face {
+  font-family: simple-line-icons;
+  src: url(fonts/Simple-Line-Icons.woff2) format('woff2'),
+       url(fonts/Simple-Line-Icons.woff) format('woff'),
+       url(fonts/Simple-Line-Icons.ttf) format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.icon-check,
+.icon-magnifier,
+.icon-minus,
+.icon-social-github {
+  font-family: simple-line-icons;
+  speak: none;
+  font-style: normal;
+  font-weight: 400;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-check::before { content: "\e080"; }
+.icon-minus::before { content: "\e615"; }
+.icon-magnifier::before { content: "\e090"; }
+.icon-social-github::before { content: "\e60c"; }

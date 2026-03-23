@@ -52,12 +52,8 @@
   {% endif %}
 {% endblock %}
 
-{% block head_preconnect %}
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-{% endblock %}
-
 {% block head_stylesheets %}
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.min.css">
+  <link rel="stylesheet" href="/static/simple-line-icons.css?v={{ css_version }}">
 {% endblock %}
 
 {% block content %}
