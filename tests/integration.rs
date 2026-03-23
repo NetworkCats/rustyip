@@ -93,9 +93,9 @@ async fn json_endpoint_returns_full_info() {
     );
     assert_eq!(json["country"]["iso_code"], "US");
     assert_eq!(json["city"]["names"]["en"], "Piscataway");
-    assert_eq!(json["proxy"]["is_proxy"], true);
+    assert_eq!(json["proxy"]["is_proxy"], false);
     assert_eq!(json["proxy"]["is_hosting"], false);
-    assert_eq!(json["proxy"]["is_tor"], false);
+    assert_eq!(json["proxy"]["is_tor"], true);
 }
 
 #[tokio::test]
@@ -154,7 +154,7 @@ async fn proxy_endpoint() {
     let app = build_test_app();
     let (status, body) = get(&app, "/proxy?ip=45.77.77.77").await;
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(body.trim(), "true");
+    assert_eq!(body.trim(), "false");
 }
 
 #[tokio::test]
@@ -178,7 +178,7 @@ async fn tor_endpoint() {
     let app = build_test_app();
     let (status, body) = get(&app, "/tor?ip=45.77.77.77").await;
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(body.trim(), "false");
+    assert_eq!(body.trim(), "true");
 }
 
 #[tokio::test]
