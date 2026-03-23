@@ -77,7 +77,8 @@
       <span class="ip-copied-tooltip" aria-live="polite" hidden>{{ "Copied"|t(locale) }}</span>
     </div>
 
-    <table class="info-table" aria-label="{{ "IP address information"|t(locale) }}">
+    <table class="info-table" aria-label="{{ "IP address information"|t(locale) }}"
+      data-l-asn="{{ "ASN"|t(locale) }}" data-l-org="{{ "Org"|t(locale) }}" data-l-country="{{ "Country"|t(locale) }}" data-l-city="{{ "City"|t(locale) }}">
       <tbody>
         {% if !asn.is_empty() %}
         <tr data-label="asn">

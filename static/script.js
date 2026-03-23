@@ -238,6 +238,15 @@ function initAltIp(root, section) {
 
   function readLabels() {
     const labels = {};
+    const table = root.querySelector(".info-table");
+    if (table) {
+      for (const [attr, val] of Object.entries(table.dataset)) {
+        if (attr.startsWith("l")) {
+          const key = attr.slice(1).toLowerCase();
+          if (key) labels[key] = val;
+        }
+      }
+    }
     for (const row of root.querySelectorAll(".info-table tbody tr")) {
       const key = row.getAttribute("data-label");
       const th = row.querySelector("th");
