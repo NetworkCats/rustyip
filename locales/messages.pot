@@ -115,7 +115,7 @@ msgid "Can I call your service programmatically?"
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 1
-msgid "Sure, but please respect our rate limits. Normally it's 100 RPM, and under heavy load we may drop it to 50 or 30 RPM."
+msgid "Sure, but please respect our rate limits. Normally it's 60 RPM, and under heavy load we may drop it to 30 or 15 RPM."
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 2
@@ -163,11 +163,11 @@ msgid "Is this service reliable?"
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 1
-msgid "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 2 core 2 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."
+msgid "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 1 core 1 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 2
-msgid "It costs me $18.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."
+msgid "It costs me $5.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."
 msgstr ""
 
 #: templates/index.html - FAQ answer paragraph 3

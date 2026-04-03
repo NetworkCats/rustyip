@@ -87,8 +87,8 @@ msgstr "Kirim permintaan ke endpoint <code>/json</code>, atau kirim permintaan d
 msgid "Can I call your service programmatically?"
 msgstr "Bisakah saya memanggil layanan Anda secara programatik?"
 
-msgid "Sure, but please respect our rate limits. Normally it's 100 RPM, and under heavy load we may drop it to 50 or 30 RPM."
-msgstr "Tentu, tapi mohon patuhi batas laju kami. Normalnya 100 RPM, dan saat beban tinggi kami mungkin menurunkannya ke 50 atau 30 RPM."
+msgid "Sure, but please respect our rate limits. Normally it's 60 RPM, and under heavy load we may drop it to 30 or 15 RPM."
+msgstr "Tentu, tapi mohon patuhi batas laju kami. Normalnya 60 RPM, dan saat beban tinggi kami mungkin menurunkannya ke 30 atau 15 RPM."
 
 msgid "The API is meant for manual use or small projects. If your site uses our API to look up visitor IPs, please use a message queue so requests don't block. If your project has high traffic or needs low latency, you're better off using our open source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. That's actually what this project uses under the hood."
 msgstr "API ini ditujukan untuk penggunaan manual atau proyek kecil. Jika situs Anda menggunakan API kami untuk mencari IP pengunjung, gunakan antrean pesan agar permintaan tidak terblokir. Jika proyek Anda memiliki lalu lintas tinggi atau membutuhkan latensi rendah, lebih baik gunakan basis data offline sumber terbuka kami: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. Sebenarnya itulah yang digunakan proyek ini di balik layar."
@@ -123,11 +123,11 @@ msgstr "UX juga lebih baik daripada kebanyakan situs pencarian IP. Situs ini ber
 msgid "Is this service reliable?"
 msgstr "Apakah layanan ini dapat diandalkan?"
 
-msgid "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 2 core 2 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."
-msgstr "Semuanya ditulis dalam Rust, jadi performanya sangat baik. Layanan ini dapat menangani lalu lintas DDoS L7 dan tetap berjalan dengan baik. Berjalan di VPS 2 core 2 GB, yang sudah lebih dari cukup. Satu-satunya hal yang bisa menyebabkan masalah nyata adalah DDoS L7 skala besar, tapi kami memiliki Cloudflare di depan kami."
+msgid "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 1 core 1 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."
+msgstr "Semuanya ditulis dalam Rust, jadi performanya sangat baik. Layanan ini dapat menangani lalu lintas DDoS L7 dan tetap berjalan dengan baik. Berjalan di VPS 1 core 1 GB, yang sudah lebih dari cukup. Satu-satunya hal yang bisa menyebabkan masalah nyata adalah DDoS L7 skala besar, tapi kami memiliki Cloudflare di depan kami."
 
-msgid "It costs me $18.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."
-msgstr "Biaya operasionalnya $18,00/bulan, yang cukup murah. Saya tidak akan menutupnya karena biaya hosting, dan tidak akan ada iklan."
+msgid "It costs me $5.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."
+msgstr "Biaya operasionalnya $5,00/bulan, yang cukup murah. Saya tidak akan menutupnya karena biaya hosting, dan tidak akan ada iklan."
 
 msgid "This service is not going to rug pull on you."
 msgstr "Layanan ini tidak akan menghilang begitu saja."

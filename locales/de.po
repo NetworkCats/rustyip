@@ -87,8 +87,8 @@ msgstr "Senden Sie eine Anfrage an den <code>/json</code>-Endpunkt oder senden S
 msgid "Can I call your service programmatically?"
 msgstr "Kann ich Ihren Dienst programmatisch aufrufen?"
 
-msgid "Sure, but please respect our rate limits. Normally it's 100 RPM, and under heavy load we may drop it to 50 or 30 RPM."
-msgstr "Klar, aber bitte halten Sie unsere Anfragelimits ein. Normalerweise sind es 100 RPM, und bei hoher Last können wir es auf 50 oder 30 RPM reduzieren."
+msgid "Sure, but please respect our rate limits. Normally it's 60 RPM, and under heavy load we may drop it to 30 or 15 RPM."
+msgstr "Klar, aber bitte halten Sie unsere Anfragelimits ein. Normalerweise sind es 60 RPM, und bei hoher Last können wir es auf 30 oder 15 RPM reduzieren."
 
 msgid "The API is meant for manual use or small projects. If your site uses our API to look up visitor IPs, please use a message queue so requests don't block. If your project has high traffic or needs low latency, you're better off using our open source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. That's actually what this project uses under the hood."
 msgstr "Die API ist für manuelle Nutzung oder kleine Projekte gedacht. Wenn Ihre Website unsere API zur Abfrage von Besucher-IPs verwendet, nutzen Sie bitte eine Nachrichtenwarteschlange, damit Anfragen nicht blockieren. Wenn Ihr Projekt hohen Datenverkehr hat oder niedrige Latenz benötigt, verwenden Sie besser unsere Open-Source-Offline-Datenbank: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. Das ist tatsächlich die Datenbank, die dieses Projekt intern verwendet."
@@ -123,11 +123,11 @@ msgstr "Die Benutzererfahrung ist auch besser als bei den meisten IP-Abfrage-Sei
 msgid "Is this service reliable?"
 msgstr "Ist dieser Dienst zuverlässig?"
 
-msgid "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 2 core 2 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."
-msgstr "Das Ganze ist in Rust geschrieben, daher ist die Leistung hervorragend. Es kann L7-DDoS-Verkehr bewältigen und problemlos online bleiben. Es läuft auf einem VPS mit 2 Kernen und 2 GB RAM, was bereits mehr als ausreichend ist. Das Einzige, was wirklich Probleme verursachen könnte, wäre ein großangelegter L7-DDoS-Angriff, aber wir haben Cloudflare vorgeschaltet."
+msgid "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 1 core 1 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."
+msgstr "Das Ganze ist in Rust geschrieben, daher ist die Leistung hervorragend. Es kann L7-DDoS-Verkehr bewältigen und problemlos online bleiben. Es läuft auf einem VPS mit 1 Kern und 1 GB RAM, was bereits mehr als ausreichend ist. Das Einzige, was wirklich Probleme verursachen könnte, wäre ein großangelegter L7-DDoS-Angriff, aber wir haben Cloudflare vorgeschaltet."
 
-msgid "It costs me $18.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."
-msgstr "Es kostet mich $18,00/Monat im Betrieb, was ziemlich günstig ist. Ich werde es nicht wegen Hosting-Kosten abschalten, und es wird keine Werbung geben."
+msgid "It costs me $5.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."
+msgstr "Es kostet mich $5,00/Monat im Betrieb, was ziemlich günstig ist. Ich werde es nicht wegen Hosting-Kosten abschalten, und es wird keine Werbung geben."
 
 msgid "This service is not going to rug pull on you."
 msgstr "Dieser Dienst wird keinen Rug Pull machen."

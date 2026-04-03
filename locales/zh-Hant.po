@@ -87,8 +87,8 @@ msgstr "向 <code>/json</code> 端點發送請求，或發送帶有 <code>applic
 msgid "Can I call your service programmatically?"
 msgstr "我可以透過程式呼叫你們的服務嗎？"
 
-msgid "Sure, but please respect our rate limits. Normally it's 100 RPM, and under heavy load we may drop it to 50 or 30 RPM."
-msgstr "當然可以，但請遵守我們的速率限制。通常為 100 RPM，在高負載時可能會降至 50 或 30 RPM。"
+msgid "Sure, but please respect our rate limits. Normally it's 60 RPM, and under heavy load we may drop it to 30 or 15 RPM."
+msgstr "當然可以，但請遵守我們的速率限制。通常為 60 RPM，在高負載時可能會降至 30 或 15 RPM。"
 
 msgid "The API is meant for manual use or small projects. If your site uses our API to look up visitor IPs, please use a message queue so requests don't block. If your project has high traffic or needs low latency, you're better off using our open source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. That's actually what this project uses under the hood."
 msgstr "本 API 適用於手動使用或小型專案。如果您的網站使用我們的 API 查詢訪客 IP，請使用訊息佇列以避免請求阻塞。如果您的專案流量較大或需要低延遲，建議使用我們的開源離線資料庫：<a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>。實際上這就是本專案底層使用的資料庫。"
@@ -123,11 +123,11 @@ msgstr "使用者體驗也優於大多數 IP 查詢網站。本站無需任何 J
 msgid "Is this service reliable?"
 msgstr "此服務可靠嗎？"
 
-msgid "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 2 core 2 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."
-msgstr "整個服務使用 Rust 編寫，效能非常出色。它能夠應對 L7 DDoS 流量並保持正常運作。運行在一台 2 核心 2 GB 的 VPS 上，已經綽綽有餘。唯一可能造成真正麻煩的是大規模 L7 DDoS 攻擊，但我們前方有 Cloudflare 保護。"
+msgid "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 1 core 1 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."
+msgstr "整個服務使用 Rust 編寫，效能非常出色。它能夠應對 L7 DDoS 流量並保持正常運作。運行在一台 1 核心 1 GB 的 VPS 上，已經綽綽有餘。唯一可能造成真正麻煩的是大規模 L7 DDoS 攻擊，但我們前方有 Cloudflare 保護。"
 
-msgid "It costs me $18.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."
-msgstr "營運成本每月 $18.00，非常便宜。我不會因為託管費用而關閉服務，也不會投放任何廣告。"
+msgid "It costs me $5.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."
+msgstr "營運成本每月 $5.00，非常便宜。我不會因為託管費用而關閉服務，也不會投放任何廣告。"
 
 msgid "This service is not going to rug pull on you."
 msgstr "本服務不會跑路。"

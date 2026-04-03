@@ -87,8 +87,8 @@ msgstr "أرسل طلبًا إلى نقطة النهاية <code>/json</code>، 
 msgid "Can I call your service programmatically?"
 msgstr "هل يمكنني استدعاء خدمتكم برمجيًا؟"
 
-msgid "Sure, but please respect our rate limits. Normally it's 100 RPM, and under heavy load we may drop it to 50 or 30 RPM."
-msgstr "بالتأكيد، لكن يرجى الالتزام بحدود المعدل. عادةً يكون 100 طلبًا في الدقيقة، وتحت الحمل الثقيل قد نخفضه إلى 50 أو 30 طلبًا في الدقيقة."
+msgid "Sure, but please respect our rate limits. Normally it's 60 RPM, and under heavy load we may drop it to 30 or 15 RPM."
+msgstr "بالتأكيد، لكن يرجى الالتزام بحدود المعدل. عادةً يكون 60 طلبًا في الدقيقة، وتحت الحمل الثقيل قد نخفضه إلى 30 أو 15 طلبًا في الدقيقة."
 
 msgid "The API is meant for manual use or small projects. If your site uses our API to look up visitor IPs, please use a message queue so requests don't block. If your project has high traffic or needs low latency, you're better off using our open source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. That's actually what this project uses under the hood."
 msgstr "واجهة برمجة التطبيقات مخصصة للاستخدام اليدوي أو المشاريع الصغيرة. إذا كان موقعك يستخدم واجهة برمجة التطبيقات الخاصة بنا للبحث عن عناوين IP للزوار، يرجى استخدام قائمة انتظار الرسائل حتى لا تتعطل الطلبات. إذا كان مشروعك يتعامل مع حركة مرور عالية أو يحتاج إلى زمن استجابة منخفض، فمن الأفضل استخدام قاعدة بياناتنا المحلية مفتوحة المصدر: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. هذا في الواقع ما يستخدمه هذا المشروع داخليًا."
@@ -123,11 +123,11 @@ msgstr "تجربة المستخدم أيضًا أفضل من معظم مواقع
 msgid "Is this service reliable?"
 msgstr "هل هذه الخدمة موثوقة؟"
 
-msgid "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 2 core 2 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."
-msgstr "كل شيء مكتوب بلغة Rust، لذا الأداء ممتاز. يمكنه التعامل مع هجمات DDoS من الطبقة السابعة والاستمرار في العمل. يعمل على خادم VPS ثنائي النواة بذاكرة 2 غيغابايت، وهو أكثر من كافٍ. الشيء الوحيد الذي قد يسبب مشكلة حقيقية هو هجوم DDoS واسع النطاق من الطبقة السابعة، لكن لدينا Cloudflare أمامنا."
+msgid "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 1 core 1 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."
+msgstr "كل شيء مكتوب بلغة Rust، لذا الأداء ممتاز. يمكنه التعامل مع هجمات DDoS من الطبقة السابعة والاستمرار في العمل. يعمل على خادم VPS أحادي النواة بذاكرة 1 غيغابايت، وهو أكثر من كافٍ. الشيء الوحيد الذي قد يسبب مشكلة حقيقية هو هجوم DDoS واسع النطاق من الطبقة السابعة، لكن لدينا Cloudflare أمامنا."
 
-msgid "It costs me $18.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."
-msgstr "تكلفة التشغيل 18.00 دولار شهريًا، وهو رخيص جدًا. لن أوقفها بسبب تكاليف الاستضافة، ولن تكون هناك أي إعلانات."
+msgid "It costs me $5.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."
+msgstr "تكلفة التشغيل 5.00 دولار شهريًا، وهو رخيص جدًا. لن أوقفها بسبب تكاليف الاستضافة، ولن تكون هناك أي إعلانات."
 
 msgid "This service is not going to rug pull on you."
 msgstr "هذه الخدمة لن تختفي فجأة."

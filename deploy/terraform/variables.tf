@@ -16,9 +16,9 @@ variable "region" {
 }
 
 variable "plan" {
-  description = "Vultr plan ID (High Frequency 2 vCPU / 2 GB)"
+  description = "Vultr plan ID (Regular Performance 1 vCPU / 1 GB)"
   type        = string
-  default     = "vhf-2c-2gb"
+  default     = "vc2-1c-1gb"
 }
 
 variable "os_id" {

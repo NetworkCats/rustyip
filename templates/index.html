@@ -197,7 +197,7 @@ curl {{ site_domain }}/tor</code></pre>
         <summary itemprop="name">{{ "Can I call your service programmatically?"|t(locale) }}</summary>
         <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
           <div itemprop="text">
-          <p>{{ "Sure, but please respect our rate limits. Normally it's 100 RPM, and under heavy load we may drop it to 50 or 30 RPM."|t(locale) }}</p>
+          <p>{{ "Sure, but please respect our rate limits. Normally it's 60 RPM, and under heavy load we may drop it to 30 or 15 RPM."|t(locale) }}</p>
           <p>{{ "The API is meant for manual use or small projects. If your site uses our API to look up visitor IPs, please use a message queue so requests don't block. If your project has high traffic or needs low latency, you're better off using our open source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. That's actually what this project uses under the hood."|t(locale)|safe }}</p>
           </div>
         </div>
@@ -248,8 +248,8 @@ curl {{ site_domain }}/tor</code></pre>
         <summary itemprop="name">{{ "Is this service reliable?"|t(locale) }}</summary>
         <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
           <div itemprop="text">
-          <p>{{ "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 2 core 2 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."|t(locale) }}</p>
-          <p>{{ "It costs me $18.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."|t(locale) }}</p>
+          <p>{{ "The whole thing is written in Rust, so performance is great. It can handle L7 DDoS traffic and stay up fine. It runs on a 1 core 1 GB VPS, which is already more than enough. The only thing that could cause real trouble is a large scale L7 DDoS, but we have Cloudflare in front of us."|t(locale) }}</p>
+          <p>{{ "It costs me $5.00/month to run, which is pretty cheap. I'm not going to shut it down over hosting costs anytime soon, and there won't be any ads."|t(locale) }}</p>
           <p>{{ "This service is not going to rug pull on you."|t(locale) }}</p>
           </div>
         </div>

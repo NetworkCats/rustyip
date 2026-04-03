@@ -1,19 +1,19 @@
-# Network performance tuning for web service (10k concurrent connections)
+# Network performance tuning for web service (1 vCPU / 1 GB RAM)
 
-# Socket buffer sizes
-net.core.rmem_max = 8388608
-net.core.wmem_max = 8388608
-net.core.rmem_default = 262144
-net.core.wmem_default = 262144
+# Socket buffer sizes (reduced for 1 GB RAM)
+net.core.rmem_max = 4194304
+net.core.wmem_max = 4194304
+net.core.rmem_default = 131072
+net.core.wmem_default = 131072
 
-# TCP buffer auto-tuning
-net.ipv4.tcp_rmem = 4096 87380 8388608
-net.ipv4.tcp_wmem = 4096 65536 8388608
+# TCP buffer auto-tuning (reduced for 1 GB RAM)
+net.ipv4.tcp_rmem = 4096 65536 4194304
+net.ipv4.tcp_wmem = 4096 32768 4194304
 
-# Connection backlog
-net.core.somaxconn = 16384
-net.core.netdev_max_backlog = 16384
-net.ipv4.tcp_max_syn_backlog = 16384
+# Connection backlog (reduced for 1 vCPU)
+net.core.somaxconn = 4096
+net.core.netdev_max_backlog = 4096
+net.ipv4.tcp_max_syn_backlog = 4096
 
 # TCP connection reuse and timeout
 net.ipv4.tcp_tw_reuse = 1
@@ -44,16 +44,16 @@ net.ipv4.tcp_sack = 1
 
 # SYN flood protection
 net.ipv4.tcp_syncookies = 1
-net.ipv4.tcp_max_tw_buckets = 200000
+net.ipv4.tcp_max_tw_buckets = 65536
 
-# File descriptor limits
-fs.file-max = 131072
-fs.nr_open = 131072
+# File descriptor limits (reduced for 1 GB RAM)
+fs.file-max = 65536
+fs.nr_open = 65536
 
-# VM tuning
-vm.swappiness = 10
-vm.dirty_ratio = 15
+# VM tuning (increased swappiness slightly for 1 GB RAM)
+vm.swappiness = 30
+vm.dirty_ratio = 10
 vm.dirty_background_ratio = 5
 
 # Connection tracking (for iptables/fail2ban)
-net.netfilter.nf_conntrack_max = 32768
+net.netfilter.nf_conntrack_max = 16384

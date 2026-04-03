@@ -1,21 +1,21 @@
 {
   "log-driver": "json-file",
   "log-opts": {
-    "max-size": "10m",
-    "max-file": "3"
+    "max-size": "5m",
+    "max-file": "2"
   },
   "live-restore": true,
   "default-ulimits": {
     "nofile": {
       "Name": "nofile",
-      "Hard": 65536,
-      "Soft": 65536
+      "Hard": 32768,
+      "Soft": 32768
     },
     "nproc": {
       "Name": "nproc",
-      "Hard": 8192,
-      "Soft": 8192
+      "Hard": 4096,
+      "Soft": 4096
     }
   },
-  "default-shm-size": "256M"
+  "default-shm-size": "64M"
 }
