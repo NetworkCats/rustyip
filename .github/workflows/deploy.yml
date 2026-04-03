@@ -69,22 +69,38 @@ jobs:
           echo "ip=${VPS_IP}" >> "$GITHUB_OUTPUT"
 
       # ---- SSH setup ----
+      - name: Wait for SSH to become available
+        run: |
+          VPS_IP="${{ steps.vps.outputs.ip }}"
+          echo "Waiting for SSH port 22 on ${VPS_IP}..."
+          for i in $(seq 1 30); do
+            if nc -z -w5 "$VPS_IP" 22 2>/dev/null; then
+              echo "SSH port open on attempt $i"
+              break
+            fi
+            echo "SSH port not ready yet (attempt $i/30), retrying in 10s..."
+            sleep 10
+          done
+
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          for i in 1 2 3; do
-            keys=$(ssh-keyscan -H "${{ steps.vps.outputs.ip }}" 2>/dev/null) || true
-            if [ -n "$keys" ]; then
-              echo "$keys" >> ~/.ssh/known_hosts
+          for i in $(seq 1 10); do
+            keys=$(ssh-keyscan -H "${{ steps.vps.outputs.ip }}" 2>&1) || true
+            # Filter to only key lines (ignore stderr/warnings)
+            key_lines=$(echo "$keys" | grep -v '^#' | grep -v '^$' | grep -v 'getaddrinfo' || true)
+            if [ -n "$key_lines" ]; then
+              echo "$key_lines" >> ~/.ssh/known_hosts
               echo "ssh-keyscan succeeded on attempt $i"
               exit 0
             fi
-            echo "ssh-keyscan attempt $i failed, retrying in 10s..."
-            sleep 10
+            echo "ssh-keyscan attempt $i failed, retrying in 15s..."
+            echo "Output was: $keys"
+            sleep 15
           done
-          echo "ssh-keyscan failed after 3 attempts"
+          echo "ssh-keyscan failed after 10 attempts"
           exit 1
 
       # ---- Detect first deployment ----
