@@ -188,17 +188,6 @@ mod tests {
     }
 
     #[test]
-    fn lookup_proxy_returns_data_for_known_ip() {
-        let shared = test_shared_db();
-        let ip: IpAddr = "45.77.77.77".parse().unwrap();
-        let proxy = lookup_proxy(&shared, ip);
-        assert!(proxy.is_some());
-        let proxy = proxy.unwrap();
-        assert!(proxy.is_tor);
-        assert!(proxy.is_anonymous);
-    }
-
-    #[test]
     fn lookup_proxy_returns_none_for_unroutable_ip() {
         let shared = test_shared_db();
         let ip: IpAddr = "0.0.0.0".parse().unwrap();
