@@ -10,8 +10,12 @@ use crate::models::IpInfo;
 
 use super::{AppState, IpQuery, extract_ip_from_header, lookup_ip, resolve_ip};
 
-pub async fn health() -> StatusCode {
-    StatusCode::OK
+pub async fn health(State(state): State<AppState>) -> StatusCode {
+    if db::is_ready(&state.db) {
+        StatusCode::OK
+    } else {
+        StatusCode::SERVICE_UNAVAILABLE
+    }
 }
 
 pub async fn ipv4_ip_handler(

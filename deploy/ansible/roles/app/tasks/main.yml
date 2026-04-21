@@ -140,6 +140,13 @@
     active_color: "{{ deploy_target }}"
   when: is_first_deploy
 
+- name: Wipe database on target volume to force fresh download (first deploy)
+  ansible.builtin.shell: |
+    docker run --rm -v rustyip_db_data_{{ deploy_target }}:/data \
+      alpine:3 sh -c 'rm -f /data/Merged-IP.mmdb /data/Merged-IP.mmdb.tmp'
+  changed_when: true
+  when: is_first_deploy
+
 - name: Start target app container (first deploy)
   ansible.builtin.shell: |
     docker compose -f /opt/rustyip/docker-compose.yml up -d "app-{{ deploy_target }}"
@@ -148,7 +155,7 @@
 
 - name: Wait for target container health check (first deploy)
   ansible.builtin.shell: |
-    for i in $(seq 1 60); do
+    for i in $(seq 1 180); do
       status=$(docker inspect --format='{% raw %}{{.State.Health.Status}}{% endraw %}' "rustyip-app-{{ deploy_target }}" 2>/dev/null)
       if [ "$status" = "healthy" ]; then
         echo "healthy"
@@ -183,6 +190,12 @@
 - name: Blue-green deployment
   when: not is_first_deploy
   block:
+    - name: Wipe database on standby volume to force fresh download
+      ansible.builtin.shell: |
+        docker run --rm -v rustyip_db_data_{{ deploy_target }}:/data \
+          alpine:3 sh -c 'rm -f /data/Merged-IP.mmdb /data/Merged-IP.mmdb.tmp'
+      changed_when: true
+
     - name: Start standby container with new image
       ansible.builtin.shell: |
         docker compose -f /opt/rustyip/docker-compose.yml up -d "app-{{ deploy_target }}"
@@ -190,7 +203,7 @@
 
     - name: Wait for standby container health check
       ansible.builtin.shell: |
-        for i in $(seq 1 60); do
+        for i in $(seq 1 180); do
           status=$(docker inspect --format='{% raw %}{{.State.Health.Status}}{% endraw %}' "rustyip-app-{{ deploy_target }}" 2>/dev/null)
           if [ "$status" = "healthy" ]; then
             echo "healthy"

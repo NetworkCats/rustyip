@@ -79,6 +79,24 @@ async fn health_returns_200() {
 }
 
 #[tokio::test]
+async fn health_returns_503_when_db_not_loaded() {
+    let shared_db = db::new_empty();
+    let site_domain: std::sync::Arc<str> = "test.example.com".into();
+    let openapi_json = build_openapi_json(&site_domain);
+    let ipv4_domain: std::sync::Arc<str> = "noipv6.test.example.com".into();
+    let state = AppState {
+        db: shared_db,
+        site_domain,
+        ipv4_domain,
+        dev_mode: false,
+        openapi_json,
+    };
+    let app = build_router(state);
+    let (status, _) = get(&app, "/health").await;
+    assert_eq!(status, StatusCode::SERVICE_UNAVAILABLE);
+}
+
+#[tokio::test]
 async fn json_endpoint_returns_full_info() {
     let app = build_test_app();
     let (status, body) = get(&app, "/json?ip=45.77.77.77").await;
