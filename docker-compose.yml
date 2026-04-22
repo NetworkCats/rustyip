@@ -21,7 +21,8 @@ services:
       - LISTEN_ADDR=0.0.0.0:3000
       - DB_PATH=/data/Merged-IP.mmdb
       - DB_UPDATE_URL=${DB_UPDATE_URL:-https://github.com/NetworkCats/Merged-IP-Data/releases/latest/download/Merged-IP.mmdb}
-      - DB_UPDATE_TIME_UTC=${DB_UPDATE_TIME_UTC:-01:20}
+      - DB_UPDATE_TIME_UTC=${DB_UPDATE_TIME_UTC:-00:20}
+      - DB_UPDATE_INTERVAL_HOURS=${DB_UPDATE_INTERVAL_HOURS:-6}
       - SITE_DOMAIN=${SITE_DOMAIN:-localhost}
       - IPV4_DOMAIN=${IPV4_DOMAIN:-}
     volumes:

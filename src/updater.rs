@@ -104,6 +104,7 @@ pub fn spawn_updater(
     db_path: PathBuf,
     update_url: String,
     update_time_utc: (u8, u8),
+    interval_hours: u8,
     cancel: CancellationToken,
 ) -> JoinHandle<()> {
     tokio::spawn(run_updater(
@@ -111,31 +112,41 @@ pub fn spawn_updater(
         db_path,
         update_url,
         update_time_utc,
+        interval_hours,
         cancel,
     ))
 }
 
 /// Returns the number of seconds from `now_secs` (seconds since UNIX epoch)
-/// until the next occurrence of the given UTC `(hour, minute)`.
-fn secs_until_next(now_secs: u64, hour: u8, minute: u8) -> u64 {
+/// until the next tick. Ticks occur at `(anchor_hour, anchor_minute)` UTC and
+/// every `interval_hours` thereafter. `interval_hours` must divide 24 evenly.
+fn secs_until_next_tick(
+    now_secs: u64,
+    anchor_hour: u8,
+    anchor_minute: u8,
+    interval_hours: u8,
+) -> u64 {
     const SECS_PER_DAY: u64 = 86_400;
+    let interval = u64::from(interval_hours) * 3600;
+    let anchor = u64::from(anchor_hour) * 3600 + u64::from(anchor_minute) * 60;
     let time_of_day = now_secs % SECS_PER_DAY;
-    let target = u64::from(hour) * 3600 + u64::from(minute) * 60;
-    if target > time_of_day {
-        target - time_of_day
+    let offset_from_anchor = if time_of_day >= anchor {
+        time_of_day - anchor
     } else {
-        // Target time already passed today; schedule for tomorrow.
-        SECS_PER_DAY - time_of_day + target
-    }
+        SECS_PER_DAY - (anchor - time_of_day)
+    };
+    let next_boundary = ((offset_from_anchor / interval) + 1) * interval;
+    next_boundary - offset_from_anchor
 }
 
-/// Runs the daily database updater loop. Sleeps until the configured UTC time
-/// each day, then downloads and swaps in a fresh database.
+/// Runs the database updater loop. Sleeps until the next scheduled tick, then
+/// downloads and hot-swaps a fresh database.
 pub async fn run_updater(
     shared_db: SharedDb,
     db_path: PathBuf,
     update_url: String,
     update_time_utc: (u8, u8),
+    interval_hours: u8,
     cancel: CancellationToken,
 ) {
     let (hour, minute) = update_time_utc;
@@ -144,13 +155,15 @@ pub async fn run_updater(
             .duration_since(UNIX_EPOCH)
             .expect("system clock before UNIX epoch")
             .as_secs();
-        let delay = Duration::from_secs(secs_until_next(now_secs, hour, minute));
+        let delay =
+            Duration::from_secs(secs_until_next_tick(now_secs, hour, minute, interval_hours));
         info!(
-            "next database update in {}h {}m (at {:02}:{:02} UTC)",
+            "next database update in {}h {}m (anchor {:02}:{:02} UTC, every {}h)",
             delay.as_secs() / 3600,
             (delay.as_secs() % 3600) / 60,
             hour,
             minute,
+            interval_hours,
         );
         tokio::select! {
             () = tokio::time::sleep(delay) => {}
@@ -172,7 +185,12 @@ async fn update_db(
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let reader = download_db(update_url, db_path).await?;
     shared_db.store(Arc::new(Some(reader)));
-    info!("database updated successfully");
+    let size = fs::metadata(db_path)
+        .await
+        .ok()
+        .map(|m| m.len())
+        .unwrap_or(0);
+    info!("database updated successfully ({size} bytes)");
     Ok(())
 }
 
@@ -279,7 +297,8 @@ mod tests {
             shared_db,
             PathBuf::from("/nonexistent/path.mmdb"),
             "https://invalid.example.com/db.mmdb".to_string(),
-            (1, 20),
+            (0, 20),
+            6,
             cancel.clone(),
         );
 
@@ -293,31 +312,57 @@ mod tests {
     }
 
     #[test]
-    fn secs_until_next_later_today() {
-        // 00:00:00 UTC, target 01:20 UTC => 1h 20m = 4800s
-        assert_eq!(secs_until_next(0, 1, 20), 4800);
+    fn secs_until_next_tick_daily_from_midnight() {
+        // 00:00 UTC, anchor 01:20, interval 24h => 1h 20m = 4800s.
+        assert_eq!(secs_until_next_tick(0, 1, 20, 24), 4800);
     }
 
     #[test]
-    fn secs_until_next_wraps_to_tomorrow() {
-        // 02:00:00 UTC (7200s into the day), target 01:20 (4800s into the day)
-        // => should wrap to next day: 86400 - 7200 + 4800 = 84000s
-        let now_secs = 7200; // midnight + 2 hours
-        assert_eq!(secs_until_next(now_secs, 1, 20), 84000);
+    fn secs_until_next_tick_daily_wraps_to_tomorrow() {
+        // 02:00 UTC (7200s), anchor 01:20 (4800s), interval 24h
+        // => 86400 - 7200 + 4800 = 84000s.
+        assert_eq!(secs_until_next_tick(7200, 1, 20, 24), 84000);
     }
 
     #[test]
-    fn secs_until_next_exact_time_wraps_to_tomorrow() {
-        // Exactly at the target time => should schedule for next day (full 24h).
-        let target_secs = 1 * 3600 + 20 * 60; // 01:20 = 4800s
-        assert_eq!(secs_until_next(target_secs, 1, 20), 86400);
+    fn secs_until_next_tick_daily_exact_time_wraps() {
+        // Exactly at the anchor with 24h interval => schedule for next day.
+        let target_secs = 3600 + 20 * 60;
+        assert_eq!(secs_until_next_tick(target_secs, 1, 20, 24), 86400);
     }
 
     #[test]
-    fn secs_until_next_midnight_target() {
-        // 23:00:00 UTC, target 00:00 UTC => 1 hour = 3600s
+    fn secs_until_next_tick_every_six_hours_at_midnight() {
+        // 00:00 UTC with anchor 00:20 and interval 6h => next tick in 20m = 1200s.
+        assert_eq!(secs_until_next_tick(0, 0, 20, 6), 1200);
+    }
+
+    #[test]
+    fn secs_until_next_tick_every_six_hours_just_after_tick() {
+        // 00:21 UTC (1260s), anchor 00:20, interval 6h
+        // => next tick is 06:20 UTC = 6h - 1m = 21540s.
+        let now_secs = 20 * 60 + 60; // 00:21
+        assert_eq!(secs_until_next_tick(now_secs, 0, 20, 6), 21540);
+    }
+
+    #[test]
+    fn secs_until_next_tick_every_six_hours_at_tick() {
+        // Exactly at a tick (00:20) with 6h interval => schedule for 6h later.
+        let target_secs = 20 * 60;
+        assert_eq!(secs_until_next_tick(target_secs, 0, 20, 6), 6 * 3600);
+    }
+
+    #[test]
+    fn secs_until_next_tick_every_six_hours_before_anchor() {
+        // 00:10 UTC (600s), anchor 00:20, interval 6h => next tick in 10m = 600s.
+        assert_eq!(secs_until_next_tick(600, 0, 20, 6), 600);
+    }
+
+    #[test]
+    fn secs_until_next_tick_midnight_target() {
+        // 23:00 UTC, anchor 00:00, interval 24h => 1h = 3600s.
         let now_secs = 23 * 3600;
-        assert_eq!(secs_until_next(now_secs, 0, 0), 3600);
+        assert_eq!(secs_until_next_tick(now_secs, 0, 0, 24), 3600);
     }
 
     #[tokio::test]
