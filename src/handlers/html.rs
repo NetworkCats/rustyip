@@ -5,14 +5,13 @@ use axum::extract::{Path, Query, State};
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{Html, IntoResponse, Redirect, Response};
 
+use crate::db;
 use crate::error::AppError;
 use crate::i18n::{self, Locale};
-use crate::models::{IpInfo, get_localized_name};
+use crate::models::PageInfo;
 use crate::static_assets;
 
-use super::{
-    AppState, IpQuery, append_ip_query, handle_non_browser_request, lookup_ip, resolve_ip,
-};
+use super::{AppState, IpQuery, append_ip_query, handle_non_browser_request, resolve_ip};
 
 /// Askama custom filters. The `filters` module name is required by Askama's
 /// filter resolution. Usage in templates: `{{ "msgid"|t(locale) }}`.
@@ -20,13 +19,12 @@ mod filters {
     use crate::i18n::{self, Locale};
 
     #[askama::filter_fn]
-    pub fn t<T: std::fmt::Display + ?Sized>(
-        msgid: &T,
+    pub fn t<'a>(
+        msgid: &'a str,
         _env: &dyn askama::Values,
         locale: &Locale,
-    ) -> askama::Result<String> {
-        let key = msgid.to_string();
-        Ok(i18n::translate(*locale, &key).to_string())
+    ) -> askama::Result<&'a str> {
+        Ok(i18n::translate(*locale, msgid))
     }
 }
 
@@ -83,42 +81,16 @@ struct ErrorPageTemplate {
     locale: Locale,
 }
 
-fn asn_number(info: &IpInfo) -> Option<u32> {
-    info.asn.as_ref().and_then(|a| a.autonomous_system_number)
-}
-
-fn format_asn(info: &IpInfo) -> String {
-    asn_number(info)
-        .map(|n| format!("AS{n}"))
-        .unwrap_or_default()
-}
-
-fn format_org(info: &IpInfo) -> &str {
-    info.asn
-        .as_ref()
-        .and_then(|a| a.autonomous_system_organization.as_deref())
-        .unwrap_or_default()
-}
-
-fn format_country(info: &IpInfo, locale: Locale) -> &str {
-    info.country
-        .as_ref()
-        .map(|c| get_localized_name(&c.names, locale.mmdb_key()))
-        .unwrap_or_default()
-}
-
-fn format_country_code(info: &IpInfo) -> &str {
-    info.country
-        .as_ref()
-        .and_then(|c| c.iso_code.as_deref())
-        .unwrap_or_default()
-}
-
-fn format_city(info: &IpInfo, locale: Locale) -> &str {
-    info.city
-        .as_ref()
-        .map(|c| get_localized_name(&c.names, locale.mmdb_key()))
-        .unwrap_or_default()
+fn lookup_page_info(
+    db: &db::SharedDb,
+    ip: std::net::IpAddr,
+    locale: Locale,
+) -> Result<PageInfo, AppError> {
+    match db::lookup_page_info(db, ip, locale.mmdb_key()).map_err(|_| AppError::DbLookupFailed)? {
+        Some(info) => Ok(info),
+        None if !db::is_ready(db) => Err(AppError::DbNotReady),
+        None => Err(AppError::IpNotFound),
+    }
 }
 
 fn render_error_alert(state: &AppState, locale: Locale, query: &str, error: &AppError) -> Response {
@@ -225,26 +197,26 @@ pub async fn root(
         Err(e) => return render_error_alert(&state, locale, &query_str, &e),
     };
 
-    let info = match lookup_ip(&state.db, ip) {
+    let info = match lookup_page_info(&state.db, ip, locale) {
         Ok(info) => info,
         Err(e) => return render_error_alert(&state, locale, &query_str, &e),
     };
 
     let is_query = query.ip.is_some();
     let template = IndexTemplate {
-        ip: info.ip.clone(),
+        ip: info.ip,
         query: query.ip.unwrap_or_default(),
         is_query,
         site_domain: state.site_domain.clone(),
         ipv4_domain: state.ipv4_domain.clone(),
         css_version: static_assets::asset_version("style.css"),
         js_version: static_assets::asset_version("script.js"),
-        asn: format_asn(&info),
-        asn_number: asn_number(&info),
-        org: format_org(&info).to_owned(),
-        country: format_country(&info, locale).to_owned(),
-        country_code: format_country_code(&info).to_owned(),
-        city: format_city(&info, locale).to_owned(),
+        asn: info.asn,
+        asn_number: info.asn_number,
+        org: info.org,
+        country: info.country,
+        country_code: info.country_code,
+        city: info.city,
         is_proxy: info.proxy.is_proxy,
         is_vpn: info.proxy.is_vpn,
         is_hosting: info.proxy.is_hosting,

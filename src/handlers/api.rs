@@ -6,9 +6,8 @@ use axum::response::{IntoResponse, Response};
 
 use crate::db::{self, SharedDb};
 use crate::error::AppError;
-use crate::models::IpInfo;
 
-use super::{AppState, IpQuery, extract_ip_from_header, lookup_ip, resolve_ip};
+use super::{AppState, IpQuery, extract_ip_from_header, lookup_json_response, resolve_ip};
 
 pub async fn health(State(state): State<AppState>) -> StatusCode {
     if db::is_ready(&state.db) {
@@ -46,10 +45,9 @@ pub async fn json_handler(
     State(state): State<AppState>,
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
-) -> Result<axum::Json<IpInfo>, AppError> {
+) -> Result<Response, AppError> {
     let ip = resolve_ip(&headers, &query, state.dev_mode)?;
-    let info = lookup_ip(&state.db, ip)?;
-    Ok(axum::Json(info))
+    lookup_json_response(&state.db, ip)
 }
 
 pub async fn ip_handler(
@@ -68,12 +66,11 @@ fn field_handler<T: std::fmt::Display + Default>(
     lookup: impl FnOnce(&SharedDb, IpAddr) -> db::LookupOutcome<T>,
 ) -> Result<String, AppError> {
     let ip = resolve_ip(headers, query, state.dev_mode)?;
-    if !db::is_ready(&state.db) {
-        return Err(AppError::DbNotReady);
-    }
-    let value = lookup(&state.db, ip)
-        .map_err(|_| AppError::DbLookupFailed)?
-        .unwrap_or_default();
+    let value = match lookup(&state.db, ip).map_err(|_| AppError::DbLookupFailed)? {
+        Some(value) => value,
+        None if !db::is_ready(&state.db) => return Err(AppError::DbNotReady),
+        None => T::default(),
+    };
     Ok(format!("{value}\n"))
 }
 

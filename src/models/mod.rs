@@ -6,11 +6,250 @@ pub mod mmdb;
 use std::fmt::Write;
 use std::net::IpAddr;
 
+use serde::Serialize;
+
 pub use api::*;
 // Mmdb types are re-exported as pub(crate) since they are internal deserialization details.
 pub(crate) use mmdb::*;
 
 // --- Conversion from MMDB record to API output ---
+
+#[derive(Serialize)]
+struct JsonIpInfo<'a> {
+    ip: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    city: Option<JsonCityInfo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    continent: Option<JsonContinentInfo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    country: Option<JsonCountryInfo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    location: Option<JsonLocationInfo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    postal: Option<JsonPostalInfo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    registered_country: Option<JsonCountryInfo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    subdivisions: Option<Vec<JsonSubdivisionInfo<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    asn: Option<JsonAsnInfo<'a>>,
+    proxy: ProxyInfo,
+}
+
+#[derive(Serialize)]
+struct JsonNames<'a> {
+    #[serde(rename = "de", skip_serializing_if = "Option::is_none")]
+    german: Option<&'a str>,
+    #[serde(rename = "en", skip_serializing_if = "Option::is_none")]
+    english: Option<&'a str>,
+    #[serde(rename = "es", skip_serializing_if = "Option::is_none")]
+    spanish: Option<&'a str>,
+    #[serde(rename = "fr", skip_serializing_if = "Option::is_none")]
+    french: Option<&'a str>,
+    #[serde(rename = "ja", skip_serializing_if = "Option::is_none")]
+    japanese: Option<&'a str>,
+    #[serde(rename = "pt-BR", skip_serializing_if = "Option::is_none")]
+    brazilian_portuguese: Option<&'a str>,
+    #[serde(rename = "ru", skip_serializing_if = "Option::is_none")]
+    russian: Option<&'a str>,
+    #[serde(rename = "zh-CN", skip_serializing_if = "Option::is_none")]
+    simplified_chinese: Option<&'a str>,
+}
+
+#[derive(Serialize)]
+struct JsonCityInfo<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    geoname_id: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    names: Option<JsonNames<'a>>,
+}
+
+#[derive(Serialize)]
+struct JsonContinentInfo<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    code: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    geoname_id: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    names: Option<JsonNames<'a>>,
+}
+
+#[derive(Serialize)]
+struct JsonCountryInfo<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    geoname_id: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    iso_code: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    names: Option<JsonNames<'a>>,
+}
+
+#[derive(Serialize)]
+struct JsonLocationInfo<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    accuracy_radius: Option<u16>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    latitude: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    longitude: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    metro_code: Option<u16>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    time_zone: Option<&'a str>,
+}
+
+#[derive(Serialize)]
+struct JsonPostalInfo<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    code: Option<&'a str>,
+}
+
+#[derive(Serialize)]
+struct JsonSubdivisionInfo<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    geoname_id: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    iso_code: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    names: Option<JsonNames<'a>>,
+}
+
+#[derive(Serialize)]
+struct JsonAsnInfo<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    autonomous_system_number: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    autonomous_system_organization: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    as_domain: Option<&'a str>,
+}
+
+fn json_names<'a>(names: &MmdbNames<'a>) -> Option<JsonNames<'a>> {
+    if names.is_empty() {
+        return None;
+    }
+    Some(JsonNames {
+        german: names.german,
+        english: names.english,
+        spanish: names.spanish,
+        french: names.french,
+        japanese: names.japanese,
+        brazilian_portuguese: names.brazilian_portuguese,
+        russian: names.russian,
+        simplified_chinese: names.simplified_chinese,
+    })
+}
+
+fn json_ip_string(ip: IpAddr) -> String {
+    let mut ip_str = String::with_capacity(45);
+    write!(ip_str, "{ip}").expect("IP address formatting cannot fail");
+    ip_str
+}
+
+fn json_record<'a>(ip: IpAddr, record: &MmdbRecord<'a>) -> JsonIpInfo<'a> {
+    let city = if has_city(&record.city) {
+        Some(JsonCityInfo {
+            geoname_id: record.city.geoname_id,
+            names: json_names(&record.city.names),
+        })
+    } else {
+        None
+    };
+
+    let continent = if has_continent(&record.continent) {
+        Some(JsonContinentInfo {
+            code: record.continent.code,
+            geoname_id: record.continent.geoname_id,
+            names: json_names(&record.continent.names),
+        })
+    } else {
+        None
+    };
+
+    let country = if has_country(&record.country) {
+        Some(JsonCountryInfo {
+            geoname_id: record.country.geoname_id,
+            iso_code: record.country.iso_code,
+            names: json_names(&record.country.names),
+        })
+    } else {
+        None
+    };
+
+    let location = if has_location(&record.location) {
+        Some(JsonLocationInfo {
+            accuracy_radius: record.location.accuracy_radius,
+            latitude: record.location.latitude,
+            longitude: record.location.longitude,
+            metro_code: record.location.metro_code,
+            time_zone: record.location.time_zone,
+        })
+    } else {
+        None
+    };
+
+    let postal = if has_postal(&record.postal) {
+        Some(JsonPostalInfo {
+            code: record.postal.code,
+        })
+    } else {
+        None
+    };
+
+    let registered_country = if has_country(&record.registered_country) {
+        Some(JsonCountryInfo {
+            geoname_id: record.registered_country.geoname_id,
+            iso_code: record.registered_country.iso_code,
+            names: json_names(&record.registered_country.names),
+        })
+    } else {
+        None
+    };
+
+    let subdivisions = if record.subdivisions.is_empty() {
+        None
+    } else {
+        Some(
+            record
+                .subdivisions
+                .iter()
+                .map(|s| JsonSubdivisionInfo {
+                    geoname_id: s.geoname_id,
+                    iso_code: s.iso_code,
+                    names: json_names(&s.names),
+                })
+                .collect(),
+        )
+    };
+
+    let asn = if has_asn(&record.asn) {
+        Some(JsonAsnInfo {
+            autonomous_system_number: record.asn.autonomous_system_number,
+            autonomous_system_organization: record.asn.autonomous_system_organization,
+            as_domain: record.asn.as_domain,
+        })
+    } else {
+        None
+    };
+
+    JsonIpInfo {
+        ip: json_ip_string(ip),
+        city,
+        continent,
+        country,
+        location,
+        postal,
+        registered_country,
+        subdivisions,
+        asn,
+        proxy: ProxyInfo::from(record.proxy),
+    }
+}
+
+pub fn serialize_mmdb_record_json(ip: IpAddr, record: &MmdbRecord<'_>) -> Vec<u8> {
+    serde_json::to_vec(&json_record(ip, record))
+        .expect("serializing MMDB lookup response cannot fail")
+}
 
 fn convert_names(names: &MmdbNames<'_>) -> Option<Names> {
     if names.is_empty() {
@@ -149,11 +388,8 @@ pub fn from_mmdb_record(ip: IpAddr, record: &MmdbRecord<'_>) -> IpInfo {
 
     let proxy = ProxyInfo::from(record.proxy);
 
-    let mut ip_str = String::with_capacity(45);
-    write!(ip_str, "{ip}").expect("IP address formatting cannot fail");
-
     IpInfo {
-        ip: ip_str,
+        ip: json_ip_string(ip),
         city,
         continent,
         country,

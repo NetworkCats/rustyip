@@ -13,7 +13,6 @@ use axum::response::{IntoResponse, Response};
 use crate::db::{self, SharedDb};
 use crate::error::AppError;
 use crate::ip_validate;
-use crate::models::IpInfo;
 use crate::ua_detect::is_plain_text_agent;
 
 // Re-export all public handlers for use by routes.rs
@@ -79,13 +78,12 @@ fn extract_client_ip(headers: &HeaderMap, dev_mode: bool) -> Result<IpAddr, AppE
     extract_ip_from_header(headers, "CF-Connecting-IP", dev_mode)
 }
 
-fn lookup_ip(db: &SharedDb, ip: IpAddr) -> Result<IpInfo, AppError> {
-    if !db::is_ready(db) {
-        return Err(AppError::DbNotReady);
+fn lookup_json_response(db: &SharedDb, ip: IpAddr) -> Result<Response, AppError> {
+    match db::lookup_json(db, ip).map_err(|_| AppError::DbLookupFailed)? {
+        Some(body) => Ok(([(header::CONTENT_TYPE, "application/json")], body).into_response()),
+        None if !db::is_ready(db) => Err(AppError::DbNotReady),
+        None => Err(AppError::IpNotFound),
     }
-    db::lookup(db, ip)
-        .map_err(|_| AppError::DbLookupFailed)?
-        .ok_or(AppError::IpNotFound)
 }
 
 fn handle_non_browser_request(
@@ -107,9 +105,10 @@ fn handle_non_browser_request(
 
     if wants_json(headers) && query.ip.is_none() {
         return Some(
-            match extract_client_ip(headers, state.dev_mode).and_then(|ip| lookup_ip(&state.db, ip))
+            match extract_client_ip(headers, state.dev_mode)
+                .and_then(|ip| lookup_json_response(&state.db, ip))
             {
-                Ok(info) => axum::Json(info).into_response(),
+                Ok(response) => response,
                 Err(e) => e.into_response(),
             },
         );

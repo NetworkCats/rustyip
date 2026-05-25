@@ -123,6 +123,18 @@ pub struct ProxyInfo {
     pub is_anonymous: bool,
 }
 
+#[derive(Debug)]
+pub struct PageInfo {
+    pub ip: String,
+    pub asn: String,
+    pub asn_number: Option<u32>,
+    pub org: String,
+    pub country: String,
+    pub country_code: String,
+    pub city: String,
+    pub proxy: ProxyInfo,
+}
+
 impl From<MmdbProxy> for ProxyInfo {
     fn from(p: MmdbProxy) -> Self {
         Self {
