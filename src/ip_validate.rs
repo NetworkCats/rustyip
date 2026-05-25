@@ -42,7 +42,13 @@ fn is_global_ipv4(ip: Ipv4Addr) -> bool {
         return false;
     }
 
-    // 192.0.0.0/24 - IETF protocol assignments (RFC 6890)
+    // 192.0.0.9/32 and 192.0.0.10/32 are globally reachable anycast
+    // exceptions inside the IETF protocol-assignment block.
+    if first == 192 && second == 0 && octets[2] == 0 && (octets[3] == 9 || octets[3] == 10) {
+        return true;
+    }
+
+    // 192.0.0.0/24 - IETF protocol assignments (RFC 6890), except above.
     if first == 192 && second == 0 && octets[2] == 0 {
         return false;
     }
@@ -90,8 +96,8 @@ fn is_global_ipv4(ip: Ipv4Addr) -> bool {
 ///
 /// Rejects: unspecified (::), loopback (::1), IPv4-mapped, IPv4-compatible,
 /// link-local, site-local (deprecated), unique local (ULA), multicast,
-/// documentation, discard, Teredo, 6to4, ORCHID, and all other
-/// non-globally-routable ranges.
+/// documentation, discard, Teredo, 6to4, benchmarking, local-use NAT64,
+/// ORCHID, SRv6 SID, and all other non-globally-routable ranges.
 fn is_global_ipv6(ip: Ipv6Addr) -> bool {
     // Unspecified address (::)
     if ip.is_unspecified() {
@@ -106,7 +112,7 @@ fn is_global_ipv6(ip: Ipv6Addr) -> bool {
     let segments = ip.segments();
     let first = segments[0];
 
-    // IPv4-mapped (::ffff:0:0/96) - check the embedded IPv4 part
+    // IPv4-mapped (::ffff:0:0/96) is not globally reachable as IPv6.
     if first == 0
         && segments[1] == 0
         && segments[2] == 0
@@ -114,13 +120,7 @@ fn is_global_ipv6(ip: Ipv6Addr) -> bool {
         && segments[4] == 0
         && segments[5] == 0xFFFF
     {
-        let ipv4 = Ipv4Addr::new(
-            (segments[6] >> 8) as u8,
-            segments[6] as u8,
-            (segments[7] >> 8) as u8,
-            segments[7] as u8,
-        );
-        return is_global_ipv4(ipv4);
+        return false;
     }
 
     // IPv4-compatible (deprecated, ::/96 excluding :: and ::1)
@@ -154,9 +154,43 @@ fn is_global_ipv6(ip: Ipv6Addr) -> bool {
         return false;
     }
 
+    // 64:ff9b::/96 - Well-known IPv4/IPv6 translation prefix. Treat it as
+    // global only when the embedded IPv4 address is global.
+    if first == 0x0064
+        && segments[1] == 0xFF9B
+        && segments[2] == 0
+        && segments[3] == 0
+        && segments[4] == 0
+        && segments[5] == 0
+    {
+        return is_global_ipv4(ipv4_from_segments(segments[6], segments[7]));
+    }
+
+    // 64:ff9b:1::/48 - Local-use IPv4/IPv6 translation prefix.
+    if first == 0x0064 && segments[1] == 0xFF9B && segments[2] == 1 {
+        return false;
+    }
+
     // 100::/64 - Discard prefix (RFC 6666)
     if first == 0x0100 && segments[1] == 0 && segments[2] == 0 && segments[3] == 0 {
         return false;
+    }
+
+    // 100:0:0:1::/64 - Dummy IPv6 prefix.
+    if first == 0x0100 && segments[1] == 0 && segments[2] == 0 && segments[3] == 1 {
+        return false;
+    }
+
+    // Outside 2000::/3, IPv6 addresses are not global unicast unless handled
+    // by a globally reachable special-purpose prefix above.
+    if (first & 0xE000) != 0x2000 {
+        return false;
+    }
+
+    // 2001::/23 - IETF protocol assignments. The broad block is not globally
+    // reachable unless a more specific IANA allocation says it is.
+    if first == 0x2001 && (segments[1] & 0xFE00) == 0 {
+        return is_global_2001_special(segments);
     }
 
     // 2001:db8::/32 - Documentation (RFC 3849)
@@ -164,26 +198,50 @@ fn is_global_ipv6(ip: Ipv6Addr) -> bool {
         return false;
     }
 
-    // 2001::/23 - IETF protocol assignments (RFC 2928)
-    // This includes 2001::/32 (Teredo) and 2001:10::/28 (ORCHID v2)
-    // but also encompasses globally routable 2001::/32 allocations.
-    // We specifically block Teredo (2001:0000::/32) which tunnels arbitrary IPv4.
-    if first == 0x2001 && segments[1] == 0x0000 {
+    // 2002::/16 - 6to4 (RFC 3056)
+    if first == 0x2002 {
         return false;
     }
 
-    // 2002::/16 - 6to4 (RFC 3056) - check embedded IPv4 for public-ness
-    if first == 0x2002 {
-        let ipv4 = Ipv4Addr::new(
-            (segments[1] >> 8) as u8,
-            segments[1] as u8,
-            (segments[2] >> 8) as u8,
-            segments[2] as u8,
-        );
-        return is_global_ipv4(ipv4);
+    // 3fff::/20 - Documentation
+    if first == 0x3FFF && (segments[1] & 0xF000) == 0 {
+        return false;
+    }
+
+    // 5f00::/16 - Segment Routing (SRv6) SIDs
+    if first == 0x5F00 {
+        return false;
     }
 
     true
+}
+
+fn ipv4_from_segments(high: u16, low: u16) -> Ipv4Addr {
+    Ipv4Addr::new((high >> 8) as u8, high as u8, (low >> 8) as u8, low as u8)
+}
+
+fn is_global_2001_special(segments: [u16; 8]) -> bool {
+    match (segments[1], segments[2]) {
+        // 2001:1::1/128, 2001:1::2/128, 2001:1::3/128
+        (0x0001, 0)
+            if segments[3] == 0
+                && segments[4] == 0
+                && segments[5] == 0
+                && segments[6] == 0
+                && matches!(segments[7], 1..=3) =>
+        {
+            true
+        }
+        // 2001:3::/32 - AMT
+        (0x0003, _) => true,
+        // 2001:4:112::/48 - AS112-v6
+        (0x0004, 0x0112) => true,
+        // 2001:20::/28 - ORCHIDv2
+        (0x0020..=0x002F, _) => true,
+        // 2001:30::/28 - Drone Remote ID Protocol Entity Tags
+        (0x0030..=0x003F, _) => true,
+        _ => false,
+    }
 }
 
 /// Returns `true` if the IP address is a globally routable public address
@@ -324,6 +382,18 @@ mod tests {
     }
 
     #[test]
+    fn ietf_anycast_exceptions_accepted() {
+        let ips = ["192.0.0.9", "192.0.0.10"];
+        for s in ips {
+            let ip: IpAddr = s.parse().unwrap();
+            assert!(
+                is_global_ip(ip),
+                "{s} should be accepted (IETF anycast exception)"
+            );
+        }
+    }
+
+    #[test]
     fn relay_6to4_rejected() {
         let ips = ["192.88.99.0", "192.88.99.1", "192.88.99.255"];
         for s in ips {
@@ -366,6 +436,15 @@ mod tests {
             "2606:4700:4700::1111",
             "2001:4860:4860::8888",
             "2400:cb00:2048:1::c629:d7a2",
+            "64:ff9b::808:808",
+            "2001:1::1",
+            "2001:1::2",
+            "2001:1::3",
+            "2001:3::1",
+            "2001:4:112::1",
+            "2001:20::1",
+            "2001:30::1",
+            "2620:4f:8000::1",
         ];
         for s in public_ips {
             let ip: IpAddr = s.parse().unwrap();
@@ -432,6 +511,9 @@ mod tests {
             "2001:db8::",
             "2001:db8::1",
             "2001:db8:ffff:ffff:ffff:ffff:ffff:ffff",
+            "3fff::",
+            "3fff::1",
+            "3fff:0fff:ffff:ffff:ffff:ffff:ffff:ffff",
         ];
         for s in ips {
             let ip: IpAddr = s.parse().unwrap();
@@ -454,7 +536,14 @@ mod tests {
 
     #[test]
     fn ipv6_discard_rejected() {
-        let ips = ["100::", "100::1", "100::ffff:ffff:ffff:ffff"];
+        let ips = [
+            "100::",
+            "100::1",
+            "100::ffff:ffff:ffff:ffff",
+            "100:0:0:1::",
+            "100:0:0:1::1",
+            "100:0:0:1:ffff:ffff:ffff:ffff",
+        ];
         for s in ips {
             let ip: IpAddr = s.parse().unwrap();
             assert!(!is_global_ip(ip), "{s} should be rejected (discard)");
@@ -462,25 +551,18 @@ mod tests {
     }
 
     #[test]
-    fn ipv6_ipv4_mapped_private_rejected() {
+    fn ipv6_ipv4_mapped_rejected() {
         let ips = [
             "::ffff:127.0.0.1",
             "::ffff:10.0.0.1",
             "::ffff:192.168.1.1",
             "::ffff:0.0.0.0",
+            "::ffff:1.1.1.1",
+            "::ffff:8.8.8.8",
         ];
         for s in ips {
             let ip: IpAddr = s.parse().unwrap();
-            assert!(!is_global_ip(ip), "{s} should be rejected (mapped private)");
-        }
-    }
-
-    #[test]
-    fn ipv6_ipv4_mapped_public_accepted() {
-        let ips = ["::ffff:1.1.1.1", "::ffff:8.8.8.8"];
-        for s in ips {
-            let ip: IpAddr = s.parse().unwrap();
-            assert!(is_global_ip(ip), "{s} should be accepted (mapped public)");
+            assert!(!is_global_ip(ip), "{s} should be rejected (IPv4-mapped)");
         }
     }
 
@@ -507,9 +589,34 @@ mod tests {
     }
 
     #[test]
-    fn ipv6_6to4_with_public_ipv4_accepted() {
+    fn ipv6_6to4_with_public_ipv4_rejected() {
         // 2002:0101:0101:: embeds 1.1.1.1
         let ip: IpAddr = "2002:0101:0101::".parse().unwrap();
-        assert!(is_global_ip(ip), "6to4 with public IPv4 should be accepted");
+        assert!(
+            !is_global_ip(ip),
+            "6to4 with public IPv4 should still be rejected"
+        );
+    }
+
+    #[test]
+    fn ipv6_special_purpose_non_global_rejected() {
+        let ips = [
+            "64:ff9b::10.0.0.1",
+            "64:ff9b:1::",
+            "64:ff9b:1::1",
+            "2001:1::",
+            "2001:1::4",
+            "2001:2::1",
+            "2001:10::1",
+            "5f00::1",
+            "4000::1",
+        ];
+        for s in ips {
+            let ip: IpAddr = s.parse().unwrap();
+            assert!(
+                !is_global_ip(ip),
+                "{s} should be rejected (special-purpose non-global)"
+            );
+        }
     }
 }

@@ -65,27 +65,15 @@ fn field_handler<T: std::fmt::Display + Default>(
     state: &AppState,
     headers: &HeaderMap,
     query: &IpQuery,
-    lookup: impl FnOnce(&SharedDb, IpAddr) -> Option<T>,
+    lookup: impl FnOnce(&SharedDb, IpAddr) -> db::LookupOutcome<T>,
 ) -> Result<String, AppError> {
+    let ip = resolve_ip(headers, query, state.dev_mode)?;
     if !db::is_ready(&state.db) {
         return Err(AppError::DbNotReady);
     }
-    let ip = resolve_ip(headers, query, state.dev_mode)?;
-    let value = lookup(&state.db, ip).unwrap_or_default();
-    Ok(format!("{value}\n"))
-}
-
-fn proxy_field_handler(
-    state: &AppState,
-    headers: &HeaderMap,
-    query: &IpQuery,
-    field: impl FnOnce(&crate::models::ProxyInfo) -> bool,
-) -> Result<String, AppError> {
-    if !db::is_ready(&state.db) {
-        return Err(AppError::DbNotReady);
-    }
-    let ip = resolve_ip(headers, query, state.dev_mode)?;
-    let value = db::lookup_proxy(&state.db, ip).is_some_and(|p| field(&p));
+    let value = lookup(&state.db, ip)
+        .map_err(|_| AppError::DbLookupFailed)?
+        .unwrap_or_default();
     Ok(format!("{value}\n"))
 }
 
@@ -95,7 +83,7 @@ pub async fn asn_handler(
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
     field_handler(&state, &headers, &query, |db, ip| {
-        db::lookup_asn_number(db, ip).map(|n| format!("AS{n}"))
+        db::lookup_asn_number(db, ip).map(|n| n.map(|n| format!("AS{n}")))
     })
 }
 
@@ -128,7 +116,7 @@ pub async fn proxy_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
-    proxy_field_handler(&state, &headers, &query, |p| p.is_proxy)
+    field_handler(&state, &headers, &query, db::lookup_is_proxy)
 }
 
 pub async fn vpn_handler(
@@ -136,7 +124,7 @@ pub async fn vpn_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
-    proxy_field_handler(&state, &headers, &query, |p| p.is_vpn)
+    field_handler(&state, &headers, &query, db::lookup_is_vpn)
 }
 
 pub async fn hosting_handler(
@@ -144,7 +132,7 @@ pub async fn hosting_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
-    proxy_field_handler(&state, &headers, &query, |p| p.is_hosting)
+    field_handler(&state, &headers, &query, db::lookup_is_hosting)
 }
 
 pub async fn tor_handler(
@@ -152,5 +140,5 @@ pub async fn tor_handler(
     headers: HeaderMap,
     Query(query): Query<IpQuery>,
 ) -> Result<String, AppError> {
-    proxy_field_handler(&state, &headers, &query, |p| p.is_tor)
+    field_handler(&state, &headers, &query, db::lookup_is_tor)
 }

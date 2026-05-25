@@ -39,8 +39,14 @@ pub async fn init_db(
     db_path: &Path,
     update_url: &str,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    ensure_db_exists(db_path, update_url).await?;
-    let reader = load_db(db_path)?;
+    let reader = if db_path.exists() {
+        load_db(db_path)?
+    } else {
+        if let Some(parent) = db_path.parent() {
+            fs::create_dir_all(parent).await?;
+        }
+        download_db(update_url, db_path).await?
+    };
     shared_db.store(Arc::new(Some(reader)));
     info!("database loaded successfully");
     Ok(())

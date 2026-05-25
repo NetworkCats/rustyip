@@ -24,6 +24,10 @@ fn build_test_app() -> axum::Router {
 fn build_test_app_with_dev_mode(dev_mode: bool) -> axum::Router {
     let reader = db::load_db(Path::new(&test_db_path())).expect("failed to load test DB");
     let shared_db = db::new_shared(reader);
+    build_test_app_with_db(shared_db, dev_mode)
+}
+
+fn build_test_app_with_db(shared_db: db::SharedDb, dev_mode: bool) -> axum::Router {
     let site_domain: std::sync::Arc<str> = "test.example.com".into();
     let openapi_json = build_openapi_json(&site_domain);
     let ipv4_domain: std::sync::Arc<str> = "noipv6.test.example.com".into();
@@ -81,17 +85,7 @@ async fn health_returns_200() {
 #[tokio::test]
 async fn health_returns_503_when_db_not_loaded() {
     let shared_db = db::new_empty();
-    let site_domain: std::sync::Arc<str> = "test.example.com".into();
-    let openapi_json = build_openapi_json(&site_domain);
-    let ipv4_domain: std::sync::Arc<str> = "noipv6.test.example.com".into();
-    let state = AppState {
-        db: shared_db,
-        site_domain,
-        ipv4_domain,
-        dev_mode: false,
-        openapi_json,
-    };
-    let app = build_router(state);
+    let app = build_test_app_with_db(shared_db, false);
     let (status, _) = get(&app, "/health").await;
     assert_eq!(status, StatusCode::SERVICE_UNAVAILABLE);
 }
@@ -237,6 +231,21 @@ async fn accept_json_returns_json() {
     assert_eq!(status, StatusCode::OK);
     let json: serde_json::Value = serde_json::from_str(&body).unwrap();
     assert_eq!(json["ip"], "45.77.77.77");
+}
+
+#[tokio::test]
+async fn accept_json_q_zero_does_not_return_json() {
+    let app = build_test_app();
+    let response = get_response(
+        &app,
+        "/",
+        vec![
+            ("Accept", "application/json; q = 0,text/html; q = 1"),
+            ("CF-Connecting-IP", "45.77.77.77"),
+        ],
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
 }
 
 // The root path for browser requests now redirects to /{lang}/
@@ -640,6 +649,24 @@ async fn invalid_ip_on_field_endpoints_returns_400() {
             status,
             StatusCode::BAD_REQUEST,
             "expected 400 for {endpoint}?ip=invalid"
+        );
+    }
+}
+
+#[tokio::test]
+async fn invalid_ip_on_db_backed_field_endpoints_returns_400_when_db_not_loaded() {
+    let app = build_test_app_with_db(db::new_empty(), false);
+
+    let endpoints = [
+        "/asn", "/org", "/country", "/city", "/proxy", "/vpn", "/hosting", "/tor",
+    ];
+    for endpoint in endpoints {
+        let uri = format!("{endpoint}?ip=invalid");
+        let (status, _) = get(&app, &uri).await;
+        assert_eq!(
+            status,
+            StatusCode::BAD_REQUEST,
+            "expected validation to run before readiness check for {endpoint}"
         );
     }
 }

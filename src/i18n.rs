@@ -262,27 +262,43 @@ pub fn negotiate_locale(headers: &HeaderMap) -> Locale {
         None => return Locale::En,
     };
 
-    let mut candidates: Vec<(&str, f32)> = Vec::new();
+    let mut best_locale = None;
+    let mut best_quality = 0.0_f32;
 
     for part in accept.split(',') {
-        let part = part.trim();
-        if let Some((lang, q_part)) = part.split_once(";q=") {
-            let quality: f32 = q_part.trim().parse().unwrap_or(0.0);
-            candidates.push((lang.trim(), quality));
-        } else {
-            candidates.push((part, 1.0));
+        let (tag, quality) = parse_accept_language_part(part);
+        if quality <= 0.0 || quality <= best_quality {
+            continue;
         }
-    }
-
-    candidates.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
-
-    for (tag, _) in &candidates {
         if let Some(locale) = match_language_tag(tag) {
-            return locale;
+            best_locale = Some(locale);
+            best_quality = quality;
         }
     }
 
-    Locale::En
+    best_locale.unwrap_or(Locale::En)
+}
+
+fn parse_accept_language_part(part: &str) -> (&str, f32) {
+    let mut pieces = part.split(';');
+    let tag = pieces.next().unwrap_or_default().trim();
+    let mut quality = 1.0;
+
+    for param in pieces {
+        let param = param.trim();
+        if let Some((name, value)) = param.split_once('=')
+            && name.trim().eq_ignore_ascii_case("q")
+        {
+            quality = value
+                .trim()
+                .parse::<f32>()
+                .ok()
+                .filter(|q| (0.0..=1.0).contains(q))
+                .unwrap_or(0.0);
+        }
+    }
+
+    (tag, quality)
 }
 
 fn match_language_tag(tag: &str) -> Option<Locale> {
@@ -414,6 +430,23 @@ mod tests {
             "en;q=0.5,de;q=0.9,fr;q=0.7".parse().unwrap(),
         );
         assert_eq!(negotiate_locale(&headers), Locale::De);
+    }
+
+    #[test]
+    fn negotiate_locale_ignores_zero_quality() {
+        let mut headers = HeaderMap::new();
+        headers.insert("Accept-Language", "de;q=0,en;q=0.8".parse().unwrap());
+        assert_eq!(negotiate_locale(&headers), Locale::En);
+    }
+
+    #[test]
+    fn negotiate_locale_accepts_spaced_quality_param() {
+        let mut headers = HeaderMap::new();
+        headers.insert(
+            "Accept-Language",
+            "en; q = 0.5, fr; q = 0.8".parse().unwrap(),
+        );
+        assert_eq!(negotiate_locale(&headers), Locale::Fr);
     }
 
     #[test]

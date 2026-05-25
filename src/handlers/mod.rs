@@ -7,7 +7,7 @@ mod seo;
 use std::net::IpAddr;
 use std::sync::Arc;
 
-use axum::http::HeaderMap;
+use axum::http::{HeaderMap, header};
 use axum::response::{IntoResponse, Response};
 
 use crate::db::{self, SharedDb};
@@ -83,7 +83,9 @@ fn lookup_ip(db: &SharedDb, ip: IpAddr) -> Result<IpInfo, AppError> {
     if !db::is_ready(db) {
         return Err(AppError::DbNotReady);
     }
-    db::lookup(db, ip).ok_or(AppError::DbLookupFailed)
+    db::lookup(db, ip)
+        .map_err(|_| AppError::DbLookupFailed)?
+        .ok_or(AppError::IpNotFound)
 }
 
 fn handle_non_browser_request(
@@ -118,9 +120,35 @@ fn handle_non_browser_request(
 
 fn wants_json(headers: &HeaderMap) -> bool {
     headers
-        .get("Accept")
+        .get(header::ACCEPT)
         .and_then(|v| v.to_str().ok())
-        .is_some_and(|v| v.contains("application/json"))
+        .is_some_and(accepts_application_json)
+}
+
+fn accepts_application_json(accept: &str) -> bool {
+    accept.split(',').any(|part| {
+        let mut pieces = part.split(';');
+        let media_type = pieces.next().unwrap_or_default().trim();
+        if !media_type.eq_ignore_ascii_case("application/json") {
+            return false;
+        }
+
+        let mut quality = 1.0;
+        for param in pieces {
+            let param = param.trim();
+            if let Some((name, value)) = param.split_once('=')
+                && name.trim().eq_ignore_ascii_case("q")
+            {
+                quality = value
+                    .trim()
+                    .parse::<f32>()
+                    .ok()
+                    .filter(|q| (0.0..=1.0).contains(q))
+                    .unwrap_or(0.0);
+            }
+        }
+        quality > 0.0
+    })
 }
 
 fn append_ip_query(path: &mut String, query: &IpQuery) {
