@@ -64,7 +64,7 @@ This triggers the full pipeline. Monitor progress under the **Actions** tab in t
 
 ### Infrastructure Details
 
-- **VPS**: Vultr Regular Performance (`vc2-1c-1gb`), Debian 13, region `dfw` (Dallas)
+- **VPS**: Vultr High Frequency (`vhf-1c-1gb`, 1 vCPU / 1 GB), Debian 13, region `sjc` (Silicon Valley)
 - **Firewall**: SSH open, HTTPS restricted to Cloudflare IP ranges
 - **Deployment**: Blue-green with HAProxy traffic switching
 - **First deploy**: Automatically applies base OS hardening (UFW, fail2ban, sysctl tuning) and installs Docker

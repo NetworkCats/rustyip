@@ -12,13 +12,13 @@ variable "ssh_public_key" {
 variable "region" {
   description = "Vultr region ID"
   type        = string
-  default     = "dfw"
+  default     = "sjc"
 }
 
 variable "plan" {
-  description = "Vultr plan ID (Regular Performance 1 vCPU / 1 GB)"
+  description = "Vultr plan ID (High Frequency 1 vCPU / 1 GB)"
   type        = string
-  default     = "vc2-1c-1gb"
+  default     = "vhf-1c-1gb"
 }
 
 variable "os_id" {
