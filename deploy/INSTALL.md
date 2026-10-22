@@ -65,7 +65,8 @@ This triggers the full pipeline. Monitor progress under the **Actions** tab in t
 ### Infrastructure Details
 
 - **VPS**: Vultr High Frequency (`vhf-1c-1gb`, 1 vCPU / 1 GB), Debian 13, region `sjc` (Silicon Valley)
-- **Firewall**: SSH open, HTTPS restricted to Cloudflare IP ranges
+- **Firewall**: Vultr opens SSH and HTTPS; on the host, UFW limits HTTPS to Cloudflare's IPv4 ranges, refreshed daily by `ufw-cloudflare-sync.timer` (Docker-published ports are filtered via the `DOCKER-USER` chain)
 - **Deployment**: Blue-green with HAProxy traffic switching
 - **First deploy**: Automatically applies base OS hardening (UFW, fail2ban, sysctl tuning) and installs Docker
-- **Subsequent deploys**: Only the application container is updated via blue-green swap
+- **Subsequent deploys**: The firewall rules are re-applied and the application container is updated via blue-green swap
+- **Rotating the SSH key**: Updating `SSH_PUBLIC_KEY`/`SSH_PRIVATE_KEY` rebuilds the instance on the next deploy (new IP; update DNS afterwards)

@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily sync of UFW rules with Cloudflare IP ranges
+
+[Timer]
+OnCalendar=daily
+RandomizedDelaySec=1h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -2,6 +2,8 @@ services:
   haproxy:
     image: haproxy:3.3.4-alpine3.23
     container_name: rustyip-haproxy
+    # The host firewall matches the container-side port after Docker's DNAT,
+    # so HTTPS must stay published as 443:443 for the Cloudflare allow rules.
     ports:
       - "80:80"
       - "443:443"

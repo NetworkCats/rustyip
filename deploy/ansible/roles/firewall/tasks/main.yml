@@ -1,0 +1,73 @@
+---
+# Restrict HTTPS to Cloudflare at the host. The Vultr firewall only opens the
+# port; this role decides who may use it. Runs on every deploy so existing
+# hosts pick up changes, and must succeed before HAProxy serves traffic,
+# because HAProxy trusts CF-Connecting-IP from anything that reaches it.
+
+- name: Route Docker-published traffic through UFW route rules
+  ansible.builtin.blockinfile:
+    path: /etc/ufw/after.rules
+    marker: "# {mark} UFW AND DOCKER (managed by ansible)"
+    block: "{{ lookup('ansible.builtin.file', 'after.rules-docker') }}"
+    insertafter: EOF
+  register: ufw_docker_rules
+
+- name: Ensure UFW is enabled
+  community.general.ufw:
+    state: enabled
+
+- name: Reload UFW to apply Docker rules
+  ansible.builtin.command: ufw reload
+  when: ufw_docker_rules.changed
+  changed_when: true
+
+- name: Install Cloudflare IP sync script
+  ansible.builtin.copy:
+    src: ufw-cloudflare-sync
+    dest: /usr/local/sbin/ufw-cloudflare-sync
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install Cloudflare IP sync systemd units
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - ufw-cloudflare-sync.service
+    - ufw-cloudflare-sync.timer
+  notify: Reload systemd
+
+- name: Apply systemd unit changes before enabling the timer
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable daily Cloudflare IP sync
+  ansible.builtin.systemd:
+    name: ufw-cloudflare-sync.timer
+    enabled: true
+    state: started
+
+- name: Sync Cloudflare IP ranges now
+  ansible.builtin.command: /usr/local/sbin/ufw-cloudflare-sync
+  register: cloudflare_sync
+  changed_when: "'added: 0, removed: 0' not in cloudflare_sync.stdout"
+
+# Fail the deploy rather than serve traffic from an unfiltered origin.
+- name: Verify Docker traffic is filtered to Cloudflare
+  ansible.builtin.shell: |
+    set -e
+    iptables -S FORWARD | grep -q -- '-j DOCKER-USER' \
+      || { echo "FORWARD does not jump to DOCKER-USER"; exit 1; }
+    first=$(iptables -S DOCKER-USER | sed -n 2p)
+    [ "$first" = "-A DOCKER-USER -j ufw-user-forward" ] \
+      || { echo "DOCKER-USER does not start with ufw-user-forward: $first"; exit 1; }
+    iptables -S DOCKER-USER | grep -q -- '-d 172.16.0.0/12 .*-j ufw-docker-logging-deny' \
+      || { echo "DOCKER-USER is missing the default deny"; exit 1; }
+    allowed=$(iptables -S ufw-user-forward | grep -c -- '--dport 443 -j ACCEPT' || true)
+    [ "$allowed" -ge 10 ] \
+      || { echo "only $allowed Cloudflare ranges allowed on 443"; exit 1; }
+    echo "ok: $allowed Cloudflare ranges allowed on 443"
+  changed_when: false

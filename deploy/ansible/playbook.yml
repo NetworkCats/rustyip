@@ -22,4 +22,6 @@
       when: first_deploy | bool
     - role: docker
       when: first_deploy | bool
+    # Runs on every deploy, and before app so HAProxy never serves unfiltered.
+    - role: firewall
     - role: app

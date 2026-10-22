@@ -1,0 +1,50 @@
+#!/bin/sh
+# Keep UFW route rules allowing Cloudflare's IPv4 ranges to reach HTTPS (443)
+# in sync with https://www.cloudflare.com/ips-v4. HAProxy's port is published
+# by Docker, so these are `ufw route` rules (evaluated from the DOCKER-USER
+# chain, see /etc/ufw/after.rules) rather than plain `ufw allow` rules.
+#
+# Runs from ufw-cloudflare-sync.timer and on every deploy. On any fetch or
+# validation failure it exits non-zero without touching the existing rules.
+set -eu
+
+URL="https://www.cloudflare.com/ips-v4"
+PORT=443
+COMMENT=cloudflare
+# Cloudflare publishes ~15 IPv4 ranges; far fewer means a bad response.
+MIN_RANGES=10
+
+fetched=$(curl -fsS --retry 3 --retry-delay 5 --max-time 30 "$URL")
+desired=$(printf '%s\n' "$fetched" | tr -d '\r' | sed '/^[[:space:]]*$/d' | sort -u)
+
+count=$(printf '%s\n' "$desired" | grep -c . || true)
+if [ "$count" -lt "$MIN_RANGES" ]; then
+    echo "refusing to sync: only $count ranges in $URL" >&2
+    exit 1
+fi
+if printf '%s\n' "$desired" | grep -Evq '^([0-9]{1,3}\.){3}[0-9]{1,3}/([0-9]|[12][0-9]|3[0-2])$'; then
+    echo "refusing to sync: unexpected entry in $URL" >&2
+    exit 1
+fi
+
+current=$(ufw show added \
+    | sed -n "s|^ufw route allow from \([0-9./]*\) to any port $PORT proto tcp comment '$COMMENT'\$|\1|p" \
+    | sort -u)
+
+added=0
+removed=0
+# Add new ranges before removing stale ones so allowed traffic is never cut off.
+for cidr in $desired; do
+    if ! printf '%s\n' "$current" | grep -qxF "$cidr"; then
+        ufw route allow proto tcp from "$cidr" to any port "$PORT" comment "$COMMENT" >/dev/null
+        added=$((added + 1))
+    fi
+done
+for cidr in $current; do
+    if ! printf '%s\n' "$desired" | grep -qxF "$cidr"; then
+        ufw route delete allow proto tcp from "$cidr" to any port "$PORT" comment "$COMMENT" >/dev/null
+        removed=$((removed + 1))
+    fi
+done
+
+echo "cloudflare ranges: $count, added: $added, removed: $removed"
