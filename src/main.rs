@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use axum::ServiceExt as _;
 use tokio_util::sync::CancellationToken;
 use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
@@ -84,7 +85,7 @@ async fn main() {
 
     info!("listening on {}", config.listen_addr);
 
-    axum::serve(listener, app)
+    axum::serve(listener, app.into_make_service())
         .with_graceful_shutdown(shutdown_signal())
         .await
         .expect("server error");

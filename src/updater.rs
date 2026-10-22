@@ -47,7 +47,7 @@ pub async fn init_db(
         }
         download_db(update_url, db_path).await?
     };
-    shared_db.store(Arc::new(Some(reader)));
+    shared_db.store(Arc::new(Some(reader.into())));
     info!("database loaded successfully");
     Ok(())
 }
@@ -190,7 +190,7 @@ async fn update_db(
     update_url: &str,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let reader = download_db(update_url, db_path).await?;
-    shared_db.store(Arc::new(Some(reader)));
+    shared_db.store(Arc::new(Some(reader.into())));
     let size = fs::metadata(db_path)
         .await
         .ok()
@@ -384,7 +384,7 @@ mod tests {
 
         // Load a new reader and manually swap it to verify the mechanism
         let new_reader = load_db(&dest).unwrap();
-        shared_db.store(Arc::new(Some(new_reader)));
+        shared_db.store(Arc::new(Some(new_reader.into())));
 
         // Verify the shared DB still works after the swap
         let guard = shared_db.load();

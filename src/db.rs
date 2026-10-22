@@ -1,28 +1,79 @@
 //! MaxMind MMDB database loading, shared state, and lookup functions.
 
 use std::net::IpAddr;
+use std::ops::Deref;
 use std::path::Path;
 use std::sync::Arc;
 
 use arc_swap::ArcSwap;
 use maxminddb::{MaxMindDbError, PathElement, Reader};
+use quick_cache::Weighter;
+use quick_cache::sync::Cache;
 use serde::Deserialize;
 
 use crate::models::{
-    IpInfo, MmdbProxy, MmdbRecord, PageInfo, ProxyInfo, from_mmdb_record,
-    serialize_mmdb_record_json,
+    IpInfo, MmdbProxy, MmdbRecord, PageInfo, ProxyInfo, from_mmdb_record, json_with_ip,
+    serialize_mmdb_record_fields,
 };
 
 pub type DbReader = Reader<Vec<u8>>;
-pub type SharedDb = Arc<ArcSwap<Option<DbReader>>>;
+pub type SharedDb = Arc<ArcSwap<Option<LoadedDb>>>;
 pub type LookupOutcome<T> = Result<Option<T>, MaxMindDbError>;
+
+/// Memory budget for cached `/json` bodies. Production runs on a 1 GB host
+/// that already holds the MMDB (twice, briefly, during an update).
+const JSON_CACHE_BYTES: u64 = 16 * 1024 * 1024;
+const JSON_CACHE_ESTIMATED_ITEMS: usize = 16 * 1024;
+/// Approximate per-entry bookkeeping cost charged on top of the body length.
+const JSON_CACHE_ENTRY_OVERHEAD: u64 = 64;
+
+type JsonCache = Cache<usize, Arc<[u8]>, JsonCacheWeighter>;
+
+#[derive(Clone)]
+struct JsonCacheWeighter;
+
+impl Weighter<usize, Arc<[u8]>> for JsonCacheWeighter {
+    fn weight(&self, _offset: &usize, fields: &Arc<[u8]>) -> u64 {
+        fields.len() as u64 + JSON_CACHE_ENTRY_OVERHEAD
+    }
+}
+
+/// A loaded database plus caches derived from it. The cache lives and dies
+/// with its reader, so swapping in an updated database never serves stale data.
+pub struct LoadedDb {
+    reader: DbReader,
+    /// Serialized `/json` fields keyed by MMDB data-section offset. Many IPs
+    /// share one record, so the expensive decode + serialize runs once per record.
+    json_cache: JsonCache,
+}
+
+impl From<DbReader> for LoadedDb {
+    fn from(reader: DbReader) -> Self {
+        Self {
+            reader,
+            json_cache: Cache::with_weighter(
+                JSON_CACHE_ESTIMATED_ITEMS,
+                JSON_CACHE_BYTES,
+                JsonCacheWeighter,
+            ),
+        }
+    }
+}
+
+impl Deref for LoadedDb {
+    type Target = DbReader;
+
+    fn deref(&self) -> &DbReader {
+        &self.reader
+    }
+}
 
 pub fn load_db(path: &Path) -> Result<DbReader, maxminddb::MaxMindDbError> {
     Reader::open_readfile(path)
 }
 
 pub fn new_shared(reader: DbReader) -> SharedDb {
-    Arc::new(ArcSwap::from_pointee(Some(reader)))
+    Arc::new(ArcSwap::from_pointee(Some(reader.into())))
 }
 
 pub fn new_empty() -> SharedDb {
@@ -43,12 +94,26 @@ pub fn lookup(db: &SharedDb, ip: IpAddr) -> LookupOutcome<IpInfo> {
 }
 
 pub fn lookup_json(db: &SharedDb, ip: IpAddr) -> LookupOutcome<Vec<u8>> {
-    with_reader(db, ip, |result| {
-        let Some(record) = result.decode::<MmdbRecord<'_>>()? else {
-            return Ok(None);
-        };
-        Ok(Some(serialize_mmdb_record_json(ip, &record)))
-    })
+    let guard = db.load();
+    let Some(loaded) = Option::as_ref(&guard) else {
+        return Ok(None);
+    };
+    let result = loaded.reader.lookup(ip)?;
+    let Some(offset) = result.offset() else {
+        return Ok(None);
+    };
+    let fields = match loaded.json_cache.get(&offset) {
+        Some(fields) => fields,
+        None => {
+            let Some(record) = result.decode::<MmdbRecord<'_>>()? else {
+                return Ok(None);
+            };
+            let fields: Arc<[u8]> = serialize_mmdb_record_fields(&record).into();
+            loaded.json_cache.insert(offset, Arc::clone(&fields));
+            fields
+        }
+    };
+    Ok(Some(json_with_ip(ip, &fields)))
 }
 
 /// Loads the shared reader, performs a lookup, and passes the raw lookup result
@@ -305,6 +370,33 @@ mod tests {
         let expected = serde_json::to_value(info).unwrap();
         let actual: serde_json::Value = serde_json::from_slice(&json).unwrap();
         assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn lookup_json_cached_fields_keep_per_ip_address() {
+        let shared = test_shared_db();
+        let first: IpAddr = "45.77.77.77".parse().unwrap();
+        let second: IpAddr = "45.77.77.78".parse().unwrap();
+        {
+            let guard = shared.load();
+            let reader = Option::as_ref(&guard).unwrap();
+            assert_eq!(
+                reader.lookup(first).unwrap().offset(),
+                reader.lookup(second).unwrap().offset(),
+                "test IPs must share an MMDB record to exercise the cache"
+            );
+        }
+
+        let uncached = lookup_json(&shared, first).unwrap().unwrap();
+        let cached = lookup_json(&shared, first).unwrap().unwrap();
+        assert_eq!(cached, uncached);
+
+        let mut other: serde_json::Value =
+            serde_json::from_slice(&lookup_json(&shared, second).unwrap().unwrap()).unwrap();
+        assert_eq!(other["ip"], "45.77.77.78");
+        other["ip"] = "45.77.77.77".into();
+        let first_json: serde_json::Value = serde_json::from_slice(&uncached).unwrap();
+        assert_eq!(other, first_json);
     }
 
     #[test]

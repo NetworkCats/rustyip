@@ -1,12 +1,16 @@
 //! Axum router construction with host-based routing for IPv4 and main domains.
 
+use std::convert::Infallible;
 use std::sync::Arc;
+use std::task::{Context, Poll};
 
 use axum::Router;
-use axum::middleware;
-use axum::response::IntoResponse;
+use axum::body::Body;
+use axum::http::{Request, header};
+use axum::response::Response;
 use axum::routing::get;
-use tower::ServiceExt as _;
+use tower::Service;
+use tower::util::MapResponseLayer;
 
 use crate::handlers::{self, AppState};
 use crate::middleware::{ipv4_domain_security_headers, security_headers};
@@ -35,7 +39,7 @@ fn build_main_router(state: AppState) -> Router {
         .route("/{lang}", get(handlers::root))
         .route("/{lang}/", get(handlers::root_trailing_slash))
         .fallback(handlers::not_found)
-        .layer(middleware::from_fn(security_headers))
+        .layer(MapResponseLayer::new(security_headers))
         .with_state(state)
 }
 
@@ -44,39 +48,57 @@ fn build_ipv4_router(state: AppState) -> Router {
         .route("/", get(handlers::ipv4_ip_handler))
         .route("/health", get(handlers::health))
         .fallback(handlers::ipv4_not_found)
-        .layer(middleware::from_fn(ipv4_domain_security_headers))
+        .layer(MapResponseLayer::new(ipv4_domain_security_headers))
         .with_state(state)
 }
 
-pub fn build_router(state: AppState) -> Router {
-    let ipv4_domain: Arc<str> = state.ipv4_domain.clone();
-    let main_router = build_main_router(state.clone());
-    let ipv4_router = build_ipv4_router(state);
+/// Dispatches each request to the IPv4-only router or the main router based
+/// on its `Host` header. Implemented as a plain service rather than an outer
+/// `Router` so requests skip a second round of route matching and boxing.
+#[derive(Clone)]
+pub struct HostRouter {
+    ipv4_domain: Arc<str>,
+    main_router: Router,
+    ipv4_router: Router,
+}
 
-    let svc = tower::service_fn(move |req: axum::http::Request<axum::body::Body>| {
-        let ipv4_domain = ipv4_domain.clone();
-        let main_router = main_router.clone();
-        let ipv4_router = ipv4_router.clone();
-        async move {
-            let is_ipv4_domain = !ipv4_domain.is_empty()
-                && req
-                    .headers()
-                    .get("host")
-                    .and_then(|v| v.to_str().ok())
-                    .is_some_and(|host| {
-                        let host = host.split(':').next().unwrap_or(host);
-                        host.eq_ignore_ascii_case(&ipv4_domain)
-                    });
+impl HostRouter {
+    fn is_ipv4_domain<B>(&self, req: &Request<B>) -> bool {
+        !self.ipv4_domain.is_empty()
+            && req
+                .headers()
+                .get(header::HOST)
+                .and_then(|v| v.to_str().ok())
+                .is_some_and(|host| {
+                    let host = host.split(':').next().unwrap_or(host);
+                    host.eq_ignore_ascii_case(&self.ipv4_domain)
+                })
+    }
+}
 
-            // Router<()> is an infallible service; unwrap is safe.
-            let response = if is_ipv4_domain {
-                ipv4_router.oneshot(req).await.into_response()
-            } else {
-                main_router.oneshot(req).await.into_response()
-            };
-            Ok::<_, std::convert::Infallible>(response)
+impl Service<Request<Body>> for HostRouter {
+    type Response = Response;
+    type Error = Infallible;
+    type Future = <Router as Service<Request<Body>>>::Future;
+
+    fn poll_ready(&mut self, _cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+        // Router<()> is always ready.
+        Poll::Ready(Ok(()))
+    }
+
+    fn call(&mut self, req: Request<Body>) -> Self::Future {
+        if self.is_ipv4_domain(&req) {
+            self.ipv4_router.call(req)
+        } else {
+            self.main_router.call(req)
         }
-    });
+    }
+}
 
-    Router::new().fallback_service(svc)
+pub fn build_router(state: AppState) -> HostRouter {
+    HostRouter {
+        ipv4_domain: state.ipv4_domain.clone(),
+        main_router: build_main_router(state.clone()),
+        ipv4_router: build_ipv4_router(state),
+    }
 }

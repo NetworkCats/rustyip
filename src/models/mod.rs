@@ -3,7 +3,8 @@
 pub mod api;
 pub mod mmdb;
 
-use std::fmt::Write;
+use std::fmt::Write as _;
+use std::io::Write as _;
 use std::net::IpAddr;
 
 use serde::Serialize;
@@ -14,9 +15,10 @@ pub(crate) use mmdb::*;
 
 // --- Conversion from MMDB record to API output ---
 
+/// Every `/json` field except `ip`. It depends only on the MMDB record, so its
+/// serialized form can be cached per record and shared by all IPs mapping to it.
 #[derive(Serialize)]
-struct JsonIpInfo<'a> {
-    ip: String,
+struct JsonRecordFields<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     city: Option<JsonCityInfo<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -146,7 +148,7 @@ fn json_ip_string(ip: IpAddr) -> String {
     ip_str
 }
 
-fn json_record<'a>(ip: IpAddr, record: &MmdbRecord<'a>) -> JsonIpInfo<'a> {
+fn json_record<'a>(record: &MmdbRecord<'a>) -> JsonRecordFields<'a> {
     let city = if has_city(&record.city) {
         Some(JsonCityInfo {
             geoname_id: record.city.geoname_id,
@@ -232,8 +234,7 @@ fn json_record<'a>(ip: IpAddr, record: &MmdbRecord<'a>) -> JsonIpInfo<'a> {
         None
     };
 
-    JsonIpInfo {
-        ip: json_ip_string(ip),
+    JsonRecordFields {
         city,
         continent,
         country,
@@ -246,9 +247,27 @@ fn json_record<'a>(ip: IpAddr, record: &MmdbRecord<'a>) -> JsonIpInfo<'a> {
     }
 }
 
-pub fn serialize_mmdb_record_json(ip: IpAddr, record: &MmdbRecord<'_>) -> Vec<u8> {
-    serde_json::to_vec(&json_record(ip, record))
-        .expect("serializing MMDB lookup response cannot fail")
+/// Serializes the IP-independent part of a `/json` response as a JSON object.
+/// Combine it with an address via [`json_with_ip`].
+pub fn serialize_mmdb_record_fields(record: &MmdbRecord<'_>) -> Vec<u8> {
+    // Sized for a typical fully populated record to avoid regrowing the buffer.
+    let mut buf = Vec::with_capacity(1536);
+    serde_json::to_writer(&mut buf, &json_record(record))
+        .expect("serializing MMDB lookup response cannot fail");
+    buf
+}
+
+/// Builds the full `/json` body by prepending the `ip` field to the object
+/// produced by [`serialize_mmdb_record_fields`].
+pub fn json_with_ip(ip: IpAddr, fields: &[u8]) -> Vec<u8> {
+    // `proxy` is always serialized, so the object is never empty and the
+    // bytes after its opening brace start with the next field.
+    debug_assert!(fields.starts_with(b"{\""));
+    let mut buf = Vec::with_capacity(fields.len() + 48);
+    // IP address text never contains characters that need JSON escaping.
+    write!(buf, "{{\"ip\":\"{ip}\",").expect("writing to a Vec cannot fail");
+    buf.extend_from_slice(&fields[1..]);
+    buf
 }
 
 fn convert_names(names: &MmdbNames<'_>) -> Option<Names> {

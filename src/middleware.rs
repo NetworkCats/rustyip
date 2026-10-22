@@ -1,12 +1,10 @@
-//! Axum middleware for applying security headers to responses.
+//! Response mappers that apply security headers. They are installed with
+//! `tower::util::MapResponseLayer`, which wraps the inner future without boxing it.
 
-use axum::extract::Request;
 use axum::http::header::{self, HeaderValue};
-use axum::middleware::Next;
 use axum::response::Response;
 
-pub async fn security_headers(request: Request, next: Next) -> Response {
-    let mut response = next.run(request).await;
+pub fn security_headers(mut response: Response) -> Response {
     apply_common_security_headers(response.headers_mut());
     response.headers_mut().insert(
         header::HeaderName::from_static("cross-origin-opener-policy"),
@@ -19,8 +17,7 @@ pub async fn security_headers(request: Request, next: Next) -> Response {
     response
 }
 
-pub async fn ipv4_domain_security_headers(request: Request, next: Next) -> Response {
-    let mut response = next.run(request).await;
+pub fn ipv4_domain_security_headers(mut response: Response) -> Response {
     apply_common_security_headers(response.headers_mut());
     response.headers_mut().insert(
         header::HeaderName::from_static("cross-origin-resource-policy"),
@@ -30,6 +27,9 @@ pub async fn ipv4_domain_security_headers(request: Request, next: Next) -> Respo
 }
 
 fn apply_common_security_headers(headers: &mut axum::http::HeaderMap) {
+    // Room for the common headers plus the per-domain ones, so the map grows
+    // at most once instead of rehashing repeatedly while headers are added.
+    headers.reserve(8);
     headers.insert(
         header::X_CONTENT_TYPE_OPTIONS,
         HeaderValue::from_static("nosniff"),

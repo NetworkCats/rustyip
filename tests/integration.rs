@@ -6,7 +6,7 @@ use tower::ServiceExt;
 
 use rustyip::db;
 use rustyip::handlers::{AppState, build_openapi_json};
-use rustyip::routes::build_router;
+use rustyip::routes::{HostRouter, build_router};
 
 fn test_db_path() -> String {
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
@@ -17,17 +17,17 @@ fn test_db_path() -> String {
     path
 }
 
-fn build_test_app() -> axum::Router {
+fn build_test_app() -> HostRouter {
     build_test_app_with_dev_mode(false)
 }
 
-fn build_test_app_with_dev_mode(dev_mode: bool) -> axum::Router {
+fn build_test_app_with_dev_mode(dev_mode: bool) -> HostRouter {
     let reader = db::load_db(Path::new(&test_db_path())).expect("failed to load test DB");
     let shared_db = db::new_shared(reader);
     build_test_app_with_db(shared_db, dev_mode)
 }
 
-fn build_test_app_with_db(shared_db: db::SharedDb, dev_mode: bool) -> axum::Router {
+fn build_test_app_with_db(shared_db: db::SharedDb, dev_mode: bool) -> HostRouter {
     let site_domain: std::sync::Arc<str> = "test.example.com".into();
     let openapi_json = build_openapi_json(&site_domain);
     let ipv4_domain: std::sync::Arc<str> = "noipv6.test.example.com".into();
@@ -41,12 +41,12 @@ fn build_test_app_with_db(shared_db: db::SharedDb, dev_mode: bool) -> axum::Rout
     build_router(state)
 }
 
-async fn get(app: &axum::Router, uri: &str) -> (StatusCode, String) {
+async fn get(app: &HostRouter, uri: &str) -> (StatusCode, String) {
     get_with_headers(app, uri, vec![]).await
 }
 
 async fn get_with_headers(
-    app: &axum::Router,
+    app: &HostRouter,
     uri: &str,
     headers: Vec<(&str, &str)>,
 ) -> (StatusCode, String) {
@@ -63,7 +63,7 @@ async fn get_with_headers(
 }
 
 async fn get_response(
-    app: &axum::Router,
+    app: &HostRouter,
     uri: &str,
     headers: Vec<(&str, &str)>,
 ) -> axum::http::Response<axum::body::Body> {

@@ -7,6 +7,8 @@ mod seo;
 use std::net::IpAddr;
 use std::sync::Arc;
 
+use axum::extract::{FromRequestParts, Query};
+use axum::http::request::Parts;
 use axum::http::{HeaderMap, header};
 use axum::response::{IntoResponse, Response};
 
@@ -52,6 +54,23 @@ fn resolve_ip(headers: &HeaderMap, query: &IpQuery, dev_mode: bool) -> Result<Ip
         }
     }
     extract_client_ip(headers, dev_mode)
+}
+
+/// The address an API request asks about: the `ip` query parameter when set,
+/// otherwise the client address. Reads the request headers in place, avoiding
+/// the full copy the `HeaderMap` extractor makes on every request.
+pub struct RequestedIp(pub IpAddr);
+
+impl FromRequestParts<AppState> for RequestedIp {
+    type Rejection = Response;
+
+    async fn from_request_parts(parts: &mut Parts, state: &AppState) -> Result<Self, Response> {
+        let Query(query) =
+            Query::<IpQuery>::try_from_uri(&parts.uri).map_err(IntoResponse::into_response)?;
+        resolve_ip(&parts.headers, &query, state.dev_mode)
+            .map(Self)
+            .map_err(IntoResponse::into_response)
+    }
 }
 
 fn extract_ip_from_header(
