@@ -41,11 +41,14 @@
     mode: "0644"
   notify: Restart docker
 
+# daemon_reload picks up the LimitNOFILE override below if it is already on
+# disk; without it Docker cannot start once base lowers fs.nr_open.
 - name: Ensure Docker is enabled and running
   ansible.builtin.systemd:
     name: docker
     enabled: true
     state: started
+    daemon_reload: true
 
 - name: Configure Docker systemd override for unlimited file descriptors
   ansible.builtin.file:

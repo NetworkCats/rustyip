@@ -39,16 +39,15 @@
   loop:
     - ufw-cloudflare-sync.service
     - ufw-cloudflare-sync.timer
-  notify: Reload systemd
 
-- name: Apply systemd unit changes before enabling the timer
-  ansible.builtin.meta: flush_handlers
-
+# Reload here rather than via a handler: flushing handlers mid-play would also
+# run other roles' pending handlers (e.g. restarting Docker) out of order.
 - name: Enable daily Cloudflare IP sync
   ansible.builtin.systemd:
     name: ufw-cloudflare-sync.timer
     enabled: true
     state: started
+    daemon_reload: true
 
 - name: Sync Cloudflare IP ranges now
   ansible.builtin.command: /usr/local/sbin/ufw-cloudflare-sync
