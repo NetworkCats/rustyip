@@ -68,6 +68,25 @@
     enabled: true
     state: started
 
+# --- SSH Hardening ---
+
+# Key-only logins. Named 10-* so sshd reads it before cloud-init's
+# 50-cloud-init.conf, which turns password logins on; sshd keeps the first
+# value it sees for each option. The Vultr web console still accepts the
+# root password if the key is ever lost.
+- name: Disable SSH password authentication
+  ansible.builtin.copy:
+    dest: /etc/ssh/sshd_config.d/10-rustyip.conf
+    content: |
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      PermitRootLogin prohibit-password
+    owner: root
+    group: root
+    mode: "0644"
+    validate: /usr/sbin/sshd -t -f %s
+  notify: Reload ssh
+
 # --- Kernel Tuning ---
 
 - name: Deploy sysctl tuning configuration

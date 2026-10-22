@@ -10,5 +10,5 @@ bantime   = 3600
 banaction         = iptables-multiport
 banaction_allports = iptables-allports
 
-logpath   = /var/log/auth.log
-backend   = auto
+# Debian 13 logs to the journal only (no rsyslog, so no /var/log/auth.log)
+backend   = systemd

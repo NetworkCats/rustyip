@@ -48,7 +48,9 @@ net.ipv4.tcp_max_tw_buckets = 65536
 
 # File descriptor limits (reduced for 1 GB RAM)
 fs.file-max = 65536
-fs.nr_open = 65536
+# fs.nr_open stays at the kernel default: systemd gives services a hard
+# NOFILE limit of 524288, and lowering nr_open below that makes every
+# service without its own LimitNOFILE fail to (re)start (205/LIMITS).
 
 # VM tuning (increased swappiness slightly for 1 GB RAM)
 vm.swappiness = 30
