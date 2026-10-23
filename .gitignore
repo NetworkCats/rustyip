@@ -45,3 +45,6 @@ deploy/ansible/inventory.yml
 # Added by cargo
 
 /target
+
+# beeps agent skill, kept local
+.claude/skills/beeps/
