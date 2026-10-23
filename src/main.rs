@@ -7,6 +7,11 @@ use tracing_subscriber::EnvFilter;
 
 use rustyip::{config, db, handlers, routes, updater};
 
+mod alloc;
+
+#[global_allocator]
+static GLOBAL: alloc::Allocator = alloc::Allocator;
+
 #[tokio::main]
 async fn main() {
     dotenvy::dotenv().ok();
