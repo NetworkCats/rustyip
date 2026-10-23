@@ -63,12 +63,12 @@ frontend http_in
     # Track global request rate (per second)
     http-request track-sc1 str(global) table global_rate_tracking
 
-    # Tier 3: global >= 300 RPS -> limit each IP to 15 RPM
-    http-request deny deny_status 429 if { sc_http_req_rate(1,global_rate_tracking) ge 300 } { sc_http_req_rate(0) gt 15 }
-    # Tier 2: global >= 200 RPS -> limit each IP to 30 RPM
-    http-request deny deny_status 429 if { sc_http_req_rate(1,global_rate_tracking) ge 200 } { sc_http_req_rate(0) gt 30 }
-    # Tier 1: default -> limit each IP to 60 RPM
-    http-request deny deny_status 429 if { sc_http_req_rate(0) gt 60 }
+    # Tier 3: global >= 1000 RPS -> limit each IP to 30 RPM
+    http-request deny deny_status 429 if { sc_http_req_rate(1,global_rate_tracking) ge 1000 } { sc_http_req_rate(0) gt 30 }
+    # Tier 2: global >= 600 RPS -> limit each IP to 60 RPM
+    http-request deny deny_status 429 if { sc_http_req_rate(1,global_rate_tracking) ge 600 } { sc_http_req_rate(0) gt 60 }
+    # Tier 1: default -> limit each IP to 120 RPM
+    http-request deny deny_status 429 if { sc_http_req_rate(0) gt 120 }
 
     # Block /health from external access
     acl is_health path /health
@@ -115,12 +115,12 @@ frontend https_in
     # Track global request rate (per second)
     http-request track-sc1 str(global) table global_rate_tracking
 
-    # Tier 3: global >= 300 RPS -> limit each IP to 15 RPM
-    http-request deny deny_status 429 if { sc_http_req_rate(1,global_rate_tracking) ge 300 } { sc_http_req_rate(0,http_in) gt 15 }
-    # Tier 2: global >= 200 RPS -> limit each IP to 30 RPM
-    http-request deny deny_status 429 if { sc_http_req_rate(1,global_rate_tracking) ge 200 } { sc_http_req_rate(0,http_in) gt 30 }
-    # Tier 1: default -> limit each IP to 60 RPM
-    http-request deny deny_status 429 if { sc_http_req_rate(0,http_in) gt 60 }
+    # Tier 3: global >= 1000 RPS -> limit each IP to 30 RPM
+    http-request deny deny_status 429 if { sc_http_req_rate(1,global_rate_tracking) ge 1000 } { sc_http_req_rate(0,http_in) gt 30 }
+    # Tier 2: global >= 600 RPS -> limit each IP to 60 RPM
+    http-request deny deny_status 429 if { sc_http_req_rate(1,global_rate_tracking) ge 600 } { sc_http_req_rate(0,http_in) gt 60 }
+    # Tier 1: default -> limit each IP to 120 RPM
+    http-request deny deny_status 429 if { sc_http_req_rate(0,http_in) gt 120 }
 
     # Block /health from external access
     acl is_health path /health

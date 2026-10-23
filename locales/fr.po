@@ -87,8 +87,8 @@ msgstr "Envoyez une requete au point de terminaison <code>/json</code>, ou envoy
 msgid "Can I call your service programmatically?"
 msgstr "Puis-je appeler votre service de maniere programmatique ?"
 
-msgid "Sure, but please respect our rate limits. Normally it's 60 RPM, and under heavy load we may drop it to 30 or 15 RPM."
-msgstr "Bien sur, mais veuillez respecter nos limites de debit. Normalement c'est 60 RPM, et en cas de forte charge nous pouvons le reduire a 30 ou 15 RPM."
+msgid "Sure, but please respect our rate limits. Normally it's 120 RPM, and under heavy load we may drop it to 60 or 30 RPM."
+msgstr "Bien sur, mais veuillez respecter nos limites de debit. Normalement c'est 120 RPM, et en cas de forte charge nous pouvons le reduire a 60 ou 30 RPM."
 
 msgid "The API is meant for manual use or small projects. If your site uses our API to look up visitor IPs, please use a message queue so requests don't block. If your project has high traffic or needs low latency, you're better off using our open source offline database: <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. That's actually what this project uses under the hood."
 msgstr "L'API est concue pour un usage manuel ou de petits projets. Si votre site utilise notre API pour rechercher les IP des visiteurs, utilisez une file de messages pour que les requetes ne soient pas bloquees. Si votre projet a un trafic eleve ou necessite une faible latence, il vaut mieux utiliser notre base de donnees hors ligne open source : <a href=\"https://github.com/NetworkCats/Merged-IP-Data\">Merged IP Database</a>. C'est d'ailleurs ce que ce projet utilise en interne."
