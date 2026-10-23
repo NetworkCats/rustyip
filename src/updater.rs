@@ -40,7 +40,7 @@ pub async fn init_db(
     update_url: &str,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let reader = if db_path.exists() {
-        load_db(db_path)?
+        validate_db_off_runtime(db_path).await?
     } else {
         if let Some(parent) = db_path.parent() {
             fs::create_dir_all(parent).await?;
@@ -66,7 +66,7 @@ async fn download_db(
         return Err(e);
     }
 
-    let reader = match validate_db(&tmp_path) {
+    let reader = match validate_db_off_runtime(&tmp_path).await {
         Ok(r) => r,
         Err(e) => {
             let _ = fs::remove_file(&tmp_path).await;
@@ -103,6 +103,16 @@ async fn stream_to_file(
 
 fn validate_db(path: &Path) -> Result<DbReader, Box<dyn std::error::Error + Send + Sync>> {
     load_db(path).map_err(|e| e.into())
+}
+
+/// Runs `validate_db` on the blocking thread pool. It reads the whole ~100 MB
+/// file synchronously, and the 1 vCPU production host has a single runtime
+/// worker, so loading inline would stall every in-flight request meanwhile.
+async fn validate_db_off_runtime(
+    path: &Path,
+) -> Result<DbReader, Box<dyn std::error::Error + Send + Sync>> {
+    let path = path.to_owned();
+    tokio::task::spawn_blocking(move || validate_db(&path)).await?
 }
 
 pub fn spawn_updater(
