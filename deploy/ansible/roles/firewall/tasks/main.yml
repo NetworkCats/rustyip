@@ -1,6 +1,6 @@
 ---
-# Restrict HTTPS to Cloudflare at the host. The Vultr firewall only opens the
-# port; this role decides who may use it. Runs on every deploy so existing
+# Restrict HTTP and HTTPS to Cloudflare at the host. The Vultr firewall only opens the
+# ports; this role decides who may use it. Runs on every deploy so existing
 # hosts pick up changes, and must succeed before HAProxy serves traffic,
 # because HAProxy trusts CF-Connecting-IP from anything that reaches it.
 
@@ -65,8 +65,10 @@
       || { echo "DOCKER-USER does not start with ufw-user-forward: $first"; exit 1; }
     iptables -S DOCKER-USER | grep -q -- '-d 172.16.0.0/12 .*-j ufw-docker-logging-deny' \
       || { echo "DOCKER-USER is missing the default deny"; exit 1; }
-    allowed=$(iptables -S ufw-user-forward | grep -c -- '--dport 443 -j ACCEPT' || true)
-    [ "$allowed" -ge 10 ] \
-      || { echo "only $allowed Cloudflare ranges allowed on 443"; exit 1; }
-    echo "ok: $allowed Cloudflare ranges allowed on 443"
+    for port in 80 443; do
+      allowed=$(iptables -S ufw-user-forward | grep -c -- "--dport $port -j ACCEPT" || true)
+      [ "$allowed" -ge 10 ] \
+        || { echo "only $allowed Cloudflare ranges allowed on $port"; exit 1; }
+      echo "ok: $allowed Cloudflare ranges allowed on $port"
+    done
   changed_when: false

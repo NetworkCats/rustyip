@@ -24,3 +24,15 @@ resource "vultr_firewall_rule" "https_v4" {
   port              = "443"
   notes             = "Allow HTTPS; host UFW limits it to Cloudflare"
 }
+
+# HTTP is needed for clients such as `curl ip.nc.gy` without an HTTPS scheme.
+# The host UFW rules restrict this port to Cloudflare, just like HTTPS.
+resource "vultr_firewall_rule" "http_v4" {
+  firewall_group_id = vultr_firewall_group.rustyip.id
+  protocol          = "tcp"
+  ip_type           = "v4"
+  subnet            = "0.0.0.0"
+  subnet_size       = 0
+  port              = "80"
+  notes             = "Allow HTTP; host UFW limits it to Cloudflare"
+}

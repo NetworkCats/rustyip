@@ -65,8 +65,26 @@ This triggers the full pipeline. Monitor progress under the **Actions** tab in t
 ### Infrastructure Details
 
 - **VPS**: Vultr High Frequency (`vhf-1c-1gb`, 1 vCPU / 1 GB), Debian 13, region `sjc` (Silicon Valley)
-- **Firewall**: Vultr opens SSH and HTTPS; on the host, UFW limits HTTPS to Cloudflare's IPv4 ranges, refreshed daily by `ufw-cloudflare-sync.timer` (Docker-published ports are filtered via the `DOCKER-USER` chain)
+- **Firewall**: Vultr opens SSH, HTTP and HTTPS; on the host, UFW limits HTTP and HTTPS to Cloudflare's IPv4 ranges, refreshed daily by `ufw-cloudflare-sync.timer` (Docker-published ports are filtered via the `DOCKER-USER` chain)
 - **Deployment**: Blue-green with HAProxy traffic switching
 - **First deploy**: Automatically applies base OS hardening (UFW, fail2ban, sysctl tuning) and installs Docker
 - **Subsequent deploys**: The firewall rules are re-applied and the application container is updated via blue-green swap
 - **Rotating the SSH key**: Updating `SSH_PUBLIC_KEY`/`SSH_PRIVATE_KEY` rebuilds the instance on the next deploy (new IP; update DNS afterwards)
+
+### Firewall-only update (no application redeploy)
+
+After merging these changes into the default branch, open **Actions > Deploy >
+Run workflow** and select that branch. Manual runs only apply the HTTP firewall
+rule and run the Ansible `firewall` role. They reuse the existing production
+secrets and Terraform state; no release tag or local credentials are required.
+
+The saved Terraform plan is checked before applying: only creation or in-place
+update of `vultr_firewall_rule.http_v4` is allowed. Any other resource change or
+replacement aborts the run. The VPS, SSH key, Docker daemon, HAProxy and application
+containers are not redeployed. UFW rules and the daily sync script are updated
+in place, then both public HTTP and HTTPS `/ip` endpoints must return 200.
+
+This repair assumes the existing HAProxy already listens on port 80 and Docker
+publishes `80:80`, as configured in the production templates. If the final HTTP
+check fails, inspect that running configuration; the workflow deliberately does
+not recreate containers. Release-triggered runs still perform the full deployment.

@@ -1,6 +1,8 @@
 name: Deploy
 
 on:
+  # Manual runs update only firewall rules; releases still deploy the app.
+  workflow_dispatch:
   workflow_run:
     workflows: [Release]
     types: [completed]
@@ -15,7 +17,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     environment: production
     concurrency:
       group: deploy-production
@@ -25,6 +27,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Resolve image tag from release
+        if: github.event_name != 'workflow_dispatch'
         id: image
         run: |
           TAG="${{ github.event.workflow_run.head_branch }}"
@@ -48,6 +51,7 @@ jobs:
             -backend-config="endpoints={s3=\"${{ secrets.TF_STATE_ENDPOINT }}\"}"
 
       - name: Terraform apply
+        if: github.event_name != 'workflow_dispatch'
         working-directory: deploy/terraform
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.TF_STATE_ACCESS_KEY }}
@@ -56,6 +60,27 @@ jobs:
           terraform apply -auto-approve \
             -var="vultr_api_key=${{ secrets.VULTR_API_KEY }}" \
             -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
+
+      # Target only the new rule. Refuse any plan that changes other resources,
+      # including dependencies, so a manual repair cannot rebuild the VPS.
+      - name: Apply HTTP firewall rule only
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: deploy/terraform
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.TF_STATE_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_STATE_SECRET_KEY }}
+          TF_VAR_vultr_api_key: ${{ secrets.VULTR_API_KEY }}
+          TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+        run: |
+          terraform plan -input=false -out=firewall.tfplan \
+            -target=vultr_firewall_rule.http_v4
+          terraform show -json firewall.tfplan | jq -e '
+            all(.resource_changes[]?;
+              .change.actions == ["no-op"] or
+              (.address == "vultr_firewall_rule.http_v4" and
+               (.change.actions == ["create"] or .change.actions == ["update"])))
+          ' > /dev/null
+          terraform apply -input=false firewall.tfplan
 
       - name: Extract VPS IP (masked)
         id: vps
@@ -105,6 +130,7 @@ jobs:
 
       # ---- Detect first deployment ----
       - name: Detect first deployment
+        if: github.event_name != 'workflow_dispatch'
         id: detect
         run: |
           set +e
@@ -134,6 +160,7 @@ jobs:
           EOF
 
       - name: Run Ansible playbook
+        if: github.event_name != 'workflow_dispatch'
         working-directory: deploy/ansible
         env:
           APP_IMAGE: ${{ steps.image.outputs.full }}
@@ -150,8 +177,26 @@ jobs:
         run: |
           ansible-playbook -i inventory.yml playbook.yml
 
+      - name: Update host firewall only
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: deploy/ansible
+        run: ansible-playbook -i inventory.yml playbook.yml --tags firewall
+
+      - name: Verify public HTTP and HTTPS
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
+        run: |
+          for scheme in http https; do
+            code=$(curl -sS --connect-timeout 10 --max-time 40 \
+              -o /dev/null -w '%{http_code}' "$scheme://$SITE_DOMAIN/ip")
+            test "$code" = 200 || { echo "$scheme returned $code"; exit 1; }
+            echo "$scheme: 200"
+          done
+
       # ---- Verify deployment ----
       - name: Verify deployment health
+        if: github.event_name != 'workflow_dispatch'
         env:
           SSH_OPTS: -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new -i ~/.ssh/deploy_key
           VPS_HOST: root@${{ steps.vps.outputs.ip }}
