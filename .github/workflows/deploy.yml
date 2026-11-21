@@ -188,9 +188,19 @@ jobs:
           SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
         run: |
           for scheme in http https; do
-            code=$(curl -sS --connect-timeout 10 --max-time 40 \
-              -o /dev/null -w '%{http_code}' "$scheme://$SITE_DOMAIN/ip")
-            test "$code" = 200 || { echo "$scheme returned $code"; exit 1; }
+            # Allow time for the provider's firewall rules to propagate.
+            for attempt in $(seq 1 6); do
+              code=$(curl -sS --connect-timeout 10 --max-time 40 \
+                -o /dev/null -w '%{http_code}' "$scheme://$SITE_DOMAIN/ip") || code=000
+              if [ "$code" = 200 ]; then
+                break
+              fi
+              echo "$scheme attempt $attempt: HTTP $code"
+              if [ "$attempt" -eq 6 ]; then
+                exit 1
+              fi
+              sleep 10
+            done
             echo "$scheme: 200"
           done
 
